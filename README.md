@@ -14,5 +14,7 @@
 
 ## 模型
 
+模型来自以下网站，仅供学习研究使用。
+
 * https://threejs.org/
 * http://www.lolking.net/models
