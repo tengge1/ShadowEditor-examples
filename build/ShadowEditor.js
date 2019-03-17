@@ -4648,7 +4648,13 @@
 	        var promises = json.image.map(n => {
 	            return new Promise(resolve => {
 	                var img = document.createElement('img');
-	                img.src = n.src;
+
+	                if (n.src && n.src.startsWith('/')) {
+	                    img.src = server + n.src;
+	                } else {
+	                    img.src = n.src;
+	                }
+
 	                img.width = n.width;
 	                img.height = n.height;
 	                img.onload = () => {
@@ -13070,7 +13076,7 @@
 	        });
 	    }
 
-	    var scene = (new SceneSerializer()).fromJSON(sceneJson);
+	    var scene = (new SceneSerializer()).fromJSON(sceneJson, undefined, options.server);
 
 	    var serverObjects = [];
 
