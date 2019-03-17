@@ -11508,7 +11508,7 @@
 	};
 
 	SmokeSerializer.prototype.fromJSON = function (json, parent, camera, renderer) {
-	    var obj = parent || new Smoke(camera, renderer);
+	    var obj = parent || new Smoke(camera, renderer, json.userData);
 
 	    MeshSerializer.prototype.fromJSON.call(this, json, obj);
 
@@ -13319,6 +13319,7 @@
 	    this.events = Object.keys(scripts).map(uuid => {
 	        var script = scripts[uuid];
 	        return (new Function(
+	            'app',
 	            'scene',
 	            'camera',
 	            'renderer',
@@ -13338,7 +13339,7 @@
             var onResize = onResize || null;
             return { init, start, update, stop, onClick, onDblClick, onKeyDown, onKeyUp, onMouseDown, onMouseMove, onMouseUp, onMouseWheel, onResize };
             `
-	        )).call(scene, scene, camera, renderer);
+	        )).call(scene, this.app, scene, scene, camera, renderer);
 	    });
 
 	    this.events.forEach(n => {
@@ -14936,7 +14937,7 @@
 
 	    // api函数
 	    // TODO: 很难受的实现
-	    Object.assign(window, {
+	    Object.assign(app, {
 	        addPhysicsObject: this.addPhysicsObject.bind(this)
 	    });
 	}
@@ -27951,6 +27952,44 @@
 	                fontWeight: 'bold'
 	            },
 	            text: L_SMOKE_COMPONENT
+	        },
+	        // {
+	        //     xtype: 'row',
+	        //     children: [{
+	        //         xtype: 'label',
+	        //         text: '数量'
+	        //     }, {
+	        //         xtype: 'int',
+	        //         id: 'particleCount',
+	        //         scope: this.id,
+	        //         range: [0, Infinity],
+	        //         onChange: this.onChange.bind(this)
+	        //     }]
+	        // }, 
+	        {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: '尺寸'
+	            }, {
+	                xtype: 'int',
+	                id: 'size',
+	                scope: this.id,
+	                range: [0, Infinity],
+	                onChange: this.onChange.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: '时长'
+	            }, {
+	                xtype: 'int',
+	                id: 'lifetime',
+	                scope: this.id,
+	                range: [0, Infinity],
+	                onChange: this.onChange.bind(this)
+	            }]
 	        }, {
 	            xtype: 'row',
 	            children: [{
@@ -27992,13 +28031,33 @@
 
 	    this.selected = editor.selected;
 
+	    // var particleCount = UI.get('particleCount', this.id);
+	    var size = UI.get('size', this.id);
+	    var lifetime = UI.get('lifetime', this.id);
 	    var btnPreview = UI.get('btnPreview', this.id);
+
+	    // particleCount.setValue(this.selected.userData.particleCount);
+	    size.setValue(this.selected.userData.size);
+	    lifetime.setValue(this.selected.userData.lifetime);
 
 	    if (this.isPlaying) {
 	        btnPreview.setText(L_CANCEL);
 	    } else {
 	        btnPreview.setText(L_PREVIEW);
 	    }
+	};
+
+	SmokeComponent.prototype.onChange = function () {
+	    // var particleCount = UI.get('particleCount', this.id);
+	    var size = UI.get('size', this.id);
+	    var lifetime = UI.get('lifetime', this.id);
+
+	    // this.selected.userData.particleCount = particleCount.getValue();
+	    this.selected.userData.size = size.getValue();
+	    this.selected.userData.lifetime = lifetime.getValue();
+
+	    this.selected.material.uniforms.size.value = size.getValue();
+	    this.selected.material.uniforms.lifetime.value = lifetime.getValue();
 	};
 
 	SmokeComponent.prototype.onPreview = function () {
