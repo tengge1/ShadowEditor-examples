@@ -80,7 +80,7 @@
         var start = () => {
             container = document.getElementById('container');
             app = new Shadow.Player(container, {
-                server: location.origin,
+                server: '.',
                 enableThrowBall: false,
             });
             app.render();
