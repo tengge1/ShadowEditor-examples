@@ -29,6 +29,21 @@
             cursor: pointer;
         }
 
+        #list .item .shadow {
+            width: 100%;
+            height: 183px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #list .item .shadow img {
+            width: 60px;
+            height: 60px;
+        }
+
         #list .item .thumbnail {
             width: 100%;
             pointer-events: none;
@@ -61,6 +76,12 @@
 
 <body>
     <div id="list">
+        <div class="item" data-id="editor">
+            <div class="shadow">
+                <img src="assets/shadow.png" alt="Shadow Editor" />
+            </div>
+            <div class="title">Shadow Editor</div>
+        </div>
         <div class="item" data-id="5c178c6bc8b49a1d70668a4f">
             <img class="thumbnail" src="Scene/image/5c178c6bc8b49a1d70668a4f.png" />
             <div class="title">基本几何体</div>
@@ -94,7 +115,7 @@
             <div class="title">着色器动画</div>
         </div>
     </div>
-    <iframe id="content" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+    <iframe id="content" src="editor.html" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
     <a href="https://github.com/tengge1/ShadowEditor" id="forkMe">
         <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_red_aa0000.png?resize=149%2C149"
             class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
@@ -102,7 +123,9 @@
     <script>
         document.querySelector('#list').addEventListener('click', event => {
             var id = event.target.getAttribute('data-id');
-            if (id) {
+            if (id === 'editor') {
+                document.querySelector('#content').src = `editor.html`;
+            } else if (id) {
                 document.querySelector('#content').src = `view.html?sceneFile=${id}`;
             }
         });
