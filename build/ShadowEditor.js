@@ -4487,7 +4487,7 @@
 	    return json;
 	};
 
-	TextureSerializer.prototype.fromJSON = function (json, parent) {
+	TextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    // 用一个像素的图片初始化Texture，避免图片载入前的警告信息。
 	    var img = ImageUtils.onePixelCanvas();
 	    var obj = parent === undefined ? new THREE.Texture(img) : parent;
@@ -4501,7 +4501,13 @@
 
 	    if (json.image && !Array.isArray(json.image) && json.image.tagName === 'img') { // 图片
 	        var img = document.createElement('img');
-	        img.src = json.image.src;
+
+	        if(json.image.src && json.image.src.startsWith('/')) {
+	            img.src = server + json.image.src;
+	        } else {
+	            img.src = json.image.src;
+	        }
+	        
 	        img.width = json.image.width;
 	        img.height = json.image.height;
 	        img.onload = function () {
@@ -4515,7 +4521,13 @@
 	        var ctx = canvas.getContext('2d');
 
 	        var img = document.createElement('img');
-	        img.src = json.image.src;
+	        
+	        if(json.image.src && json.image.src.startsWith('/')) {
+	            img.src = server + json.image.src;
+	        } else {
+	            img.src = json.image.src;
+	        }
+
 	        img.onload = function () {
 	            canvas.width = img.width;
 	            canvas.height = img.height;
@@ -4565,10 +4577,10 @@
 	    return TextureSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	CanvasTextureSerializer.prototype.fromJSON = function (json, parent) {
+	CanvasTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.CanvasTexture() : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4588,10 +4600,10 @@
 	    return TextureSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	CompressedTextureSerializer.prototype.fromJSON = function (json, parent) {
+	CompressedTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.CompressedTexture() : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4625,12 +4637,12 @@
 	    return json;
 	};
 
-	CubeTextureSerializer.prototype.fromJSON = function (json, parent) {
+	CubeTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    // 用一个像素的图片初始化CubeTexture，避免图片载入前的警告信息。
 	    var img = ImageUtils.onePixelCanvas();
 	    var obj = parent === undefined ? new THREE.CubeTexture([img, img, img, img, img, img]) : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    if (Array.isArray(json.image)) {
 	        var promises = json.image.map(n => {
@@ -4668,10 +4680,10 @@
 	    return TextureSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	DataTextureSerializer.prototype.fromJSON = function (json, parent) {
+	DataTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.DataTexture() : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4691,10 +4703,10 @@
 	    return TextureSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	DepthTextureSerializer.prototype.fromJSON = function (json, parent) {
+	DepthTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.DataTexture() : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4714,10 +4726,10 @@
 	    return TextureSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	VideoTextureSerializer.prototype.fromJSON = function (json, parent) {
+	VideoTextureSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.VideoTexture() : parent;
 
-	    TextureSerializer.prototype.fromJSON.call(this, json, obj);
+	    TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4754,7 +4766,7 @@
 	    return (new serializer()).toJSON(obj);
 	};
 
-	TexturesSerializer.prototype.fromJSON = function (json, parent) {
+	TexturesSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var generator = json.metadata.generator;
 
 	    var serializer = Serializers[generator.replace('Serializer', '')];
@@ -4764,7 +4776,7 @@
 	        return null;
 	    }
 
-	    return (new serializer()).fromJSON(json, parent);
+	    return (new serializer()).fromJSON(json, parent, server);
 	};
 
 	/**
@@ -4851,12 +4863,12 @@
 	    return json;
 	};
 
-	MaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.Material() : parent;
 
-	    obj.alphaMap = json.alphaMap == null ? null : (new TexturesSerializer()).fromJSON(json.alphaMap);
+	    obj.alphaMap = json.alphaMap == null ? null : (new TexturesSerializer()).fromJSON(json.alphaMap, undefined, server);
 	    obj.alphaTest = json.alphaTest;
-	    obj.aoMap = json.aoMap == null ? null : (new TexturesSerializer()).fromJSON(json.aoMap);
+	    obj.aoMap = json.aoMap == null ? null : (new TexturesSerializer()).fromJSON(json.aoMap, undefined, server);
 	    obj.aoMapIntensity = json.aoMapIntensity;
 	    obj.blendDst = json.blendDst;
 	    obj.blendDstAlpha = json.blendDstAlpha;
@@ -4865,7 +4877,7 @@
 	    obj.blendSrc = json.blendSrc;
 	    obj.blendSrcAlpha = json.blendSrcAlpha;
 	    obj.blending = json.blending;
-	    obj.bumpMap = json.bumpMap == null ? null : (new TexturesSerializer()).fromJSON(json.bumpMap);
+	    obj.bumpMap = json.bumpMap == null ? null : (new TexturesSerializer()).fromJSON(json.bumpMap, undefined, server);
 	    obj.bumpScale = json.bumpScale;
 	    obj.clipIntersection = json.clipIntersection;
 	    obj.clipShadow = json.clipShadow;
@@ -4876,27 +4888,27 @@
 	    obj.depthTest = json.depthTest;
 	    obj.depthWrite = json.depthWrite;
 	    obj.displacementBias = json.displacementBias;
-	    obj.displacementMap = json.displacementMap == null ? null : (new TexturesSerializer()).fromJSON(json.displacementMap);
+	    obj.displacementMap = json.displacementMap == null ? null : (new TexturesSerializer()).fromJSON(json.displacementMap, undefined, server);
 	    obj.displacementScale = json.displacementScale;
 	    obj.dithering = json.dithering;
 	    obj.emissive = json.emissive == null ? undefined : new THREE.Color(json.emissive);
 	    obj.emissiveIntensity = json.emissiveIntensity;
-	    obj.emissiveMap = json.emissiveMap == null ? null : (new TexturesSerializer()).fromJSON(json.emissiveMap);
-	    obj.envMap = json.envMap == null ? null : (new TexturesSerializer()).fromJSON(json.envMap);
+	    obj.emissiveMap = json.emissiveMap == null ? null : (new TexturesSerializer()).fromJSON(json.emissiveMap, undefined, server);
+	    obj.envMap = json.envMap == null ? null : (new TexturesSerializer()).fromJSON(json.envMap, undefined, server);
 	    obj.envMapIntensity = json.envMapIntensity;
 	    obj.flatShading = json.flatShading;
 	    obj.fog = json.fog;
-	    obj.lightMap = json.lightMap == null ? null : (new TexturesSerializer()).fromJSON(json.lightMap);
+	    obj.lightMap = json.lightMap == null ? null : (new TexturesSerializer()).fromJSON(json.lightMap, undefined, server);
 	    obj.lightMapIntensity = json.lightMapIntensity;
 	    obj.lights = json.lights;
 	    obj.linewidth = json.linewidth;
 	    obj.map = json.map == null ? null : (new TexturesSerializer()).fromJSON(json.map);
 	    obj.metalness = json.metalness;
-	    obj.metalnessMap = json.metalnessMap == null ? null : (new TexturesSerializer()).fromJSON(json.metalnessMap);
+	    obj.metalnessMap = json.metalnessMap == null ? null : (new TexturesSerializer()).fromJSON(json.metalnessMap, undefined, server);
 	    obj.morphNormals = json.morphNormals;
 	    obj.morphTargets = json.morphTargets;
 	    obj.name = json.name;
-	    obj.normalMap = json.normalMap == null ? null : (new TexturesSerializer()).fromJSON(json.normalMap);
+	    obj.normalMap = json.normalMap == null ? null : (new TexturesSerializer()).fromJSON(json.normalMap, undefined, server);
 	    obj.normalScale = json.normalScale == null ? null : new THREE.Vector2().copy(json.normalScale);
 	    obj.opacity = json.opacity;
 	    obj.polygonOffset = json.polygonOffset;
@@ -4906,7 +4918,7 @@
 	    obj.premultipliedAlpha = json.premultipliedAlpha;
 	    obj.refractionRatio = json.refractionRatio;
 	    obj.roughness = json.roughness;
-	    obj.roughnessMap = json.roughnessMap == null ? null : (new TexturesSerializer()).fromJSON(json.roughnessMap);
+	    obj.roughnessMap = json.roughnessMap == null ? null : (new TexturesSerializer()).fromJSON(json.roughnessMap, undefined, server);
 	    obj.shadowSide = json.shadowSide;
 	    obj.side = json.side;
 	    obj.skinning = json.skinning;
@@ -4939,10 +4951,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	LineBasicMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	LineBasicMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.LineBasicMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4962,10 +4974,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	LineDashedMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	LineDashedMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.LineDashedMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -4985,10 +4997,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshBasicMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshBasicMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshBasicMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5008,10 +5020,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshDepthMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshDepthMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshDepthMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5031,10 +5043,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshDistanceMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshDistanceMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshDistanceMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5054,10 +5066,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshFaceMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshFaceMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshFaceMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5077,10 +5089,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshLambertMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshLambertMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshLambertMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5100,10 +5112,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshNormalMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshNormalMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshNormalMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5123,10 +5135,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshPhongMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshPhongMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshPhongMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5146,10 +5158,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshPhysicalMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshPhysicalMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshPhysicalMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5169,10 +5181,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshStandardMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshStandardMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshStandardMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5192,10 +5204,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MeshToonMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MeshToonMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MeshToonMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5215,10 +5227,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	MultiMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	MultiMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.MultiMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5238,10 +5250,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	ParticleBasicMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	ParticleBasicMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.ParticleBasicMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5261,10 +5273,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	ParticleSystemMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	ParticleSystemMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.ParticleSystemMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5284,10 +5296,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	PointCloudMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	PointCloudMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.PointCloudMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5307,10 +5319,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	PointsMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	PointsMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.PointsMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5353,10 +5365,10 @@
 	    return json;
 	};
 
-	RawShaderMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	RawShaderMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.RawShaderMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    obj.defines = json.defines;
 
@@ -5419,10 +5431,10 @@
 	    return json;
 	};
 
-	ShaderMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	ShaderMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.ShaderMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    obj.defines = json.defines;
 
@@ -5462,10 +5474,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	ShadowMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	ShadowMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.ShadowMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5485,10 +5497,10 @@
 	    return MaterialSerializer.prototype.toJSON.call(this, obj);
 	};
 
-	SpriteCanvasMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	SpriteCanvasMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.SpriteCanvasMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5510,10 +5522,10 @@
 	    return json;
 	};
 
-	SpriteMaterialSerializer.prototype.fromJSON = function (json, parent) {
+	SpriteMaterialSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.SpriteMaterial() : parent;
 
-	    MaterialSerializer.prototype.fromJSON.call(this, json, obj);
+	    MaterialSerializer.prototype.fromJSON.call(this, json, obj, server);
 
 	    return obj;
 	};
@@ -5565,7 +5577,7 @@
 	    return (new serializer()).toJSON(obj);
 	};
 
-	MaterialsSerializer.prototype.fromJSON = function (json, parent) {
+	MaterialsSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var generator = json.metadata.generator;
 
 	    var serializer = Serializers$1[generator.replace('Serializer', '')];
@@ -5575,7 +5587,7 @@
 	        return null;
 	    }
 
-	    return (new serializer()).fromJSON(json, parent);
+	    return (new serializer()).fromJSON(json, parent, server);
 	};
 
 	/**
@@ -5604,7 +5616,7 @@
 	    return json;
 	};
 
-	SceneSerializer.prototype.fromJSON = function (json, parent) {
+	SceneSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var obj = parent === undefined ? new THREE.Scene() : parent;
 
 	    Object3DSerializer.prototype.fromJSON(json, obj);
@@ -5613,7 +5625,7 @@
 	        (json.background.metadata.generator === 'CubeTextureSerializer' ||
 	            json.background.metadata.generator === 'TextureSerializer')
 	    ) { // 天空盒和背景图片
-	        obj.background = new TexturesSerializer().fromJSON(json.background);
+	        obj.background = new TexturesSerializer().fromJSON(json.background, undefined, server);
 	    } else { // 纯色
 	        obj.background = new THREE.Color(json.background);
 	    }
@@ -5626,7 +5638,7 @@
 	        console.warn(`SceneSerializer: unknown fog type ${json.fog.type}.`);
 	    }
 
-	    obj.overrideMaterial = json.overrideMaterial == null ? null : (new MaterialsSerializer()).fromJSON(json.overrideMaterial);
+	    obj.overrideMaterial = json.overrideMaterial == null ? null : (new MaterialsSerializer()).fromJSON(json.overrideMaterial, undefined, server);
 
 	    return obj;
 	};
@@ -9562,7 +9574,7 @@
 	    }
 
 	    return new Promise(resolve => {
-	        loader.loadWithAnimation(url, [options.Animation.Url], mmd => {
+	        loader.loadWithAnimation(url, [environment.server + options.Animation.Url], mmd => {
 	            resolve(mmd);
 	        }, undefined, () => {
 	            resolve(null);
@@ -9578,7 +9590,7 @@
 	    }
 
 	    return new Promise(resolve => {
-	        loader.loadAnimation([options.CameraAnimation.Url], environment.camera, vmd => {
+	        loader.loadAnimation([environment.server + options.CameraAnimation.Url], environment.camera, vmd => {
 	            resolve(vmd);
 	        }, undefined, () => {
 	            resolve(null);
@@ -9595,7 +9607,7 @@
 
 	    return new Promise(resolve => {
 	        var loader = new THREE.AudioLoader();
-	        loader.load(options.Audio.Url, buffer => {
+	        loader.load(environment.server + options.Audio.Url, buffer => {
 	            var audio = new THREE.Audio(environment.audioListener).setBuffer(buffer);
 	            Object.assign(audio.userData, options.Audio);
 	            resolve(audio);
@@ -10369,6 +10381,9 @@
 	    } else {
 	        url = options.server + url;
 	    }
+
+	    // 将server传递给MMDLoader，以便下载资源
+	    environment.server = options.server;
 
 	    return new Promise(resolve => {
 	        var loader = new ModelLoader();
@@ -12832,6 +12847,7 @@
 	/**
 	 * 将应用转为json
 	 * @param {*} obj 格式：{ options: options, camera: camera, renderer: renderer, scripts: scripts, scene: scene }
+	 * @param {*} obj.server 服务端地址
 	 */
 	Converter.prototype.toJSON = function (obj) {
 	    var options = obj.options;
@@ -12962,6 +12978,7 @@
 	 * 场景反序列化
 	 * @param {*} jsons json对象（列表）
 	 * @param {*} options 配置选项 格式：{ server: serverUrl } 其中，serverUrl为服务端地址，用于下载模型、纹理等资源
+	 * @param {*} options.server 服务端地址
 	 */
 	Converter.prototype.fromJson = function (jsons, options) {
 	    var obj = {
@@ -13077,7 +13094,7 @@
 
 	            switch (objJson.metadata.generator) {
 	                case 'SceneSerializer':
-	                    obj = (new SceneSerializer()).fromJSON(objJson);
+	                    obj = (new SceneSerializer()).fromJSON(objJson, undefined, options.server);
 	                    break;
 	                case 'GroupSerializer':
 	                    obj = (new GroupSerializer()).fromJSON(objJson);
@@ -17056,7 +17073,7 @@
 	                //     xtype: 'div',
 	                //     html: L_EXPORT_STATIC_WEBSITE,
 	                //     cls: 'option',
-	                //     onClick: this.publish.bind(this)
+	                //     onClick: this.exportAll.bind(this)
 	                // }
 	            ]
 	        }]
