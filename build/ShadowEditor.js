@@ -4908,7 +4908,7 @@
 	    obj.lightMapIntensity = json.lightMapIntensity;
 	    obj.lights = json.lights;
 	    obj.linewidth = json.linewidth;
-	    obj.map = json.map == null ? null : (new TexturesSerializer()).fromJSON(json.map);
+	    obj.map = json.map == null ? null : (new TexturesSerializer()).fromJSON(json.map, undefined, server);
 	    obj.metalness = json.metalness;
 	    obj.metalnessMap = json.metalnessMap == null ? null : (new TexturesSerializer()).fromJSON(json.metalnessMap, undefined, server);
 	    obj.morphNormals = json.morphNormals;
@@ -6419,7 +6419,7 @@
 	    return json;
 	};
 
-	MeshSerializer.prototype.fromJSON = function (json, parent) {
+	MeshSerializer.prototype.fromJSON = function (json, parent, server) {
 	    // 子类创建模型
 	    if (parent !== undefined) {
 	        var obj = parent;
@@ -6438,7 +6438,7 @@
 	    }
 
 	    var geometry = (new GeometriesSerializer()).fromJSON(json.geometry);
-	    var material = (new MaterialsSerializer()).fromJSON(json.material);
+	    var material = (new MaterialsSerializer()).fromJSON(json.material, undefined, server);
 
 	    var obj = new THREE.Mesh(geometry, material);
 
@@ -6517,7 +6517,7 @@
 	    return json;
 	};
 
-	SpriteSerializer.prototype.fromJSON = function (json, parent) {
+	SpriteSerializer.prototype.fromJSON = function (json, parent, server) {
 	    var material;
 
 	    if (parent === undefined) {
@@ -6525,7 +6525,7 @@
 	            console.warn(`SpriteSerializer: ${json.name} json.material is not defined.`);
 	            return null;
 	        }
-	        material = (new MaterialsSerializer()).fromJSON(json.material);
+	        material = (new MaterialsSerializer()).fromJSON(json.material, undefined, server);
 	    }
 
 	    var obj = parent === undefined ? new THREE.Sprite(material) : parent;
@@ -13109,10 +13109,10 @@
 	                    obj = (new ReflectorSerializer()).fromJSON(objJson);
 	                    break;
 	                case 'MeshSerializer':
-	                    obj = (new MeshSerializer()).fromJSON(objJson);
+	                    obj = (new MeshSerializer()).fromJSON(objJson, undefined, options.server);
 	                    break;
 	                case 'SpriteSerializer':
-	                    obj = (new SpriteSerializer()).fromJSON(objJson);
+	                    obj = (new SpriteSerializer()).fromJSON(objJson, undefined, options.server);
 	                    break;
 	                case 'AmbientLightSerializer':
 	                    obj = (new AmbientLightSerializer()).fromJSON(objJson);
