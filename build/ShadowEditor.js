@@ -17075,14 +17075,7 @@
 	                html: L_EXPORT_SCENE,
 	                cls: 'option',
 	                onClick: this.exportScene.bind(this)
-	            }
-	                // , {
-	                //     xtype: 'div',
-	                //     html: L_EXPORT_STATIC_WEBSITE,
-	                //     cls: 'option',
-	                //     onClick: this.exportAll.bind(this)
-	                // }
-	            ]
+	            }]
 	        }]
 	    });
 
@@ -19196,6 +19189,351 @@
 	};
 
 	/**
+	 * 地球几何体
+	 */
+	function GlobeGeometry() {
+	    THREE.PlaneBufferGeometry.call(this, 1, 1);
+	}
+
+	GlobeGeometry.prototype = Object.create(THREE.PlaneBufferGeometry.prototype);
+	GlobeGeometry.prototype.constructor = GlobeGeometry;
+
+	var GlobeVertex = "uniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\n\r\nvarying vec3 vNormal;\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
+
+	var GlobeFragment = "precision highp float;\r\n\r\nuniform sampler2D map;\r\n\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_FragColor = texture2D(map, vUV);\r\n}";
+
+	//------------------------------------------------------------------------------
+	// <copyright company="Microsoft">
+	//     Copyright (c) 2006-2009 Microsoft Corporation.  All rights reserved.
+	// </copyright>
+	//------------------------------------------------------------------------------
+
+	// https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+
+	const EarthRadius = 6378137;
+	const MinLatitude = -85.05112878;
+	const MaxLatitude = 85.05112878;
+	const MinLongitude = -180;
+	const MaxLongitude = 180;
+
+	class BingTileSystem {
+	    /// <summary>
+	    /// Clips a number to the specified minimum and maximum values.
+	    /// </summary>
+	    /// <param name="n">The number to clip.</param>
+	    /// <param name="minValue">Minimum allowable value.</param>
+	    /// <param name="maxValue">Maximum allowable value.</param>
+	    /// <returns>The clipped value.</returns>
+	    clip(n, minValue, maxValue) {
+	        return Math.min(Math.max(n, minValue), maxValue);
+	    }
+
+	    /// <summary>
+	    /// Determines the map width and height (in pixels) at a specified level
+	    /// of detail.
+	    /// </summary>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>The map width and height in pixels.</returns>
+	    mapSize(levelOfDetail) {
+	        return parseInt(256 << levelOfDetail);
+	    }
+
+	    /// <summary>
+	    /// Determines the ground resolution (in meters per pixel) at a specified
+	    /// latitude and level of detail.
+	    /// </summary>
+	    /// <param name="latitude">Latitude (in degrees) at which to measure the
+	    /// ground resolution.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>The ground resolution, in meters per pixel.</returns>
+	    groundResolution(latitude, levelOfDetail) {
+	        latitude = this.clip(latitude, MinLatitude, MaxLatitude);
+	        return Math.cos(latitude * Math.PI / 180) * 2 * Math.PI * EarthRadius / this.mapSize(levelOfDetail);
+	    }
+
+	    /// <summary>
+	    /// Determines the map scale at a specified latitude, level of detail,
+	    /// and screen resolution.
+	    /// </summary>
+	    /// <param name="latitude">Latitude (in degrees) at which to measure the
+	    /// map scale.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <param name="screenDpi">Resolution of the screen, in dots per inch.</param>
+	    /// <returns>The map scale, expressed as the denominator N of the ratio 1 : N.</returns>
+	    mapScale(latitude, levelOfDetail, screenDpi) {
+	        return GroundResolution(latitude, levelOfDetail) * screenDpi / 0.0254;
+	    }
+
+	    /// <summary>
+	    /// Converts a point from latitude/longitude WGS-84 coordinates (in degrees)
+	    /// into pixel XY coordinates at a specified level of detail.
+	    /// </summary>
+	    /// <param name="longitude">Longitude of the point, in degrees.</param>
+	    /// <param name="latitude">Latitude of the point, in degrees.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>the [X,Y] coordinate in pixels.</returns>
+	    longLatToPixelXY(longitude, latitude, levelOfDetail) {
+	        latitude = this.clip(latitude, MinLatitude, MaxLatitude);
+	        longitude = this.clip(longitude, MinLongitude, MaxLongitude);
+
+	        let x = (longitude + 180) / 360;
+	        let sinLatitude = Math.sin(latitude * Math.PI / 180);
+	        let y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
+
+	        let mapSize = this.mapSize(levelOfDetail);
+	        let pixelX = parseInt(this.clip(x * mapSize + 0.5, 0, mapSize - 1));
+	        let pixelY = parseInt(this.clip(y * mapSize + 0.5, 0, mapSize - 1));
+	        return [pixelX, pixelY];
+	    }
+
+	    /// <summary>
+	    /// Converts a pixel from pixel XY coordinates at a specified level of detail
+	    /// into latitude/longitude WGS-84 coordinates (in degrees).
+	    /// </summary>
+	    /// <param name="pixelX">X coordinate of the point, in pixels.</param>
+	    /// <param name="pixelY">Y coordinates of the point, in pixels.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>the [latitude,longitude] in degrees.</returns>
+	    pixelXYToLongLat(pixelX, pixelY, levelOfDetail) {
+	        let mapSize = this.mapSize(levelOfDetail);
+	        let x = (this.clip(pixelX, 0, mapSize - 1) / mapSize) - 0.5;
+	        let y = 0.5 - (this.clip(pixelY, 0, mapSize - 1) / mapSize);
+
+	        let latitude = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
+	        let longitude = 360 * x;
+	        return [longitude, latitude];
+	    }
+
+	    /// <summary>
+	    /// Converts pixel XY coordinates into tile XY coordinates of the tile containing
+	    /// the specified pixel.
+	    /// </summary>
+	    /// <param name="pixelX">Pixel X coordinate.</param>
+	    /// <param name="pixelY">Pixel Y coordinate.</param>
+	    /// <returns>the tile [X,Y] coordinate.</returns>
+	    pixelXYToTileXY(pixelX, pixelY) {
+	        let tileX = pixelX / 256;
+	        let tileY = pixelY / 256;
+	        return [tileX, tileY];
+	    }
+
+	    /// <summary>
+	    /// Converts tile XY coordinates into pixel XY coordinates of the upper-left pixel
+	    /// of the specified tile.
+	    /// </summary>
+	    /// <param name="tileX">Tile X coordinate.</param>
+	    /// <param name="tileY">Tile Y coordinate.</param>
+	    /// <returns>the pixel [X,Y] coordinate.</returns>
+	    tileXYToPixelXY(tileX, tileY) {
+	        let pixelX = tileX * 256;
+	        let pixelY = tileY * 256;
+	        return [pixelX, pixelY];
+	    }
+
+	    /// <summary>
+	    /// Converts tile XY coordinates into a QuadKey at a specified level of detail.
+	    /// </summary>
+	    /// <param name="tileX">Tile X coordinate.</param>
+	    /// <param name="tileY">Tile Y coordinate.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>A string containing the QuadKey.</returns>
+	    tileXYToQuadKey(tileX, tileY, levelOfDetail) {
+	        let quadKey = '';
+	        let digit;
+	        let mask;
+	        for (let i = levelOfDetail; i > 0; i--) {
+	            digit = '0';
+	            mask = 1 << (i - 1);
+	            if ((tileX & mask) != 0) {
+	                digit++;
+	            }
+	            if ((tileY & mask) != 0) {
+	                digit++;
+	                digit++;
+	            }
+	            quadKey += digit;
+	        }
+	        return quadKey;
+	    }
+
+	    /// <summary>
+	    /// Converts a QuadKey into tile XY coordinates.
+	    /// </summary>
+	    /// <param name="quadKey">QuadKey of the tile.</param>
+	    /// <returns>the tile X coordinate,the tile Y coordinate, the level of detail.</returns>
+	    quadKeyToTileXY(quadKey) {
+	        let tileX = tileY = 0;
+	        let levelOfDetail = quadKey.Length;
+	        for (i = levelOfDetail; i > 0; i--) {
+	            mask = 1 << (i - 1);
+	            switch (quadKey[levelOfDetail - i]) {
+	                case '0':
+	                    break;
+	                case '1':
+	                    tileX |= mask;
+	                    break;
+	                case '2':
+	                    tileY |= mask;
+	                    break;
+	                case '3':
+	                    tileX |= mask;
+	                    tileY |= mask;
+	                    break;
+	                default:
+	                    throw new ArgumentException("Invalid QuadKey digit sequence.");
+	            }
+	        }
+	        return [tileX, tileY, levelOfDetail];
+	    }
+
+	    /// <summary>
+	    /// Converts tile XY coordinates to url.
+	    /// </summary>
+	    /// <param name="tileX">Tile X coordinate.</param>
+	    /// <param name="tileY">Tile Y coordinate.</param>
+	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
+	    /// to 23 (highest detail).</param>
+	    /// <returns>url of the tile</returns>
+	    tileXYToUrl(tileX, tileY, levelOfDetail) {
+	        let key = this.tileXYToQuadKey(tileX, tileY, parseInt(levelOfDetail));
+	        return `http://t0.ssl.ak.tiles.virtualearth.net/tiles/a${key}.jpeg?g=5793`;
+	    }
+	}
+
+	/**
+	 * 地球材质
+	 */
+	function GlobeMaterial() {
+	    var url = (new BingTileSystem()).tileXYToUrl(0, 0, 1);
+
+	    THREE.RawShaderMaterial.call(this, {
+	        vertexShader: GlobeVertex,
+	        fragmentShader: GlobeFragment,
+	        uniforms: {
+	            map: {
+	                type: 't',
+	                value: new THREE.TextureLoader().load(url)
+	            }
+	        },
+	        side: THREE.DoubleSide,
+	    });
+	}
+
+	GlobeMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
+	GlobeMaterial.prototype.constructor = GlobeMaterial;
+
+	/**
+	 * 地球
+	 * @param {*} app 
+	 */
+	function Globe(app) {
+	    this.app = app;
+	}
+
+	Globe.prototype.start = function () {
+	    var renderer = this.app.editor.renderer;
+
+	    var geometry = new GlobeGeometry();
+	    var material = new GlobeMaterial();
+
+	    var gl = renderer.context;
+
+	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	    gl.shaderSource(vertexShader, material.vertexShader);
+	    gl.compileShader(vertexShader);
+
+	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	    gl.shaderSource(fragmentShader, material.fragmentShader);
+	    gl.compileShader(fragmentShader);
+
+	    var program = gl.createProgram();
+	    gl.attachShader(program, vertexShader);
+	    gl.attachShader(program, fragmentShader);
+	    gl.linkProgram(program);
+	    gl.useProgram(program);
+
+	    var positionAttr = gl.getAttribLocation(program, 'position');
+	    var normalAttr = gl.getAttribLocation(program, 'normal');
+	    var uvAttr = gl.getAttribLocation(program, 'uv');
+
+	    // gl.enableVertexAttribArray(positionAttr);
+	    // gl.enableVertexAttribArray(normalAttr);
+	    // gl.enableVertexAttribArray(uvAttr);
+
+	    var modelViewMatrixUniform = gl.getUniformLocation(program, 'modelViewMatrix');
+	    var projectionMatrixUniform = gl.getUniformLocation(program, 'projectionMatrix');
+
+	    var positionBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.position.array, gl.STATIC_DRAW);
+
+	    var normalBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.normal.array, gl.STATIC_DRAW);
+
+	    var uvBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.uv.array, gl.STATIC_DRAW);
+
+	    var indexBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
+
+	    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+	    this.program = program;
+
+	    this.positionAttr = positionAttr;
+	    this.normalAttr = normalAttr;
+	    this.uvAttr = uvAttr;
+
+	    this.modelViewMatrixUniform = modelViewMatrixUniform;
+	    this.projectionMatrixUniform = projectionMatrixUniform;
+
+	    this.positionBuffer = positionBuffer;
+	    this.normalBuffer = normalBuffer;
+	    this.uvBuffer = uvBuffer;
+	    this.indexBuffer = indexBuffer;
+
+	    this.app.on(`afterRender`, this.onAfterRender.bind(this));
+	};
+
+	Globe.prototype.onAfterRender = function () {
+	    var scene = this.scene;
+	    var camera = this.app.editor.camera;
+	    var renderer = this.app.editor.renderer;
+
+	    var gl = renderer.context;
+
+	    renderer.state.useProgram(this.program);
+
+	    gl.uniformMatrix4fv(this.modelViewMatrixUniform, false, camera.matrixWorldInverse.elements);
+	    gl.uniformMatrix4fv(this.projectionMatrixUniform, false, camera.projectionMatrix.elements);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+	    gl.enableVertexAttribArray(this.positionAttr);
+	    gl.vertexAttribPointer(this.positionAttr, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+	    gl.enableVertexAttribArray(this.normalAttr);
+	    gl.vertexAttribPointer(this.normalAttr, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
+	    gl.enableVertexAttribArray(this.uvAttr);
+	    gl.vertexAttribPointer(this.uvAttr, 2, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+	    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+	};
+
+	/**
 	 * 组件菜单
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} options 
@@ -19255,6 +19593,11 @@
 	                html: L_CLOTH,
 	                cls: 'option',
 	                onClick: this.onAddCloth.bind(this)
+	            }, {
+	                xtype: 'div',
+	                html: '地球(测试)',
+	                cls: 'option',
+	                onClick: this.onAddEarth.bind(this)
 	            }]
 	        }]
 	    });
@@ -19346,6 +19689,13 @@
 	    cloth.name = L_CLOTH;
 
 	    editor.execute(new AddObjectCommand(cloth));
+	};
+
+	// ----------------------------- 地球 --------------------------------------
+
+	ComponentMenu.prototype.onAddEarth = function () {
+	    var globe = new Globe(this.app);
+	    globe.start();
 	};
 
 	/**
@@ -19501,6 +19851,13 @@
 	                html: L_ARRANGE_THUMBNAIL,
 	                cls: 'option',
 	                onClick: this.onArrangeThumbnail.bind(this)
+	            }, {
+	                xtype: 'hr'
+	            }, {
+	                xtype: 'div',
+	                html: '导出编辑器',
+	                cls: 'option',
+	                onClick: this.onExportEditor.bind(this)
 	            }]
 	        }]
 	    });
@@ -19549,6 +19906,23 @@
 	                if (response.ok) {
 	                    response.json().then(json => {
 	                        UI$1.msg(json.Msg);
+	                    });
+	                }
+	            });
+	        }
+	    });
+	};
+
+	ToolMenu.prototype.onExportEditor = function () {
+	    UI$1.confirm('询问', '是否导出编辑器？', (event, btn) => {
+	        if (btn === 'ok') {
+	            fetch(`${this.app.options.server}/api/ExportEditor/Run`, {
+	                method: 'POST'
+	            }).then(response => {
+	                if (response.ok) {
+	                    response.json().then(json => {
+	                        UI$1.msg(json.Msg);
+	                        window.open(`${this.app.options.server}${json.Url}`, 'export');
 	                    });
 	                }
 	            });
@@ -19620,11 +19994,11 @@
 	                }, {
 	                    xtype: 'select',
 	                    id: 'theme',
+	                    scope: this.id,
 	                    options: {
 	                        'assets/css/light.css': L_LIGHT_COLOR,
 	                        'assets/css/dark.css': L_DARK_COLOR
 	                    },
-	                    value: app.options.theme,
 	                    style: {
 	                        width: '150px'
 	                    }
@@ -19646,13 +20020,13 @@
 	                }, {
 	                    xtype: 'select',
 	                    id: 'shadowMapType',
+	                    scope: this.id,
 	                    options: {
 	                        [-1]: L_DISABLED,
 	                        [THREE.BasicShadowMap]: L_BASIC_SHADOW, // 0
 	                        [THREE.PCFShadowMap]: L_PCF_SHADOW, // 1
 	                        [THREE.PCFSoftShadowMap]: L_PCF_SOFT_SHADOW // 2
-	                    },
-	                    value: shadowMap.enabled === false ? -1 : shadowMap.type
+	                    }
 	                }]
 	            }, {
 	                xtype: 'row',
@@ -19662,7 +20036,7 @@
 	                }, {
 	                    xtype: 'boolean',
 	                    id: 'gammaInput',
-	                    value: renderer.gammaInput
+	                    scope: this.id,
 	                }]
 	            }, {
 	                xtype: 'row',
@@ -19672,7 +20046,7 @@
 	                }, {
 	                    xtype: 'boolean',
 	                    id: 'gammaOutput',
-	                    value: renderer.gammaOutput
+	                    scope: this.id,
 	                }]
 	            }, {
 	                xtype: 'row',
@@ -19682,7 +20056,7 @@
 	                }, {
 	                    xtype: 'number',
 	                    id: 'gammaFactor',
-	                    value: renderer.gammaFactor
+	                    scope: this.id,
 	                }]
 	            }]
 	        }],
@@ -19705,6 +20079,30 @@
 
 	OptionsWindow.prototype.show = function () {
 	    this.window.show();
+
+	    var theme = UI$1.get('theme', this.id);
+	    var shadowMapType = UI$1.get('shadowMapType', this.id);
+	    var gammaInput = UI$1.get('gammaInput', this.id);
+	    var gammaOutput = UI$1.get('gammaOutput', this.id);
+	    var gammaFactor = UI$1.get('gammaFactor', this.id);
+
+	    if (!this.app.storage.get('theme')) {
+	        this.app.storage.set('theme', 'assets/css/light.css');
+	    }
+
+	    theme.setValue(this.app.storage.get('theme'));
+
+	    var renderer = this.app.editor.renderer;
+
+	    if (renderer.shadowMap.enabled) {
+	        shadowMapType.setValue(renderer.shadowMap.type);
+	    } else {
+	        shadowMapType.setValue(-1);
+	    }
+
+	    gammaInput.setValue(renderer.gammaInput);
+	    gammaOutput.setValue(renderer.gammaOutput);
+	    gammaFactor.setValue(renderer.gammaFactor);
 	};
 
 	OptionsWindow.prototype.hide = function () {
@@ -19727,35 +20125,29 @@
 
 	OptionsWindow.prototype.save = function () {
 	    // 主题
-	    var theme = UI$1.get('theme').getValue();
-	    this.app.options.theme = theme;
+	    var theme = UI$1.get('theme', this.id).getValue();
+	    this.app.storage.set('theme', theme);
 	    document.getElementById('theme').href = theme;
 
 	    // 渲染器
-	    var shadowMapType = parseInt(UI$1.get('shadowMapType').getValue());
-	    var gammaInput = UI$1.get('gammaInput').getValue();
-	    var gammaOutput = UI$1.get('gammaOutput').getValue();
-	    var gammaFactor = UI$1.get('gammaFactor').getValue();
+	    var shadowMapType = parseInt(UI$1.get('shadowMapType', this.id).getValue());
+	    var gammaInput = UI$1.get('gammaInput', this.id).getValue();
+	    var gammaOutput = UI$1.get('gammaOutput', this.id).getValue();
+	    var gammaFactor = UI$1.get('gammaFactor', this.id).getValue();
 
 	    var renderer = this.app.editor.renderer;
-	    var json = (new WebGLRendererSerializer(this.app)).toJSON(renderer);
-	    var newRenderer = (new WebGLRendererSerializer(this.app)).fromJSON(json);
 
 	    if (shadowMapType === -1) {
-	        newRenderer.shadowMap.enabled = false;
+	        renderer.shadowMap.enabled = false;
 	    } else {
-	        newRenderer.shadowMap.enabled = true;
-	        newRenderer.shadowMap.type = shadowMapType;
+	        renderer.shadowMap.enabled = true;
+	        renderer.shadowMap.type = shadowMapType;
 	    }
-	    newRenderer.gammaInput = gammaInput;
-	    newRenderer.gammaOutput = gammaOutput;
-	    newRenderer.gammaFactor = gammaFactor;
+	    renderer.gammaInput = gammaInput;
+	    renderer.gammaOutput = gammaOutput;
+	    renderer.gammaFactor = gammaFactor;
 
-	    this.app.viewport.container.dom.removeChild(renderer.domElement);
-	    this.app.viewport.container.dom.appendChild(newRenderer.domElement);
-	    this.app.editor.renderer = newRenderer;
-	    this.app.editor.renderer.setSize(this.app.viewport.container.dom.offsetWidth, this.app.viewport.container.dom.offsetHeight);
-	    this.app.call('render', this);
+	    renderer.dispose();
 
 	    // 隐藏窗口
 	    this.hide();
