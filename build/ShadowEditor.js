@@ -15482,14 +15482,15 @@
 	        );
 	    }
 
-	    this.camera.updateProjectionMatrix();
-
 	    this.renderer = obj.renderer || new THREE.WebGLRenderer({
 	        antialias: true
 	    });
 
 	    this.renderer.setSize(container.dom.clientWidth, container.dom.clientHeight);
 	    container.dom.appendChild(this.renderer.domElement);
+
+	    this.camera.aspect = this.renderer.domElement.width / this.renderer.domElement.height;
+	    this.camera.updateProjectionMatrix();
 
 	    var listener = obj.audioListener || new THREE.AudioListener();
 	    this.camera.add(listener);
@@ -20733,6 +20734,8 @@
 	        return;
 	    }
 
+	    this.onAddPoint();
+
 	    var geometry = new THREE.CircleBufferGeometry(0.4, 32, 0, Math.PI * 2);
 
 	    var material = new THREE.PointsMaterial({
@@ -20810,7 +20813,7 @@
 	    }
 	};
 
-	Toolbar.prototype.onAddLineIntersect = function (obj, event) { // 向线添加顶点
+	Toolbar.prototype.onAddLineIntersect = function (obj, event) {
 	    if (event.button !== 0) {
 	        return;
 	    }
@@ -20833,8 +20836,7 @@
 	    this.line.computeLineDistances();
 	};
 
-	Toolbar.prototype.onAddLineDblClick = function (obj) { // 停止画线，并开始绘制新的一条线
-	    this.isAddingLine = !this.isAddingLine;
+	Toolbar.prototype.onAddLineDblClick = function (obj) {
 	    this.onAddLine();
 	};
 
@@ -20920,7 +20922,6 @@
 	};
 
 	Toolbar.prototype.onAddPolygonDblClick = function (obj) {
-	    this.isAddingPolygon = !this.isAddingPolygon;
 	    this.onAddPolygon();
 	};
 
@@ -20944,6 +20945,8 @@
 	    if (event.button !== 0) {
 	        return;
 	    }
+
+	    this.onSpray();
 
 	    var mesh = obj.object;
 	    var position = obj.point;
