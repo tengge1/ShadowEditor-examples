@@ -14706,10 +14706,6 @@
 
 	    this.maxTime = this.calculateMaxTime();
 
-	    // this.app.call(`resetAnimation`, this);
-	    // this.app.call(`startAnimation`, this);
-	    // this.app.on(`animationTime.${this.id}`, this.updateTime.bind(this));
-
 	    var promises = this.animators.map(n => {
 	        return n.create(scene, camera, renderer, animations);
 	    });
@@ -14731,20 +14727,14 @@
 	    return maxTime;
 	};
 
-	PlayerAnimation.prototype.updateTime = function (time) {
-	    this.currentTime = time;
-	};
-
 	PlayerAnimation.prototype.update = function (clock, deltaTime) {
+	    if (this.maxTime > 0) {
+	        this.currentTime = clock.getElapsedTime() % this.maxTime;
+	    }
+
 	    this.animators.forEach(n => {
 	        n.update(clock, deltaTime, this.currentTime);
 	    });
-
-	    // // 超过最大动画时间，重置动画
-	    // if (this.currentTime > this.maxTime) {
-	    //     this.app.call(`resetAnimation`, this.id);
-	    //     this.app.call(`startAnimation`, this.id);
-	    // }
 	};
 
 	PlayerAnimation.prototype.dispose = function () {
@@ -14758,9 +14748,6 @@
 	    this.animators.forEach(n => {
 	        n.dispose();
 	    });
-
-	    // this.app.on(`animationTime.${this.id}`, null);
-	    // this.app.call(`resetAnimation`, this);
 	};
 
 	/**
@@ -19189,17 +19176,107 @@
 
 	};
 
+	var ID$7 = -1;
+
+	/**
+	 * 图层
+	 */
+	function Layer() {
+	    this.id = `${this.constructor.name}${ID$7--}`;
+	    this.name = this.constructor.name;
+	}
+
+	Layer.prototype.dispose = function () {
+
+	};
+
+	/**
+	 * 瓦片图层
+	 */
+	function TiledLayer() {
+	    Layer.call(this);
+
+	    this.tree = rbush();
+	}
+
+	TiledLayer.prototype = Object.create(Layer.prototype);
+	TiledLayer.prototype.constructor = TiledLayer;
+
+	TiledLayer.prototype.add = function (tile) {
+	    var item = Object.assign({}, tile.aabb, {
+	        data: tile
+	    });
+
+	    this.tree.insert(item);
+	};
+
+	TiledLayer.prototype.remove = function (tile) {
+	    this.tree.remove(tile);
+	};
+
+	TiledLayer.prototype.clear = function () {
+	    this.tree.clear();
+	};
+
+	TiledLayer.prototype.all = function () {
+	    return this.tree.all();
+	};
+
+	TiledLayer.prototype.search = function (aabb) {
+	    return this.tree.search(aabb);
+	};
+
+	TiledLayer.prototype.collide = function (aabb) {
+	    return tree.collides({ minX: 40, minY: 20, maxX: 80, maxY: 70 });
+	};
+
+	TiledLayer.prototype.dispose = function () {
+
+	};
+
+	/**
+	 * 必应地图图层
+	 */
+	function BingTiledLayer() {
+	    TiledLayer.call(this);
+	}
+
+	BingTiledLayer.prototype = Object.create(TiledLayer.prototype);
+	BingTiledLayer.prototype.constructor = BingTiledLayer;
+
+	var ID$8 = -1;
+
+	/**
+	 * 渲染器
+	 * @param {*} camera 
+	 * @param {*} renderer 
+	 */
+	function Renderer(camera, renderer) {
+	    this.camera = camera;
+	    this.renderer = renderer;
+	    this.id = `${this.constructor.name}${ID$8--}`;
+	}
+
+	Renderer.prototype.render = function (layer) {
+
+	};
+
+	Renderer.prototype.dispose = function () {
+	    delete this.camera;
+	    delete this.render;
+	};
+
 	/**
 	 * 地球几何体
 	 */
 	function GlobeGeometry() {
-	    THREE.PlaneBufferGeometry.call(this, 1, 1);
+	    THREE.PlaneBufferGeometry.call(this, 1, 1, 16, 16);
 	}
 
 	GlobeGeometry.prototype = Object.create(THREE.PlaneBufferGeometry.prototype);
 	GlobeGeometry.prototype.constructor = GlobeGeometry;
 
-	var GlobeVertex = "uniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\n\r\nvarying vec3 vNormal;\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
+	var GlobeVertex = "uniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\n\r\nvarying vec3 vNormal;\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    vec3 transformed = vec3(position);\r\n\r\n    transformed.z = sqrt(1.0 * 1.0 - transformed.x * transformed.x - transformed.y * transformed.y);\r\n\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);\r\n\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
 
 	var GlobeFragment = "precision highp float;\r\n\r\nuniform sampler2D map;\r\n\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_FragColor = texture2D(map, vUV);\r\n}";
 
@@ -19430,45 +19507,56 @@
 	GlobeMaterial.prototype.constructor = GlobeMaterial;
 
 	/**
-	 * 地球
-	 * @param {*} app 
+	 * 瓦片图层渲染器
+	 * @param {*} camera 
+	 * @param {*} renderer 
 	 */
-	function Globe(app) {
-	    this.app = app;
-	}
-
-	Globe.prototype.start = function () {
-	    var renderer = this.app.editor.renderer;
+	function TiledLayerRenderer(camera, renderer) {
+	    Renderer.call(this, camera, renderer);
 
 	    var geometry = new GlobeGeometry();
 	    var material = new GlobeMaterial();
 
-	    var gl = renderer.context;
+	    var gl = this.renderer.context;
 
 	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
 	    gl.shaderSource(vertexShader, material.vertexShader);
 	    gl.compileShader(vertexShader);
 
+	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(vertexShader));
+	        return;
+	    }
+
 	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 	    gl.shaderSource(fragmentShader, material.fragmentShader);
 	    gl.compileShader(fragmentShader);
+
+	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(fragmentShader));
+	        return;
+	    }
 
 	    var program = gl.createProgram();
 	    gl.attachShader(program, vertexShader);
 	    gl.attachShader(program, fragmentShader);
 	    gl.linkProgram(program);
+
+	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+	        console.warn("Could not initialise shaders");
+	        return;
+	    }
+
 	    gl.useProgram(program);
 
 	    var positionAttr = gl.getAttribLocation(program, 'position');
 	    var normalAttr = gl.getAttribLocation(program, 'normal');
 	    var uvAttr = gl.getAttribLocation(program, 'uv');
 
-	    // gl.enableVertexAttribArray(positionAttr);
-	    // gl.enableVertexAttribArray(normalAttr);
-	    // gl.enableVertexAttribArray(uvAttr);
-
 	    var modelViewMatrixUniform = gl.getUniformLocation(program, 'modelViewMatrix');
 	    var projectionMatrixUniform = gl.getUniformLocation(program, 'projectionMatrix');
+
+	    var mapUniform = gl.getUniformLocation(program, 'map');
 
 	    var positionBuffer = gl.createBuffer();
 	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -19486,8 +19574,25 @@
 	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
 
-	    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	    var texture = gl.createTexture();
+
+	    texture.image = document.createElement('img');
+	    texture.image.crossOrigin = "anonymous";
+
+	    texture.image.onload = function () {
+	        texture.image.onload = null;
+
+	        gl.bindTexture(gl.TEXTURE_2D, texture);
+	        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, texture.image);
+
+	        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+	        gl.bindTexture(gl.TEXTURE_2D, null);
+	    };
+
+	    texture.image.src = 'http://t0.ssl.ak.tiles.virtualearth.net/tiles/a0.jpeg?g=5793';
 
 	    this.program = program;
 
@@ -19497,19 +19602,29 @@
 
 	    this.modelViewMatrixUniform = modelViewMatrixUniform;
 	    this.projectionMatrixUniform = projectionMatrixUniform;
+	    this.mapUniform = mapUniform;
 
 	    this.positionBuffer = positionBuffer;
 	    this.normalBuffer = normalBuffer;
 	    this.uvBuffer = uvBuffer;
 	    this.indexBuffer = indexBuffer;
 
-	    this.app.on(`afterRender`, this.onAfterRender.bind(this));
-	};
+	    this.texture = texture;
 
-	Globe.prototype.onAfterRender = function () {
-	    var scene = this.scene;
-	    var camera = this.app.editor.camera;
-	    var renderer = this.app.editor.renderer;
+	    this.geometry = geometry;
+	    this.material = material;
+	}
+
+	TiledLayerRenderer.prototype = Object.create(Renderer.prototype);
+	TiledLayerRenderer.prototype.constructor = TiledLayerRenderer;
+
+	TiledLayerRenderer.prototype.render = function (layer) {
+	    if (!this.program) {
+	        return;
+	    }
+
+	    var camera = this.camera;
+	    var renderer = this.renderer;
 
 	    var gl = renderer.context;
 
@@ -19517,6 +19632,12 @@
 
 	    gl.uniformMatrix4fv(this.modelViewMatrixUniform, false, camera.matrixWorldInverse.elements);
 	    gl.uniformMatrix4fv(this.projectionMatrixUniform, false, camera.projectionMatrix.elements);
+
+	    if (this.texture.image.complete) {
+	        gl.activeTexture(gl.TEXTURE0);
+	        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	        gl.uniform1i(this.mapUniform, 0);
+	    }
 
 	    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 	    gl.enableVertexAttribArray(this.positionAttr);
@@ -19531,7 +19652,36 @@
 	    gl.vertexAttribPointer(this.uvAttr, 2, gl.FLOAT, false, 0, 0);
 
 	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-	    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+	    gl.drawElements(gl.TRIANGLES, this.geometry.index.count, gl.UNSIGNED_SHORT, 0);
+	};
+
+	/**
+	 * 地球
+	 * @param {*} camera 
+	 * @param {*} renderer 
+	 */
+	function Globe(camera, renderer) {
+	    this.camera = camera;
+	    this.renderer = renderer;
+	}
+
+	Globe.prototype.create = function () {
+	    this.layer = new BingTiledLayer();
+	    this.tiledLayerRenderer = new TiledLayerRenderer(this.camera, this.renderer);
+	};
+
+	Globe.prototype.update = function () {
+	    this.tiledLayerRenderer.render(this.layer);
+	};
+
+	Globe.prototype.dispose = function () {
+	    this.layer.dispose();
+	    this.tiledLayerRenderer.dispose();
+	    delete this.layer;
+	    delete this.tiledLayerRenderer;
+	    delete this.camera;
+	    delete this.renderer;
 	};
 
 	/**
@@ -19695,8 +19845,11 @@
 	// ----------------------------- 地球 --------------------------------------
 
 	ComponentMenu.prototype.onAddEarth = function () {
-	    var globe = new Globe(this.app);
-	    globe.start();
+	    if (this.globe === undefined) {
+	        this.globe = new Globe(this.app.editor.camera, this.app.editor.renderer);
+	        this.globe.create();
+	        this.app.on(`afterRender.Globe`, this.globe.update.bind(this.globe));
+	    }
 	};
 
 	/**
@@ -20426,7 +20579,7 @@
 	 * Port from https://github.com/mapbox/earcut (v2.1.2)
 	 */
 
-	var ID$7 = -1;
+	var ID$9 = -1;
 
 	/**
 	 * 工具基类
@@ -20434,7 +20587,7 @@
 	 */
 	function BaseTool(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$7--}`;
+	    this.id = `${this.constructor.name}${ID$9--}`;
 
 	    this.dispatch = dispatch('end');
 
@@ -36361,7 +36514,7 @@ void main()	{
 	    control.render();
 	};
 
-	var ID$8 = -1;
+	var ID$a = -1;
 
 	const STOP = 0;
 	const PLAY = 1;
@@ -36728,7 +36881,7 @@ void main()	{
 	        var animation = {
 	            id: null,
 	            uuid: THREE.Math.generateUUID(),
-	            name: `${L_ANIMATION}${ID$8--}`,
+	            name: `${L_ANIMATION}${ID$a--}`,
 	            target: null,
 	            type: 'Tween',
 	            beginTime: event.offsetX / timeline.scale,
