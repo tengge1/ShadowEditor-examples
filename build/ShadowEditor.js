@@ -3117,11 +3117,7 @@
 	    var a = document.createElement('a');
 	    a.setAttribute('href', 'javascript:;');
 
-	    if (text.length > 8) {
-	        a.innerHTML = text.substr(0, 7) + '...';
-	    } else {
-	        a.innerHTML = text;
-	    }
+	    a.innerHTML = text;
 
 	    li.appendChild(a);
 
