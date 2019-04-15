@@ -208,6 +208,7 @@ L_MAX_VOLUME = '主音量';
 L_BACKGROUND_MUSIC = '背景音乐';
 L_AUTO_PLAY = '自动播放';
 L_VOLUME = '循环播放';
+L_LOOP = '循环播放';
 L_PLAY = '播放';
 L_STOP = '停止';
 L_CLICK_AUDIO_IN_PANEL = '请点击音频面板中的音频！';
@@ -582,3 +583,25 @@ L_ARRANGE_MESH = '整理模型';
 L_ARRANGE_THUMBNAIL = '整理缩略图';
 
 L_EXPORT_SCENE = '导出场景';
+
+L_FILTER = '滤镜';
+L_HUE = '色调';
+L_SATURATE = '饱和度';
+L_BRIGHTNESS = '亮度';
+L_BLUR = '模糊';
+L_CONTRAST = '对比度';
+L_GRAYSCALE = '灰度';
+L_INVERT = '颜色反转';
+L_SEPIA = '复古';
+
+L_EMPTY_SCENE = '空场景';
+L_GIS_SCENE = 'GIS场景';
+
+L_CREATE_EMPTY_SCENE_SUCCESS = '空场景创建成功！';
+L_GLOBE = '地球';
+L_EXPORT_EDITOR = '导出编辑器';
+L_GIS_COMPONENT = 'GIS组件';
+L_TILE_MAP = '地图';
+L_GOOGLE_MAP = '谷歌地图';
+L_BING_MAP = '必应地图';
+L_TIANDITU_MAP = '天地图';
