@@ -4,29 +4,696 @@
 	(factory((global.Shadow = {})));
 }(this, (function (exports) { 'use strict';
 
+	window.URL = window.URL || window.webkitURL;
+	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+	Number.prototype.format = function () {
+	    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+	};
+
+	String.prototype.format = function () {
+	    var str = this;
+	    for (var i = 0; i < arguments.length; i++) {
+	        str = str.replace('{' + i + '}', arguments[i]);
+	    }
+	    return str;
+	};
+
+	Object.assign(window, {
+	    // command
+	    L_ADD_OBJECT_COLON: 'Add Object:',
+	    L_ADD_SCRIPT: 'Add Script',
+	    L_MOVE_OBJECT: 'Move Object',
+	    L_MULTI_MODIFY: 'Multi Modify',
+	    L_REMOVE_OBJECT: 'Remove Object',
+	    L_REMOVE_SCRIPT: 'Remove Script',
+	    L_SET: 'Set',
+	    L_SET_GEOMETRY: 'Set Geometry',
+	    L_SET_MATERIAL: 'Set Material',
+	    L_NEW_MATERIAL: 'New Material',
+	    L_SET_POSITION: 'Set Position',
+	    L_SET_ROTATION: 'Set Rotation',
+	    L_SET_SCALE: 'Set Scale',
+	    L_SET_SCENE: 'Set Scene',
+	    L_SET_SCRIPT: 'Set Script',
+	    L_UPDATE_UUID: 'Update UUID',
+
+	    // component
+	    L_BASIC_INFO: 'Basic Info',
+	    L_NAME: 'Name',
+	    L_TYPE: 'Type',
+	    L_VISIBLE: 'Visible',
+	    L_CAMERA_COMPONENT: 'Camera Component',
+	    L_FOV: 'Fov',
+	    L_NEAR: 'Near',
+	    L_FAR: 'Far',
+	    L_FIRE_COMPONENT: 'Fire Component',
+	    L_WIDTH: 'Width',
+	    L_HEIGHT: 'Height',
+	    L_DEPTH: 'Depth',
+	    L_SLICE_SPACING: 'SliceSpacing',
+	    L_PREVIEW: 'Preview',
+	    L_GEOMETRY_COMPONENT: 'Geometry Component',
+	    L_LIGHT_COMPONENT: 'Light Component',
+	    L_COLOR: 'Color',
+	    L_INTENSITY: 'Intensity',
+	    L_DISTANCE: 'Distance',
+	    L_ANGLE: 'Angle',
+	    L_PENUMBRA: 'Penumbra',
+	    L_DECAY: 'Decay',
+	    L_SKY_COLOR: 'SkyColor',
+	    L_GROUND_COLOR: 'GroundColor',
+	    L_LMESH_COMPONENT: 'LMesh Component',
+	    L_ANIMATION: 'Animation',
+	    L_MATERIAL_COMPONENT: 'Material Component',
+	    L_SAVE: 'Save',
+	    L_SELECT: 'Select',
+	    L_LINE_BASIC_MATERIAL: 'LineBasicMaterial',
+	    L_LINE_DASHED_MATERIAL: 'LineDashedMaterial',
+	    L_MESH_BASIC_MATERIAL: 'MeshBasicMaterial',
+	    L_MESH_DEPTH_MATERIAL: 'MeshDepthMaterial',
+	    L_MESH_NORMAL_MATERIAL: 'MeshNormalMaterial',
+	    L_MESH_LAMBERT_MATERIAL: 'MeshLambertMaterial',
+	    L_MESH_PHONG_MATERIAL: 'MeshPhongMaterial',
+	    L_POINT_CLOUD_MATERIAL: 'PointCloudMaterial',
+	    L_MESH_STANDARD_MATERIAL: 'MeshStandardMaterial',
+	    L_MESH_PHYSICAL_MATERIAL: 'MeshPhysicalMaterial',
+	    L_SPRITE_MATERIAL: 'SpriteMaterial',
+	    L_SHADER_MATERIAL: 'ShaderMaterial',
+	    L_RAW_SHADER_MATERIAL: 'RawShaderMaterial',
+	    L_SHADER_PROGRAM: 'Shader Program',
+	    L_INFO: 'Information',
+	    L_VERTEX: 'Vertex',
+	    L_FRAGMENT: 'Fragment',
+	    L_ROUGHNESS: 'Roughness',
+	    L_METALNESS: 'MetalNess',
+	    L_EMISSIVE: 'Emissive',
+	    L_SPECULAR: 'Specular',
+	    L_SHININESS: 'Shininess',
+	    L_CLEAR_COAT: 'ClearCoat',
+	    L_CLEAR_COAT_ROUGHNESS: 'ClearCoatRoughness',
+	    L_VERTEX_COLOR: 'Vertex Color',
+	    L_NO_COLORS: 'No Colors',
+	    L_FACE_COLORS: 'Face Colors',
+	    L_VERTEX_COLORS: 'Vertex Colors',
+	    L_SKIN: 'Skin',
+	    L_TEXTURE: 'Texture',
+	    L_SET_MAP: 'Set',
+	    L_ALPHA_MAP: 'AlphaMap',
+	    L_BUMP_MAP: 'BumpMap',
+	    L_NORMAL_MAP: 'NormalMap',
+	    L_DISPLACEMENT_MAP: 'DisplacementMap',
+	    L_ROUGHNESS_MAP: 'RoughnessMap',
+	    L_METALNESS_MAP: 'MetalnessMap',
+	    L_SPECULAR_MAP: 'SpecularMap',
+	    L_ENV_MAP: 'EnvMap',
+	    L_LIGHT_MAP: 'LightMap',
+	    L_AO_MAP: 'AoMap',
+	    L_EMISSIVE_MAP: 'EmissiveMap',
+	    L_SIDE: 'Side',
+	    L_FRONT_SIDE: 'Front Side',
+	    L_BACK_SIDE: 'Back Side',
+	    L_DOUBLE_SIDE: 'Double Side',
+	    L_FLAT_SHADING: 'Flat Shading',
+	    L_BLENDING: 'Blending',
+	    L_NO_BLENDING: 'No Blending',
+	    L_NORMAL_BLENDING: 'Normal Blending',
+	    L_ADDITIVE_BLENDING: 'Additive Blending',
+	    L_SUBSTRACTIVE_BLENDING: 'Substractive Blending',
+	    L_MULTIPLY_BLENDING: 'Multiply Blending',
+	    L_CUSTOM_BLENDING: 'Custom Blending',
+	    L_OPACITY: 'Opacity',
+	    L_TRANSPARENT: 'Transparent',
+	    L_ALPHA_TEST: 'AlphaTest',
+	    L_WIREFRAME: 'Wireframe',
+	    L_CANNOT_SET_TEXTURE: 'Cannot set texture, ',
+	    L_MATERIAL_HAS_NO_COORDINATES: ' material has no coordinates.',
+	    L_SHADER_INFO: 'ShaderInfo',
+	    L_SHADER_CANNOT_PARSE: 'Shader cannot be parsed.',
+	    L_VERTEX_SHADER: 'Vertex Shader',
+	    L_FRAGMENT_SHADER: 'Fragment Shader',
+	    L_SELECT_TEXTURE_FIRST: 'Please select texture first.',
+	    L_ENTER_MATERIAL_NAME: 'Please enter material name',
+	    L_CLICK_MATERIAL_ON_PANEL: 'Please click material on material panel.',
+	    L_MMD_MODEL: 'MMD Model',
+	    L_MODEL_ANIMATION: 'Model Animation',
+	    L_CAMERA_ANIMATION: 'Camera Animation',
+	    L_AUDIO: 'Audio',
+	    L_CLICK_ANIMATION_PANEL: 'Please click the animation in the animation panel.',
+	    L_SELECT_MMD_ANIMATION_ONLY: 'Please select MMD animation only.',
+	    L_CLICK_CAMERA_ANIMATION: 'Please select camera animation.',
+	    L_SELECT_CAMERA_ANIMATION_ONLY: 'Please select camera animation only.',
+	    L_SELECT_MMD_AUDIO: 'Please select MMD audio.',
+	    L_PARTICLE_EMITTER: 'Particle Emitter',
+	    L_POSITION: 'Position',
+	    L_POSITION_SPREAD: 'PositionSpread',
+	    L_VELOCITY: 'Velocity',
+	    L_VELOCITY_SPREAD: 'VelocitySpread',
+	    L_ACCELERATION: 'Acceleration',
+	    L_ACCELERATION_SPREAD: 'AccelerationSpread',
+	    L_SIZE: 'Size',
+	    L_SIZE_SPREAD: 'SizeSpread',
+	    L_PARTICLE_COUNT: 'ParticleCount',
+	    L_MAX_AGE: 'MaxAge',
+	    L_MAX_AGE_SPREAD: 'maxAgeSpread',
+	    L_CANCEL: 'Cancel',
+	    L_REFLECTOR_COMPONENT: 'Reflector Component',
+	    L_REFLECT: 'Reflect',
+	    L_TEXTURE_SIZE: 'TextureSize',
+	    L_CLIP_BIAS: 'ClipBias',
+	    L_RECURSION: 'Recursion',
+	    L_SCENE_COMPONENT: 'SceneComponent',
+	    L_BACKGROUND: 'Background',
+	    L_SOLID_COLOR: 'Solid Color',
+	    L_BACKGROUND_IMAGE: 'Background Image',
+	    L_CUBE_TEXTURE: 'Cube Texture',
+	    L_BACKGROUND_COLOR: 'BackgroundColor',
+	    L_POS_X: 'PosX',
+	    L_NEG_X: 'NegX',
+	    L_POS_Y: 'PosY',
+	    L_NEG_Y: 'NegY',
+	    L_POS_Z: 'PosZ',
+	    L_NEG_Z: 'NegZ',
+	    L_UPLOAD: 'Upload',
+	    L_FOG: 'Fog',
+	    L_NONE: 'None',
+	    L_LINEAR: 'Linear',
+	    L_EXPONENTIAL: 'Exponential',
+	    L_FOG_COLOR: 'FogColor',
+	    L_FOG_NEAR: 'FogNear',
+	    L_FOG_FAR: 'FogFar',
+	    L_FOG_DENSITY: 'FogDensity',
+	    L_CLICK_MAP_PANEL: 'Please click the map in the Map Panel.',
+	    L_ONLY_SELECT_CUBE_TEXTURE: 'You should select Cube Texture.',
+	    L_CUBE_TEXTURE_FETCH_FAILED: 'Cube Texture fetch failed.',
+	    L_UPLOAD_ALL_BEFORE_SAVE: 'Please upload all the textures before save.',
+	    L_CUBE_TEXTURE_EXISTED: 'Cube texture has already been uploaded.',
+	    L_SHADOW_COMPONENT: 'Shadow Component',
+	    L_SHADOW: 'Shadow',
+	    L_CAST: 'Cast',
+	    L_RECEIVE: 'Receive',
+	    L_RADIUS: 'Radius',
+	    L_MAP_SIZE: 'MapSize',
+	    L_BIAS: 'Bias',
+	    L_CAMERA_LEFT: 'CameraLeft',
+	    L_CAMERA_RIGHT: 'CameraRight',
+	    L_CAMERA_TOP: 'CameraTop',
+	    L_CAMERA_BOTTOM: 'CameraBottom',
+	    L_CAMERA_NEAR: 'CameraNear',
+	    L_CAMERA_FAR: 'CameraFar',
+	    L_SMOKE_COMPONENT: 'SmokeComponent',
+	    L_TRANSFORM_COMPONENT: 'Transform Component',
+	    L_TRANSLATE: 'Translate',
+	    L_ROTATE: 'Rotate',
+	    L_SCALE: 'Scale',
+	    L_BASIC_INFORMATION: 'Basic Information',
+	    L_TARGET: 'Target',
+	    L_TWEEN_ANIMATION: 'Tween Animation',
+	    L_SKELETAL_ANIMATION: 'Skeletal Animation',
+	    L_PLAY_AUDIO: 'Play Audio',
+	    L_FILTER_ANIMATION: 'Filter Animation',
+	    L_PARTICLE_ANIMATION: 'Particle Animation',
+	    L_BEGIN_TIME: 'BeginTime',
+	    L_END_TIME: 'EndTime',
+	    L_ANIMATION_OBJECT: 'Animation Object',
+	    L_NOT_EXISTED_IN_SCENE: 'is not existed in the scene.',
+	    L_BEGIN_STATUS: 'BeginStatus',
+	    L_CURRENT_STATUS: 'Current Status',
+	    L_CUSTOM_STATUS: 'Custom Status',
+	    L_EASE_FUNC: 'Ease Func',
+	    L_END_STATUS: 'EndStatus',
+	    L_AUDIO_LISTENER: 'Audio Listener',
+	    L_MAX_VOLUME: 'Max Volume',
+	    L_BACKGROUND_MUSIC: 'Background Music',
+	    L_AUTO_PLAY: 'Auto Play',
+	    L_LOOP: 'Loop',
+	    L_VOLUME: 'Volume',
+	    L_PLAY: 'Play',
+	    L_STOP: 'Stop',
+	    L_CLICK_AUDIO_IN_PANEL: 'Please click the audio in the Audio Panel.',
+	    L_SCENE_CONTROLLER: 'Scene Controller',
+	    L_FIRST_PERSON_CONTROLS: 'First Person Controls',
+	    L_FLY_CONTROLS: 'Fly Controls',
+	    L_ORBIT_CONTROLS: 'Orbit Controls',
+	    L_POINTER_LOCK_CONTROLS: 'Pointer Lock Controls',
+	    L_TRACEBALL_CONTROLS: 'Traceball Controls',
+	    L_MOVEMENT_SPEED: 'MovementSpeed',
+	    L_LOOK_SPEED: 'LookSpeed',
+	    L_LOOK_VERTICAL: 'LookVertical',
+	    L_AUTO_FORWARD: 'AutoForward',
+	    L_ACTIVE_LOCK: 'ActiveLock',
+	    L_HEIGHT_SPEED: 'HeightSpeed',
+	    L_HEIGHT_COEF: 'HeightCoef',
+	    L_HEIGHT_MIN: 'HeightMin',
+	    L_HEIGHT_MAX: 'HeightMax',
+	    L_CONSTRAIN_VERTICAL: 'ConstrainVertical',
+	    L_VERTICAL_MIN: 'VerticalMin',
+	    L_VERTICAL_MAX: 'VerticalMax',
+	    L_ROTATE_SPEED: 'RotateSpeed',
+	    L_DRAG_TO_LOOK: 'DragToLook',
+	    L_MIN_DISTANCE: 'MinDistance',
+	    L_MAX_DISTANCE: 'MaxDistance',
+	    L_MIN_POLAR_ANGLE: 'MinPolarAngle',
+	    L_MAX_POLAR_ANGLE: 'MaxPolarAngle',
+	    L_MIN_AZIMUTH_ANGLE: 'MinAzimuthAngle',
+	    L_MAX_AZIMUTH_ANGLE: 'MaxAzimuthAngle',
+	    L_ENABLE_DAMPING: 'EnableDamping',
+	    L_DAMPING_FACTOR: 'DampingFactor',
+	    L_ENABLE_ZOOM: 'EnableZoom',
+	    L_ZOOM_SPEED: 'ZoomSpeed',
+	    L_ENABLE_ROTATE: 'EnableRotate',
+	    L_ENABLE_PAN: 'EnablePan',
+	    L_PAN_SPEED: 'PanSpeed',
+	    L_SCREEN_SPACE_PANNING: 'ScreenSpacePanning',
+	    L_KEY_PAN_SPEED: 'KeyPanSpeed',
+	    L_AUTO_ROTATE: 'AutoRotate',
+	    L_AUTO_ROTATE_SPEED: 'AutoRotateSpeed',
+	    L_ENABLE_KEYS: 'EnableKeys',
+	    L_IS_LOCKED: 'IsLocked',
+	    L_NO_ROTATE: 'NoRotate',
+	    L_NO_ZOOM: 'NoZoom',
+	    L_NO_PAN: 'NoPan',
+	    L_STATIC_MOVING: 'StaticMoving',
+	    L_DYNAMIC_DAMPING_FACTOR: 'DampingFactor',
+	    L_WIDTH_SEGMENTS: 'WidthSegments',
+	    L_HEIGHT_SEGMENTS: 'HeightSegments',
+	    L_DEPTH_SEGMENTS: 'DepthSegments',
+	    L_SEGMENTS: 'Segments',
+	    L_THETA_START: 'ThetaStart',
+	    L_THETA_LENGTH: 'ThetaLength',
+	    L_RADIUS_TOP: 'RadiusTop',
+	    L_RADIUS_BOTTOM: 'RadiusBottom',
+	    L_RADIAL_SEGMENTS: 'RadialSegments',
+	    L_OPEN_ENDED: 'OpenEnded',
+	    L_DETAIL: 'Detail',
+	    L_PHI_START: 'PhiStart',
+	    L_PHI_LENGTH: 'PhiLength',
+	    L_BOTTOM: 'Bottom',
+	    L_LID: 'Lid',
+	    L_BODY: 'Body',
+	    L_FIT_LID: 'FitLid',
+	    L_BLINN: 'Blinn',
+	    L_TUBE: 'Tube',
+	    L_TUBULAR_SEGMENTS: 'TubelarSegments',
+	    L_ARC: 'Arc',
+	    L_TUBE_ARC: 'TubeArc',
+	    L_DISTORTED_ARC: 'DistortedArc',
+	    L_CLOTH_COMPONENT: 'ClothComponent',
+	    L_PERLIN_TERRAIN: 'PerlinTerrain',
+	    L_QUALITY: 'Quality',
+	    L_SKY: 'Sky',
+	    L_TURBIDITY: 'Turbidity',
+	    L_RAYLEIGH: 'Rayleigh',
+	    L_LUMINANCE: 'Luminance',
+	    L_MIE_COEFFICIENT: 'MieCofficient',
+	    L_MIE_DIRECTIONAL_G: 'MieDirectionalG',
+	    L_PHYSICS_TYPE: 'PhysicsType',
+	    L_ENABLED: 'Enabled',
+	    L_RIGID_BODY: 'RigidBody',
+	    L_SOFT_VOLUME: 'SoftVolume',
+	    L_PHYSICS_ENVIRONMENT: 'PhysicsEnvironment',
+	    L_COLLISION_CONFIG: 'CollisionConfig',
+	    L_DEFAULT_COLLISION_CONFIG: 'DefaultCollisionConfig',
+	    L_SOFTBODY_RIGIDBODY_COLLISIONCONFIG: 'SoftBodyRigidBodyCollisionConfig',
+	    L_GRAVITY: 'Gravity',
+	    L_SHAPE: 'Shape',
+	    L_BOX_SHAPE: 'BoxShape',
+	    L_SPHERE_SHAPE: 'SphereShape',
+	    L_MASS: 'Mass',
+	    L_INERTIA: 'Inertia',
+	    L_HAS_NO_PHYSICS_HELPER: 'has no physics helper.',
+	    L_PRESSURE: 'Pressure',
+	    L_AFTERIMAGE_EFFECT: 'AfterimageEffect',
+	    L_ENABLE_STATE: 'EnableState',
+	    L_DAMP: 'Damp',
+	    L_BOKEH_EFFECT: 'Bokeh Effect',
+	    L_FOCUS: 'Focus',
+	    L_APERTURE: 'Aperture',
+	    L_MAX_BLUR: 'MaxBlur',
+	    L_DOT_SCREEN_EFFECT: 'DotScreenEffect',
+	    L_FXAA: 'FXAA Component',
+	    L_GLITCH_EFFECT: 'Glitch Effect',
+	    L_WILD_MODE: 'WildMode',
+	    L_HALFTONE_EFFECT: 'Halftone Effect',
+	    L_POINT: 'Point',
+	    L_ELLIPSE: 'Ellipse',
+	    L_LINE: 'Line',
+	    L_SQUARE: 'Square',
+	    L_ROTATE_RED: 'RotateRed',
+	    L_ROTATE_GREEN: 'RotateGreen',
+	    L_ROTATE_BLUE: 'RotateBlue',
+	    L_SCATTER: 'Scatter',
+	    L_BLENDING: 'Blending',
+	    L_BLENDING_MODE: 'BlendingMode',
+	    L_MULTIPLY: 'Multiply',
+	    L_ADD: 'Add',
+	    L_LIGHTER: 'Lighter',
+	    L_DARKER: 'Darker',
+	    L_GREY_SCALE: 'GreyScale',
+	    L_PIXEL_EFFECT: 'PixelEffect',
+	    L_PIXEL_SIZE: 'PixelSize',
+	    L_RGB_SHIFT_EFFECT: 'RGB Shift Effect',
+	    L_AMOUNT: 'Amount',
+	    L_SAO: 'SAO',
+	    L_OUTPUT: 'Output',
+	    L_BEAUTY: 'Beauty',
+	    L_BEAUTY_AND_OCCLUSION: 'Beauty&Occlusion',
+	    L_OCCLUSION: 'Occlusion',
+	    L_NORMAL: 'Normal',
+	    L_KERNAL_RADIUS: 'KernalRadius',
+	    L_MIN_RESOLUTION: 'MinResolution',
+	    L_BLUR: 'Blur',
+	    L_BLUR_RADIUS: 'BlurRadius',
+	    L_BLUR_STD_DEV: 'BlurStdDev',
+	    L_BLUR_DEPTH_CUTOFF: 'BlurDepthCutoff',
+	    L_SMAA: 'SMAA',
+	    L_SSAA: 'SSAA',
+	    L_ONE_SAMPLE: '1 Sample',
+	    L_TWO_SAMPLES: '2 Samples',
+	    L_FOUR_SAMPLES: '4 Samples',
+	    L_EIGHT_SAMPLES: '8 Samples',
+	    L_SIXTEEN_SAMPLES: '16 Samples',
+	    L_THIRTYTWO_SAMPLES: '32 Samples',
+	    L_UNBIASED: 'Unbiased',
+	    L_SSAO: 'SSAO',
+	    L_DEFAULT: 'Default',
+	    L_OCCLUSION_AND_BLUR: 'Occlusion&Blur',
+	    L_TAA: 'TAA',
+	    L_LEVEL: 'Level',
+
+	    // core
+	    L_IS_NOT_AVAILABLE: 'is not available.',
+	    L_SAVE_INTO_INDEXEDDB: 'Saved into indexDB.',
+	    L_CLEAR_INDEXED_DB: 'Clear indexedDB.',
+
+	    // editor
+	    L_SCENE: 'Scene',
+	    L_DEFAULT_CAMERA: 'DefaultCamera',
+	    L_AUDIO_LISTENER: 'AudioListener',
+	    L_ANIMATION_LAYER_1: 'AnimLayer1',
+	    L_ANIMATION_LAYER_2: 'AnimLayer2',
+	    L_ANIMATION_LAYER_3: 'AnimLayer3',
+	    L_AMBIENT: 'Ambient',
+	    L_DIRECTIONAL: 'Directional',
+	    L_OBJECT_NUM: 'Object',
+	    L_VERTEX_NUM: 'Vertex',
+	    L_TRIANGLE_NUM: 'Triangle',
+	    L_THROW_BALL: 'ThrowBall',
+	    L_SELECT: 'Select',
+	    L_TRANSLATE_W: 'Translate(W)',
+	    L_ROTATE_E: 'Rotate(E)',
+	    L_SCALE_R: 'Scale(R)',
+	    L_DRAW_POINT: 'Draw Point',
+	    L_DRAW_LINE: 'Draw Line',
+	    L_DRAW_POLYGON: 'Draw Pologon',
+	    L_SPRAY: 'Spray',
+	    L_POLYGON: 'Polygon',
+	    L_DECAL: 'Decal',
+	    L_UPLOAD_FAILED: 'Upload failed.',
+	    L_CONFIRM: 'Confirm',
+	    L_DELETE: 'Delete',
+	    L_TIME: 'Time',
+	    L_MODEL: 'Model',
+	    L_MAP: 'Map',
+	    L_MATERIAL: 'Material',
+	    L_PARTICLE: 'Particle',
+	    L_PREFAB: 'Prefab',
+	    L_CHARACTER: 'Character',
+	    L_LOG: 'Logs',
+	    L_COLLAPSE: 'Collapse',
+	    L_CLEAR: 'Clear',
+	    L_CLEAR_LOGS: 'Clear Logs',
+	    L_LOAD_SUCCESS: 'Load Successfully!',
+	    L_ILLUSTRATE_DOUBLE_CLICK_ADD_ANIM: 'Illustrate: Double click area below to add animation.',
+	    L_ANIM_LAYER: 'AnimLayer',
+	    L_CHECK_DELETE_LAYER: 'Please check the layer.',
+	    L_DELETE_LAYER_WILL_DELETE_ANIM: 'Delete layer will delete all the anims on the layer. Are you sure?',
+	    L_NO_IMAGE: 'No Image',
+	    L_CLICK_MAP_IN_PANEL: 'Please click the map in the map panel.',
+	    L_ASSETS: 'Assets',
+	    L_EXPORT_GEOMETRY: 'Export Geometry',
+	    L_EXPORT_OBJECT: 'Export Object',
+	    L_EXPORT_GLTF: 'Export GLTF',
+	    L_EXPORT_OBJ: 'Export OBJ',
+	    L_EXPORT_PLY: 'Export PLY',
+	    L_EXPORT_STL_BINARY: 'Export STL Binary',
+	    L_EXPORT_STL: 'Export STL',
+	    L_PLEASE_SELECT_OBJECT: 'Please select object!',
+	    L_OBJECT_SELECTED_IS_NOT_GEOMETRY: 'The object you selected is not geometry.',
+	    L_COMPONENT: 'Component',
+	    L_BACKGROUND_MUSIC: 'Background Music',
+	    L_PARTICLE_EMITTER: 'ParticleEmitter',
+	    L_SKY: 'Sky',
+	    L_FIRE: 'Fire',
+	    L_WATER: 'Water',
+	    L_SMOKE: 'Smoke',
+	    L_CLOTH: 'Cloth',
+	    L_PHYSICS_CLOTH: 'Physics Cloth',
+	    L_ADD_PHYSICS_CLOTH_SUCCESS: 'Add physics cloth successfully',
+	    L_EDIT: 'Edit',
+	    L_UNDO: 'Undo',
+	    L_REDO: 'Redo',
+	    L_CLEAR_HISTORY: 'Clear History',
+	    L_CLONE: 'Clone',
+	    L_HISTORY_WILL_CLEAR: 'Undo/Redo history will be cleared. Are you sure?',
+	    L_GEOMETRY: 'Geometry',
+	    L_GROUP: 'Group',
+	    L_PLANE: 'Plane',
+	    L_BOX: 'Box',
+	    L_CIRCLE: 'Circle',
+	    L_CYLINDER: 'Cylinder',
+	    L_SPHERE: 'Sphere',
+	    L_ICOSAHEDRON: 'Icosahedron',
+	    L_TORUS: 'Torus',
+	    L_TORUS_KNOT: 'Torus Knot',
+	    L_TEAPOT: 'Teapot',
+	    L_LATHE: 'Lathe',
+	    L_SPRITE: 'Sprite',
+	    L_TEXT: 'Text',
+	    L_SPLINE: 'Spline',
+	    L_PLEASE_INPUT: 'Please input',
+	    L_SOME_WORDS: 'Sone Words',
+	    L_HELP: 'Help',
+	    L_SOURCE: 'Source',
+	    L_EXAMPLES: 'Examples',
+	    L_DOCUMENTS: 'Documents',
+	    L_ABOUT: 'About',
+	    L_AUTHOR: 'Author',
+	    L_LISENSE: 'Lisense',
+	    L_LIGHT: 'Light',
+	    L_AMBIENT_LIGHT: 'Ambient Light',
+	    L_DIRECTIONAL_LIGHT: 'Directional Light',
+	    L_POINT_LIGHT: 'Point Light',
+	    L_SPOT_LIGHT: 'Spot Light',
+	    L_HEMISPHERE_LIGHT: 'Hemisphere Light',
+	    L_RECT_AREA_LIGHT: 'Rect Area Light',
+	    L_OPTIONS: 'Options',
+	    L_SURFACE: 'Furface',
+	    L_RENDERER: 'Renderer',
+	    L_NEW: 'New',
+	    L_SAVE_AS: 'Save As',
+	    L_EXPORT_STATIC_WEBSITE: 'Export Static Website',
+	    L_NO_NAME: 'No Name',
+	    L_UNSAVED_WILL_LOSE_CONFIRM: 'All unsaved data will be lost. Are you sure?',
+	    L_SAVE_SCENE: 'Save Scene',
+	    L_NEW_SCENE: 'New Scene',
+	    L_PUBLISH_WEBSITE: 'Publish website',
+	    L_CONFIRM_PUBLISH_WEBSITE: 'Are you sure to publish all scenes and assets?',
+	    L_TERRAIN: 'Terrain',
+	    L_PERLIN_TERRAIN: 'Perlin Terrain',
+	    L_SHADER_TERRAIN: 'Shader Terrain',
+	    L_RAISE_TERRAIN: 'Raise Terrain',
+	    L_REDUCE_TERRAIN: 'Reduce Terrain',
+	    L_PLANT_TREES: 'Plant Trees',
+	    L_SCRIPT_SAVED_SUCCESS: 'Script saved successfully!',
+	    L_EXECUTE_BEFORE_SCENE_RENDER: 'Execute before scene render',
+	    L_EXECUTE_AFTER_SCENE_RENDER: 'Execute after scene render',
+	    L_EXECUTE_EACH_FRAME_DURING_RUNNING: 'Execute each frame during running',
+	    L_EXECUTE_AFTER_PROGRAM_STOP: 'Execute after program stopped',
+	    L_LISTEN_TO_CLICK_EVENT: 'Listen to click event',
+	    L_LISTEN_TO_DBLCLICK_EVENT: 'Listen to dblclick event',
+	    L_LISTEN_TO_KEYDOWN_EVENT: 'Listen to keydown event',
+	    L_LISTEN_TO_KEYUP_EVENT: 'Listen to keyup event',
+	    L_LISTEN_TO_MOUSEDOWN_EVENT: 'Listen to mousedown event',
+	    L_LISTEN_TO_MOUSEMOVE_EVENT: 'Listen to mousemove event',
+	    L_LISTEN_TO_MOUSEUP_EVENT: 'Listen to mouseup event',
+	    L_LISTEN_TO_MOUSEWHEEL_EVENT: 'Listen to mousewheel event',
+	    L_LISTEN_TO_RESIZE_EVENT: 'Listen to resize event',
+	    L_CREATE_SCRIPT: 'Create Script',
+	    L_SHADER_PROGRAM_INFO: 'Shader Program Info',
+	    L_OK: 'OK',
+	    L_SCRIPT_NAME_EXISTED: 'Script name existed.',
+	    L_HISTORY: 'History',
+	    L_HELPERS: 'Helpers',
+	    L_GRID: 'Grid',
+	    L_CAMERA: 'Camera',
+	    L_SKELETON: 'Skeleton',
+	    L_PROPERTY: 'Property',
+	    L_SETTINGS: 'Settings',
+	    L_NEW_SCRIPT: 'New Script',
+	    L_HIERACHY: 'Hierachy',
+	    L_SCRIPT: 'Script',
+	    L_THUMBNAIL: 'Thumbnail',
+	    L_NOT_SET: 'Not Set',
+	    L_CATEGORY: 'Category',
+	    L_OPTIONS_WINDOW: 'Options Window',
+	    L_THEME: 'Theme',
+	    L_LIGHT_COLOR: 'Light Color',
+	    L_DARK_COLOR: 'Dark Color',
+	    L_SHADOW: 'Shadow',
+	    L_DISABLED: 'Disabled',
+	    L_BASIC_SHADOW: 'Basic Shadow',
+	    L_PCF_SHADOW: 'PCF Shadow',
+	    L_PCF_SOFT_SHADOW: 'PCF Soft Shadow',
+	    L_GAMMA_INPUT: 'Gamma Input',
+	    L_GAMMA_OUTPUT: 'Gamma Output',
+	    L_GAMMA_FACTOR: 'Gamma Factor',
+	    L_SAVE_SUCCESS: 'Save Successfully.',
+	    L_TEXTURE_SETTINGS: 'Texture Settings',
+	    L_OFFSET: 'Offset',
+	    L_ROTATE_CENTER: 'Rotate Center',
+	    L_WRAP_S: 'WrapS',
+	    L_CLAMP_TO_EDGE: 'Clamp To Edge',
+	    L_REPEAT: 'Repeat',
+	    L_MIRRORED_REPEAT: 'Mirrored Repeat',
+	    L_WRAP_T: 'WrapT',
+	    L_REPEAT_NUM: 'RepeatNum',
+	    L_FLIP_Y: 'FlipY',
+	    L_MAG_FILTER: 'MagFilter',
+	    L_MIN_FILTER: 'MinFilter',
+	    L_ENCODING: 'Encoding',
+	    L_FORMAT: 'Format',
+	    L_GENERATE_MIPMAPS: 'GenerateMipmaps',
+	    L_MAPPING: 'Mapping',
+	    L_PREMULTIPLY_ALPHA: 'PremultiplyAlpha',
+	    L_UNPACK_ALIGNMENT: 'UnpackAlignment',
+	    L_ANISOTROPY: 'Anisotropy',
+	    L_CATEGORY_EDIT: 'Category Edit',
+	    L_CATEGORY_LIST: 'Category List',
+	    L_PLEASE_SELECT_CATEGORY: 'Please select category.',
+	    L_DELETE_SUCCESS: 'Delete successfully!',
+
+	    // object
+	    L_HALO: 'Halo',
+	    L_FrontSide: 'FrontSide',
+	    L_BackSide: 'BackSide',
+
+	    // ui
+	    L_MESSAGE: 'Message',
+	    L_NO_IMAGE: 'No Image',
+	    L_IMAGE_UPLOAD_SUCCESS: 'Image upload successfully!',
+	    L_IMAGE_UPLOAD_FAILED: 'Image upload failed!',
+	    L_PLEASE_INPUT: 'Please input',
+	    L_SEARCH_CONTENT: 'Search Content',
+	    L_ERROR: 'Error',
+
+	    L_LINE_CURVE: 'Line Curve',
+	    L_CATMULL_ROM_CURVE: 'CatmullRom Curve',
+	    L_QUADRATIC_BEZIER_CURVE: 'QuadraticBezier Curve',
+	    L_CUBIC_BEZIER_CURVE: 'CubicBezier Curve',
+	    L_ELLIPSE_CURVE: 'Ellipse Curve',
+
+	    L_PLAY_FULLSCREEN: 'Play Fullscreen',
+	    L_PLAY_NEW_WINDOW: 'Play New Window',
+
+	    L_TOOL: 'Tool',
+	    L_ARRANGE_MAP: 'Arrange Map',
+	    L_ARRANGE_MESH: 'Arrange Mesh',
+	    L_ARRANGE_THUMBNAIL: 'Arrange Thumbnail',
+
+	    L_EXPORT_SCENE: 'Export Scene',
+
+	    L_FILTER: 'Filter',
+	    L_HUE: 'HueRotate',
+	    L_SATURATE: 'Saturate',
+	    L_BRIGHTNESS: 'Brightness',
+	    L_BLUR: 'Blur',
+	    L_CONTRAST: 'Contrast',
+	    L_GRAYSCALE: 'Grayscale',
+	    L_INVERT: 'Invert',
+	    L_SEPIA: 'Sepia',
+
+	    L_EMPTY_SCENE: 'Empty Scene',
+	    L_GIS_SCENE: 'GIS Scene',
+	    L_CREATE_EMPTY_SCENE_SUCCESS: 'Create empty scene successfully.',
+
+	    L_GLOBE: 'Globe',
+	    L_EXPORT_EDITOR: 'Export Editor',
+	    L_GIS_COMPONENT: 'GIS Component',
+	    L_TILE_MAP: 'Map',
+	    L_GOOGLE_MAP: 'Google Map',
+	    L_BING_MAP: 'Bing Map',
+	    L_TIANDITU_MAP: 'Tianditu Map',
+	});
+
+	var applyMatrix4 = "\r\nvec3 applyMatrix4(vec3 v, mat4 m) {\r\n    float x = v.x;\r\n    float y = v.y;\r\n    float z = v.z;\r\n    \r\n    float w = 1.0 / ( m[0][3] * x + m[1][3] * y + m[2][3] * z + m[3][3] );\r\n\r\n    return vec3(\r\n        (m[0][0] * x + m[1][0] * y + m[2][0] * z + m[3][0]) * w,\r\n        (m[0][1] * x + m[1][1] * y + m[2][1] * z + m[3][1]) * w,\r\n        (m[0][2] * x + m[1][2] * y + m[2][2] * z + m[3][2] ) * w\r\n    );\r\n}";
+
+	var lengthSq = "\r\nfloat lengthSq(vec3 v) {\r\n    return v.x * v.x + v.y * v.y + v.z * v.z;\r\n}";
+
+	var angleTo = "#include <lengthSq>\r\n\r\n\r\nfloat angleTo(vec3 v1, vec3 v2) {\r\n    float theta = dot(v1, v2) / sqrt(lengthSq(v1) * lengthSq(v2) );\r\n    \r\n    // clamp, to handle numerical problems\r\n    return acos(clamp(theta, -1.0, 1.0));\r\n}";
+
+	var makeOrthographic = "\r\nmat4 makeOrthographic(float left, float right, float top, float bottom, float near, float far) {\r\n    float w = 1.0 / ( right - left );\r\n    float h = 1.0 / ( top - bottom );\r\n    float p = 1.0 / ( far - near );\r\n    \r\n    float x = ( right + left ) * w;\r\n    float y = ( top + bottom ) * h;\r\n    float z = ( far + near ) * p;\r\n\r\n    return mat4(\r\n        2 * w, 0.0,     0.0,      0.0,\r\n        0.0,   2.0 * h, 0.0,      0.0,\r\n        0.0,   0.0,     -2.0 * p, 0.0,\r\n        -x,    -y,      -z,       1.0\r\n    );\r\n}";
+
+	var makePerspective = "\r\nmat4 makePerspective(float left, float right, float top, float bottom, float near, float far) {\r\n    float x = 2.0 * near / ( right - left );\r\n    float y = 2.0 * near / ( top - bottom );\r\n    \r\n    float a = ( right + left ) / ( right - left );\r\n    float b = ( top + bottom ) / ( top - bottom );\r\n    float c = - ( far + near ) / ( far - near );\r\n    float d = - 2.0 * far * near / ( far - near );\r\n\r\n    return mat4(\r\n        x,   0.0, 0.0, 0.0,\r\n        0.0, y,   0.0, 0.0,\r\n        a,   b,   c,   -1.0,\r\n        0.0, 0.0, d,   0.0\r\n    );\r\n}";
+
+	var makePerspective2 = "#include <makePerspective>\r\n\r\n\r\nmat4 makePerspective2(float fov, float aspect, float near, float far) {\r\n    const float DEG2RAD = 0.017453292519943295; // PI / 180\r\n\r\n    float top = near * tan( DEG2RAD * 0.5 * fov );\r\n\tfloat height = 2.0 * top;\r\n\tfloat width = aspect * height;\r\n\tfloat left = - 0.5 * width;\r\n    \r\n    return makePerspective(left, left + width, top, top - height, near, far );\r\n}";
+
+	var determinant = "\r\nfloat determinant(mat4 te) {\r\n    float n11 = te[0][0], n12 = te[1][0], n13 = te[2][0], n14 = te[3][0];\r\n\tfloat n21 = te[0][1], n22 = te[1][1], n23 = te[2][1], n24 = te[3][1];\r\n\tfloat n31 = te[0][2], n32 = te[1][2], n33 = te[2][2], n34 = te[3][2];\r\n\tfloat n41 = te[0][3], n42 = te[1][3], n43 = te[2][3], n44 = te[3][3];\r\n\r\n\t//TODO: make this more efficient\r\n\t//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )\r\n\treturn (\r\n\t\tn41 * (\r\n\t\t\t+ n14 * n23 * n32\r\n\t\t\t - n13 * n24 * n32\r\n\t\t\t - n14 * n22 * n33\r\n\t\t\t + n12 * n24 * n33\r\n\t\t\t + n13 * n22 * n34\r\n\t\t\t - n12 * n23 * n34\r\n\t\t) +\r\n\t\tn42 * (\r\n\t\t\t+ n11 * n23 * n34\r\n\t\t\t - n11 * n24 * n33\r\n\t\t\t + n14 * n21 * n33\r\n\t\t\t - n13 * n21 * n34\r\n\t\t\t + n13 * n24 * n31\r\n\t\t\t - n14 * n23 * n31\r\n\t\t) +\r\n\t\tn43 * (\r\n\t\t\t+ n11 * n24 * n32\r\n\t\t\t - n11 * n22 * n34\r\n\t\t\t - n14 * n21 * n32\r\n\t\t\t + n12 * n21 * n34\r\n\t\t\t + n14 * n22 * n31\r\n\t\t\t - n12 * n24 * n31\r\n\t\t) +\r\n\t\tn44 * (\r\n\t\t\t- n13 * n22 * n31\r\n\t\t\t - n11 * n23 * n32\r\n\t\t\t + n11 * n22 * n33\r\n\t\t\t + n13 * n21 * n32\r\n\t\t\t - n12 * n21 * n33\r\n\t\t\t + n12 * n23 * n31\r\n\t\t)\r\n\t);\r\n}";
+
+	var compose = "\r\nmat4 compose( vec3 position, vec4 quaternion, vec3 scale ) {\r\n\tfloat x = quaternion.x,\r\n          y = quaternion.y,\r\n          z = quaternion.z,\r\n          w = quaternion.w;\r\n\r\n\tfloat x2 = x + x,\r\n          y2 = y + y,\r\n          z2 = z + z;\r\n\r\n\tfloat xx = x * x2, xy = x * y2, xz = x * z2;\r\n\tfloat yy = y * y2, yz = y * z2, zz = z * z2;\r\n\tfloat wx = w * x2, wy = w * y2, wz = w * z2;\r\n\t\r\n    float sx = scale.x, sy = scale.y, sz = scale.z;\r\n\r\n    return mat4(\r\n        ( 1.0 - ( yy + zz ) ) * sx,\r\n        ( xy + wz ) * sx,\r\n        ( xz - wy ) * sx,\r\n        0.0,\r\n        ( xy - wz ) * sy,\r\n        ( 1.0 - ( xx + zz ) ) * sy,\r\n        ( yz + wx ) * sy,\r\n        0.0,\r\n        ( xz + wy ) * sz,\r\n        ( yz - wx ) * sz,\r\n        ( 1.0 - ( xx + yy ) ) * sz,\r\n        0.0,\r\n        position.x,\r\n        position.y,\r\n        position.z,\r\n        1.0\r\n    );\r\n}";
+
+	var decomposeMatrix = "#include <determinant>\r\n\r\n\r\nvoid decomposeMatrix(in mat4 te, out mat4 position, out mat4 rotation, out mat4 scale) {\r\n    float sx = length(vec3(te[0][0], te[0][1], te[0][2]));\r\n    float sy = length(vec3(te[1][0], te[1][1], te[1][2]));\r\n    float sz = length(vec3(te[2][0], te[2][1], te[2][2]));\r\n    \r\n    // if determine is negative, we need to invert one scale\r\n\tfloat det = determinant(te);\r\n    \r\n    if (det < 0.0) sx = -sx;\r\n\r\n\tposition = mat4(\r\n\t\t1.0, 0.0, 0.0, 0.0,\r\n\t\t0.0, 1.0, 0.0, 0.0,\r\n\t\t0.0, 0.0, 1.0, 0.0,\r\n\t\tte[3][0], te[3][1], te[3][2], 1.0\r\n\t);\r\n    \r\n    // scale the rotation part\r\n    float invSX = 1.0 / sx;\r\n\tfloat invSY = 1.0 / sy;\r\n\tfloat invSZ = 1.0 / sz;\r\n\r\n\trotation = mat4(\r\n\t\tte[0][0] * invSX, te[0][1] * invSX, te[0][2] * invSX, 0.0,\r\n\t\tte[1][0] * invSY, te[1][1] * invSY, te[1][2] * invSY, 0.0,\r\n\t\tte[2][0] * invSZ, te[2][1] * invSZ, te[2][2] * invSZ, 0.0,\r\n\t\t0.0,              0.0,              0.0,              1.0\r\n\t);\r\n    \r\n\tscale = mat4(\r\n\t\tsx, 0.0, 0.0, 0.0,\r\n\t\t0.0, sy, 0.0, 0.0,\r\n\t\t0.0, 0.0, sz, 0.0,\r\n\t\t0.0, 0.0, 0.0, 1.0\r\n\t);\r\n}";
+
+	var mercator = "\r\nvec2 mercator(vec2 lonlat) \r\n{\r\n    return vec2(\r\n        lonlat.x,\r\n        log(tan((PI / 2.0 + lonlat.y) / 2.0))\r\n    );\r\n}";
+
+	var mercatorInvert = "\r\nvec2 mercatorInvert(vec2 mercatorXY) \r\n{\r\n    return vec2(\r\n        mercatorXY.x,\r\n        2.0 * atan(exp(mercatorXY.y)) - PI / 2.0\r\n    );\r\n}";
+
+	Object.assign(THREE.ShaderChunk, {
+	    // vec3
+	    applyMatrix4: applyMatrix4,
+	    lengthSq: lengthSq,
+	    angleTo: angleTo,
+
+	    // mat4
+	    makeOrthographic: makeOrthographic,
+	    makePerspective: makePerspective,
+	    makePerspective2: makePerspective2,
+	    determinant: determinant,
+	    compose: compose,
+	    decomposeMatrix: decomposeMatrix,
+
+	    // geo
+	    mercator: mercator,
+	    mercatorInvert: mercatorInvert,
+	});
+
 	/**
 	 * 配置选项
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} options 配置选项
 	 */
-	function Options(options) {
-	    options = options || {};
-
-	    // 服务器配置
+	function Options(options = {}) {
+	    // 服务端配置
 	    this.server = options.server === undefined ? location.origin : options.server; // 服务端地址
+	    this.sceneType = options.sceneType === undefined ? 'Empty' : options.sceneType; // 场景类型：Empty, GIS
 
-	    // 外观配置
-	    this.theme = options.theme || 'assets/css/light.css'; // 皮肤
+	    // 阴影配置
+	    this.shadowMapType = THREE.PCFSoftShadowMap;
 
-	    // 帮助器配置
-	    this.showGrid = true; // 是否显示网格
-	    this.showCameraHelper = true; // 是否显示相机帮助器
-	    this.showPointLightHelper = false; // 是否显示点光源帮助器
-	    this.showDirectionalLightHelper = true; // 是否显示平行光帮助器
-	    this.showSpotLightHelper = true; // 是否显示聚光灯帮助器
-	    this.showHemisphereLightHelper = true; // 是否显示半球光帮助器
-	    this.showRectAreaLightHelper = true; // 是否显示矩形光帮助器
-	    this.showSkeletonHelper = false; // 是否显示骨骼帮助器
+	    // gamma校正
+	    this.gammaInput = false;
+	    this.gammaOutput = false;
+	    this.gammaFactor = 2.0;
+
+	    // 滤镜
+	    this.hueRotate = 0;
+	    this.saturate = 1;
+	    this.brightness = 1;
+	    this.blur = 0;
+	    this.contrast = 1;
+	    this.grayscale = 0;
+	    this.invert = 0;
+	    this.sepia = 0;
 	}
 
 	var ID = -1;
@@ -404,7 +1071,11 @@
 	 */
 	Manager.prototype.create = function (config) {
 	    if (config instanceof Control) { // config是Control实例
-	        this.add(config.id, config, config.scope);
+	        var key = `${config.scope}:${config.id}`;
+	        if (this.objects[key] === undefined) {
+	            // 如果config是控件，则可能已使用Manager管理，增加判断，避免出现太多警告信息。
+	            this.add(config.id, config, config.scope);
+	        }
 	        return config;
 	    }
 
@@ -482,6 +1153,7 @@
 
 	    this.cls = options.cls || 'Modal';
 	    this.style = options.style || null;
+	    this.containerStyle = options.containerStyle || null;
 	    this.width = options.width || '500px';
 	    this.height = options.height || '300px';
 	    this.shade = options.shade === false ? false : true;
@@ -510,6 +1182,10 @@
 	    this.container = document.createElement('div');
 
 	    this.container.className = 'Container';
+
+	    if (this.containerStyle) {
+	        Object.assign(this.container.style, this.containerStyle);
+	    }
 
 	    this.container.style.width = this.width;
 	    this.container.style.height = this.height;
@@ -671,6 +1347,7 @@
 
 	    this.cls = options.cls || 'Modal Window';
 	    this.style = options.style || null;
+	    this.containerStyle = options.containerStyle || null;
 	    this.bodyStyle = options.bodyStyle || null;
 	    this.title = options.title || '';
 	    this.buttons = options.buttons || [];
@@ -687,6 +1364,7 @@
 	        xtype: 'container',
 	        children: [{
 	            xtype: 'div',
+	            scope: this.scope,
 	            cls: 'caption',
 	            html: this.title
 	        }]
@@ -695,6 +1373,7 @@
 	    // 关闭按钮
 	    this.closeBtn = UI$1.create({
 	        xtype: 'closebutton',
+	        scope: this.scope,
 	        onClick: () => {
 	            this.hide();
 	        }
@@ -703,6 +1382,7 @@
 	    // 标题栏
 	    this.header = UI$1.create({
 	        xtype: 'div',
+	        scope: this.scope,
 	        cls: 'header',
 	        children: [
 	            this.caption,
@@ -714,6 +1394,7 @@
 	    // 内容区域
 	    this.body = UI$1.create({
 	        xtype: 'div',
+	        scope: this.scope,
 	        cls: 'body',
 	        style: this.bodyStyle,
 	        children: this.content
@@ -723,6 +1404,7 @@
 	    // 按钮区域
 	    this.footer = UI$1.create({
 	        xtype: 'div',
+	        scope: this.scope,
 	        cls: 'footer',
 	        children: this.buttons
 	    });
@@ -3026,6 +3708,7 @@
 	    Control.call(this, options);
 
 	    this.data = options.data || []; // [{ value: '值', text: '文本', expand: 'true/false, 默认关闭', draggable: 'true/false, 默认不可拖动', 其他属性 }, ...]
+	    this.cls = options.cls || 'Tree';
 
 	    this.onClick = options.onClick || null;
 	    this.onDblClick = options.onDblClick || null;
@@ -3044,7 +3727,7 @@
 	        this.parent.appendChild(this.dom);
 
 	        Object.assign(this.dom, {
-	            className: 'Tree'
+	            className: this.cls
 	        });
 	    }
 
@@ -3068,12 +3751,13 @@
 	    var leaf = !Array.isArray(data.children) || data.children.length === 0;
 	    var expand = data.expand || this._expands[value] === true;
 	    var draggable = data.draggable || false;
+	    var cls = data.cls || '';
 
 	    data.leaf = leaf;
 	    data.expand = expand;
 
 	    Object.assign(li, {
-	        className: 'Node',
+	        className: 'Node ' + cls,
 	        data: data
 	    });
 
@@ -3451,6 +4135,36 @@
 
 	UI$1.addXType('tree', Tree);
 
+	/**
+	 * 图标
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function Icon(options) {
+	    Control.call(this, options);
+
+	    this.icon = options.icon || null; // 对应assets/css/icon/iconfont.css中的css
+	    this.style = options.style || null;
+	}
+
+	Icon.prototype = Object.create(Control.prototype);
+	Icon.prototype.constructor = Icon;
+
+	Icon.prototype.render = function () {
+	    this.dom = document.createElement('i');
+	    this.parent.appendChild(this.dom);
+
+	    if (this.icon) {
+	        this.dom.className = `iconfont ${this.icon}`;
+	    }
+
+	    if (this.style) {
+	        Object.assign(this.dom.style, this.style);
+	    }
+	};
+
+	UI$1.addXType('icon', Icon);
+
 	// 添加一些实用功能
 	Object.assign(UI$1, {
 	    Control: Control,
@@ -3534,722 +4248,6 @@
 	});
 
 	window.UI = UI$1;
-
-	window.URL = window.URL || window.webkitURL;
-	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-
-	Number.prototype.format = function () {
-	    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-	};
-
-	String.prototype.format = function () {
-	    var str = this;
-	    for (var i = 0; i < arguments.length; i++) {
-	        str = str.replace('{' + i + '}', arguments[i]);
-	    }
-	    return str;
-	};
-
-	Object.assign(window, {
-	    // command
-	    L_ADD_OBJECT_COLON: 'Add Object:',
-	    L_ADD_SCRIPT: 'Add Script',
-	    L_MOVE_OBJECT: 'Move Object',
-	    L_MULTI_MODIFY: 'Multi Modify',
-	    L_REMOVE_OBJECT: 'Remove Object',
-	    L_REMOVE_SCRIPT: 'Remove Script',
-	    L_SET: 'Set',
-	    L_SET_GEOMETRY: 'Set Geometry',
-	    L_SET_MATERIAL: 'Set Material',
-	    L_NEW_MATERIAL: 'New Material',
-	    L_SET_POSITION: 'Set Position',
-	    L_SET_ROTATION: 'Set Rotation',
-	    L_SET_SCALE: 'Set Scale',
-	    L_SET_SCENE: 'Set Scene',
-	    L_SET_SCRIPT: 'Set Script',
-	    L_UPDATE_UUID: 'Update UUID',
-
-	    // component
-	    L_BASIC_INFO: 'Basic Info',
-	    L_NAME: 'Name',
-	    L_TYPE: 'Type',
-	    L_VISIBLE: 'Visible',
-	    L_CAMERA_COMPONENT: 'Camera Component',
-	    L_FOV: 'Fov',
-	    L_NEAR: 'Near',
-	    L_FAR: 'Far',
-	    L_FIRE_COMPONENT: 'Fire Component',
-	    L_WIDTH: 'Width',
-	    L_HEIGHT: 'Height',
-	    L_DEPTH: 'Depth',
-	    L_SLICE_SPACING: 'SliceSpacing',
-	    L_PREVIEW: 'Preview',
-	    L_GEOMETRY_COMPONENT: 'Geometry Component',
-	    L_LIGHT_COMPONENT: 'Light Component',
-	    L_COLOR: 'Color',
-	    L_INTENSITY: 'Intensity',
-	    L_DISTANCE: 'Distance',
-	    L_ANGLE: 'Angle',
-	    L_PENUMBRA: 'Penumbra',
-	    L_DECAY: 'Decay',
-	    L_SKY_COLOR: 'SkyColor',
-	    L_GROUND_COLOR: 'GroundColor',
-	    L_LMESH_COMPONENT: 'LMesh Component',
-	    L_ANIMATION: 'Animation',
-	    L_MATERIAL_COMPONENT: 'Material Component',
-	    L_SAVE: 'Save',
-	    L_SELECT: 'Select',
-	    L_LINE_BASIC_MATERIAL: 'LineBasicMaterial',
-	    L_LINE_DASHED_MATERIAL: 'LineDashedMaterial',
-	    L_MESH_BASIC_MATERIAL: 'MeshBasicMaterial',
-	    L_MESH_DEPTH_MATERIAL: 'MeshDepthMaterial',
-	    L_MESH_NORMAL_MATERIAL: 'MeshNormalMaterial',
-	    L_MESH_LAMBERT_MATERIAL: 'MeshLambertMaterial',
-	    L_MESH_PHONG_MATERIAL: 'MeshPhongMaterial',
-	    L_POINT_CLOUD_MATERIAL: 'PointCloudMaterial',
-	    L_MESH_STANDARD_MATERIAL: 'MeshStandardMaterial',
-	    L_MESH_PHYSICAL_MATERIAL: 'MeshPhysicalMaterial',
-	    L_SPRITE_MATERIAL: 'SpriteMaterial',
-	    L_SHADER_MATERIAL: 'ShaderMaterial',
-	    L_RAW_SHADER_MATERIAL: 'RawShaderMaterial',
-	    L_SHADER_PROGRAM: 'Shader Program',
-	    L_INFO: 'Information',
-	    L_VERTEX: 'Vertex',
-	    L_FRAGMENT: 'Fragment',
-	    L_ROUGHNESS: 'Roughness',
-	    L_METALNESS: 'MetalNess',
-	    L_EMISSIVE: 'Emissive',
-	    L_SPECULAR: 'Specular',
-	    L_SHININESS: 'Shininess',
-	    L_CLEAR_COAT: 'ClearCoat',
-	    L_CLEAR_COAT_ROUGHNESS: 'ClearCoatRoughness',
-	    L_VERTEX_COLOR: 'Vertex Color',
-	    L_NO_COLORS: 'No Colors',
-	    L_FACE_COLORS: 'Face Colors',
-	    L_VERTEX_COLORS: 'Vertex Colors',
-	    L_SKIN: 'Skin',
-	    L_TEXTURE: 'Texture',
-	    L_SET_MAP: 'Set',
-	    L_ALPHA_MAP: 'AlphaMap',
-	    L_BUMP_MAP: 'BumpMap',
-	    L_NORMAL_MAP: 'NormalMap',
-	    L_DISPLACEMENT_MAP: 'DisplacementMap',
-	    L_ROUGHNESS_MAP: 'RoughnessMap',
-	    L_METALNESS_MAP: 'MetalnessMap',
-	    L_SPECULAR_MAP: 'SpecularMap',
-	    L_ENV_MAP: 'EnvMap',
-	    L_LIGHT_MAP: 'LightMap',
-	    L_AO_MAP: 'AoMap',
-	    L_EMISSIVE_MAP: 'EmissiveMap',
-	    L_SIDE: 'Side',
-	    L_FRONT_SIDE: 'Front Side',
-	    L_BACK_SIDE: 'Back Side',
-	    L_DOUBLE_SIDE: 'Double Side',
-	    L_FLAT_SHADING: 'Flat Shading',
-	    L_BLENDING: 'Blending',
-	    L_NO_BLENDING: 'No Blending',
-	    L_NORMAL_BLENDING: 'Normal Blending',
-	    L_ADDITIVE_BLENDING: 'Additive Blending',
-	    L_SUBSTRACTIVE_BLENDING: 'Substractive Blending',
-	    L_MULTIPLY_BLENDING: 'Multiply Blending',
-	    L_CUSTOM_BLENDING: 'Custom Blending',
-	    L_OPACITY: 'Opacity',
-	    L_TRANSPARENT: 'Transparent',
-	    L_ALPHA_TEST: 'AlphaTest',
-	    L_WIREFRAME: 'Wireframe',
-	    L_CANNOT_SET_TEXTURE: 'Cannot set texture, ',
-	    L_MATERIAL_HAS_NO_COORDINATES: ' material has no coordinates.',
-	    L_SHADER_INFO: 'ShaderInfo',
-	    L_SHADER_CANNOT_PARSE: 'Shader cannot be parsed.',
-	    L_VERTEX_SHADER: 'Vertex Shader',
-	    L_FRAGMENT_SHADER: 'Fragment Shader',
-	    L_SELECT_TEXTURE_FIRST: 'Please select texture first.',
-	    L_ENTER_MATERIAL_NAME: 'Please enter material name',
-	    L_CLICK_MATERIAL_ON_PANEL: 'Please click material on material panel.',
-	    L_MMD_MODEL: 'MMD Model',
-	    L_MODEL_ANIMATION: 'Model Animation',
-	    L_CAMERA_ANIMATION: 'Camera Animation',
-	    L_AUDIO: 'Audio',
-	    L_CLICK_ANIMATION_PANEL: 'Please click the animation in the animation panel.',
-	    L_SELECT_MMD_ANIMATION_ONLY: 'Please select MMD animation only.',
-	    L_CLICK_CAMERA_ANIMATION: 'Please select camera animation.',
-	    L_SELECT_CAMERA_ANIMATION_ONLY: 'Please select camera animation only.',
-	    L_SELECT_MMD_AUDIO: 'Please select MMD audio.',
-	    L_PARTICLE_EMITTER: 'Particle Emitter',
-	    L_POSITION: 'Position',
-	    L_POSITION_SPREAD: 'PositionSpread',
-	    L_VELOCITY: 'Velocity',
-	    L_VELOCITY_SPREAD: 'VelocitySpread',
-	    L_ACCELERATION: 'Acceleration',
-	    L_ACCELERATION_SPREAD: 'AccelerationSpread',
-	    L_SIZE: 'Size',
-	    L_SIZE_SPREAD: 'SizeSpread',
-	    L_PARTICLE_COUNT: 'ParticleCount',
-	    L_MAX_AGE: 'MaxAge',
-	    L_MAX_AGE_SPREAD: 'maxAgeSpread',
-	    L_CANCEL: 'Cancel',
-	    L_REFLECTOR_COMPONENT: 'Reflector Component',
-	    L_REFLECT: 'Reflect',
-	    L_TEXTURE_SIZE: 'TextureSize',
-	    L_CLIP_BIAS: 'ClipBias',
-	    L_RECURSION: 'Recursion',
-	    L_SCENE_COMPONENT: 'SceneComponent',
-	    L_BACKGROUND: 'Background',
-	    L_SOLID_COLOR: 'Solid Color',
-	    L_BACKGROUND_IMAGE: 'Background Image',
-	    L_CUBE_TEXTURE: 'Cube Texture',
-	    L_BACKGROUND_COLOR: 'BackgroundColor',
-	    L_POS_X: 'PosX',
-	    L_NEG_X: 'NegX',
-	    L_POS_Y: 'PosY',
-	    L_NEG_Y: 'NegY',
-	    L_POS_Z: 'PosZ',
-	    L_NEG_Z: 'NegZ',
-	    L_UPLOAD: 'Upload',
-	    L_FOG: 'Fog',
-	    L_NONE: 'None',
-	    L_LINEAR: 'Linear',
-	    L_EXPONENTIAL: 'Exponential',
-	    L_FOG_COLOR: 'FogColor',
-	    L_FOG_NEAR: 'FogNear',
-	    L_FOG_FAR: 'FogFar',
-	    L_FOG_DENSITY: 'FogDensity',
-	    L_CLICK_MAP_PANEL: 'Please click the map in the Map Panel.',
-	    L_ONLY_SELECT_CUBE_TEXTURE: 'You should select Cube Texture.',
-	    L_CUBE_TEXTURE_FETCH_FAILED: 'Cube Texture fetch failed.',
-	    L_UPLOAD_ALL_BEFORE_SAVE: 'Please upload all the textures before save.',
-	    L_CUBE_TEXTURE_EXISTED: 'Cube texture has already been uploaded.',
-	    L_SHADOW_COMPONENT: 'Shadow Component',
-	    L_SHADOW: 'Shadow',
-	    L_CAST: 'Cast',
-	    L_RECEIVE: 'Receive',
-	    L_RADIUS: 'Radius',
-	    L_MAP_SIZE: 'MapSize',
-	    L_BIAS: 'Bias',
-	    L_CAMERA_LEFT: 'CameraLeft',
-	    L_CAMERA_RIGHT: 'CameraRight',
-	    L_CAMERA_TOP: 'CameraTop',
-	    L_CAMERA_BOTTOM: 'CameraBottom',
-	    L_CAMERA_NEAR: 'CameraNear',
-	    L_CAMERA_FAR: 'CameraFar',
-	    L_SMOKE_COMPONENT: 'SmokeComponent',
-	    L_TRANSFORM_COMPONENT: 'Transform Component',
-	    L_TRANSLATE: 'Translate',
-	    L_ROTATE: 'Rotate',
-	    L_SCALE: 'Scale',
-	    L_BASIC_INFORMATION: 'Basic Information',
-	    L_TARGET: 'Target',
-	    L_TWEEN_ANIMATION: 'Tween Animation',
-	    L_SKELETAL_ANIMATION: 'Skeletal Animation',
-	    L_PLAY_AUDIO: 'Play Audio',
-	    L_FILTER_ANIMATION: 'Filter Animation',
-	    L_PARTICLE_ANIMATION: 'Particle Animation',
-	    L_BEGIN_TIME: 'BeginTime',
-	    L_END_TIME: 'EndTime',
-	    L_ANIMATION_OBJECT: 'Animation Object',
-	    L_NOT_EXISTED_IN_SCENE: 'is not existed in the scene.',
-	    L_BEGIN_STATUS: 'BeginStatus',
-	    L_CURRENT_STATUS: 'Current Status',
-	    L_CUSTOM_STATUS: 'Custom Status',
-	    L_EASE_FUNC: 'Ease Func',
-	    L_END_STATUS: 'EndStatus',
-	    L_AUDIO_LISTENER: 'Audio Listener',
-	    L_MAX_VOLUME: 'Max Volume',
-	    L_BACKGROUND_MUSIC: 'Background Music',
-	    L_AUTO_PLAY: 'Auto Play',
-	    L_LOOP: 'Loop',
-	    L_VOLUME: 'Volume',
-	    L_PLAY: 'Play',
-	    L_STOP: 'Stop',
-	    L_CLICK_AUDIO_IN_PANEL: 'Please click the audio in the Audio Panel.',
-	    L_SCENE_CONTROLLER: 'Scene Controller',
-	    L_FIRST_PERSON_CONTROLS: 'First Person Controls',
-	    L_FLY_CONTROLS: 'Fly Controls',
-	    L_ORBIT_CONTROLS: 'Orbit Controls',
-	    L_POINTER_LOCK_CONTROLS: 'Pointer Lock Controls',
-	    L_TRACEBALL_CONTROLS: 'Traceball Controls',
-	    L_MOVEMENT_SPEED: 'MovementSpeed',
-	    L_LOOK_SPEED: 'LookSpeed',
-	    L_LOOK_VERTICAL: 'LookVertical',
-	    L_AUTO_FORWARD: 'AutoForward',
-	    L_ACTIVE_LOCK: 'ActiveLock',
-	    L_HEIGHT_SPEED: 'HeightSpeed',
-	    L_HEIGHT_COEF: 'HeightCoef',
-	    L_HEIGHT_MIN: 'HeightMin',
-	    L_HEIGHT_MAX: 'HeightMax',
-	    L_CONSTRAIN_VERTICAL: 'ConstrainVertical',
-	    L_VERTICAL_MIN: 'VerticalMin',
-	    L_VERTICAL_MAX: 'VerticalMax',
-	    L_ROTATE_SPEED: 'RotateSpeed',
-	    L_DRAG_TO_LOOK: 'DragToLook',
-	    L_MIN_DISTANCE: 'MinDistance',
-	    L_MAX_DISTANCE: 'MaxDistance',
-	    L_MIN_POLAR_ANGLE: 'MinPolarAngle',
-	    L_MAX_POLAR_ANGLE: 'MaxPolarAngle',
-	    L_MIN_AZIMUTH_ANGLE: 'MinAzimuthAngle',
-	    L_MAX_AZIMUTH_ANGLE: 'MaxAzimuthAngle',
-	    L_ENABLE_DAMPING: 'EnableDamping',
-	    L_DAMPING_FACTOR: 'DampingFactor',
-	    L_ENABLE_ZOOM: 'EnableZoom',
-	    L_ZOOM_SPEED: 'ZoomSpeed',
-	    L_ENABLE_ROTATE: 'EnableRotate',
-	    L_ENABLE_PAN: 'EnablePan',
-	    L_PAN_SPEED: 'PanSpeed',
-	    L_SCREEN_SPACE_PANNING: 'ScreenSpacePanning',
-	    L_KEY_PAN_SPEED: 'KeyPanSpeed',
-	    L_AUTO_ROTATE: 'AutoRotate',
-	    L_AUTO_ROTATE_SPEED: 'AutoRotateSpeed',
-	    L_ENABLE_KEYS: 'EnableKeys',
-	    L_IS_LOCKED: 'IsLocked',
-	    L_NO_ROTATE: 'NoRotate',
-	    L_NO_ZOOM: 'NoZoom',
-	    L_NO_PAN: 'NoPan',
-	    L_STATIC_MOVING: 'StaticMoving',
-	    L_DYNAMIC_DAMPING_FACTOR: 'DampingFactor',
-	    L_WIDTH_SEGMENTS: 'WidthSegments',
-	    L_HEIGHT_SEGMENTS: 'HeightSegments',
-	    L_DEPTH_SEGMENTS: 'DepthSegments',
-	    L_SEGMENTS: 'Segments',
-	    L_THETA_START: 'ThetaStart',
-	    L_THETA_LENGTH: 'ThetaLength',
-	    L_RADIUS_TOP: 'RadiusTop',
-	    L_RADIUS_BOTTOM: 'RadiusBottom',
-	    L_RADIAL_SEGMENTS: 'RadialSegments',
-	    L_OPEN_ENDED: 'OpenEnded',
-	    L_DETAIL: 'Detail',
-	    L_PHI_START: 'PhiStart',
-	    L_PHI_LENGTH: 'PhiLength',
-	    L_BOTTOM: 'Bottom',
-	    L_LID: 'Lid',
-	    L_BODY: 'Body',
-	    L_FIT_LID: 'FitLid',
-	    L_BLINN: 'Blinn',
-	    L_TUBE: 'Tube',
-	    L_TUBULAR_SEGMENTS: 'TubelarSegments',
-	    L_ARC: 'Arc',
-	    L_TUBE_ARC: 'TubeArc',
-	    L_DISTORTED_ARC: 'DistortedArc',
-	    L_CLOTH_COMPONENT: 'ClothComponent',
-	    L_PERLIN_TERRAIN: 'PerlinTerrain',
-	    L_QUALITY: 'Quality',
-	    L_SKY: 'Sky',
-	    L_TURBIDITY: 'Turbidity',
-	    L_RAYLEIGH: 'Rayleigh',
-	    L_LUMINANCE: 'Luminance',
-	    L_MIE_COEFFICIENT: 'MieCofficient',
-	    L_MIE_DIRECTIONAL_G: 'MieDirectionalG',
-	    L_PHYSICS_TYPE: 'PhysicsType',
-	    L_ENABLED: 'Enabled',
-	    L_RIGID_BODY: 'RigidBody',
-	    L_SOFT_VOLUME: 'SoftVolume',
-	    L_PHYSICS_ENVIRONMENT: 'PhysicsEnvironment',
-	    L_COLLISION_CONFIG: 'CollisionConfig',
-	    L_DEFAULT_COLLISION_CONFIG: 'DefaultCollisionConfig',
-	    L_SOFTBODY_RIGIDBODY_COLLISIONCONFIG: 'SoftBodyRigidBodyCollisionConfig',
-	    L_GRAVITY: 'Gravity',
-	    L_SHAPE: 'Shape',
-	    L_BOX_SHAPE: 'BoxShape',
-	    L_SPHERE_SHAPE: 'SphereShape',
-	    L_MASS: 'Mass',
-	    L_INERTIA: 'Inertia',
-	    L_HAS_NO_PHYSICS_HELPER: 'has no physics helper.',
-	    L_PRESSURE: 'Pressure',
-	    L_AFTERIMAGE_EFFECT: 'AfterimageEffect',
-	    L_ENABLE_STATE: 'EnableState',
-	    L_DAMP: 'Damp',
-	    L_BOKEH_EFFECT: 'Bokeh Effect',
-	    L_FOCUS: 'Focus',
-	    L_APERTURE: 'Aperture',
-	    L_MAX_BLUR: 'MaxBlur',
-	    L_DOT_SCREEN_EFFECT: 'DotScreenEffect',
-	    L_FXAA: 'FXAA Component',
-	    L_GLITCH_EFFECT: 'Glitch Effect',
-	    L_WILD_MODE: 'WildMode',
-	    L_HALFTONE_EFFECT: 'Halftone Effect',
-	    L_POINT: 'Point',
-	    L_ELLIPSE: 'Ellipse',
-	    L_LINE: 'Line',
-	    L_SQUARE: 'Square',
-	    L_ROTATE_RED: 'RotateRed',
-	    L_ROTATE_GREEN: 'RotateGreen',
-	    L_ROTATE_BLUE: 'RotateBlue',
-	    L_SCATTER: 'Scatter',
-	    L_BLENDING: 'Blending',
-	    L_BLENDING_MODE: 'BlendingMode',
-	    L_MULTIPLY: 'Multiply',
-	    L_ADD: 'Add',
-	    L_LIGHTER: 'Lighter',
-	    L_DARKER: 'Darker',
-	    L_GREY_SCALE: 'GreyScale',
-	    L_PIXEL_EFFECT: 'PixelEffect',
-	    L_PIXEL_SIZE: 'PixelSize',
-	    L_RGB_SHIFT_EFFECT: 'RGB Shift Effect',
-	    L_AMOUNT: 'Amount',
-	    L_SAO: 'SAO',
-	    L_OUTPUT: 'Output',
-	    L_BEAUTY: 'Beauty',
-	    L_BEAUTY_AND_OCCLUSION: 'Beauty&Occlusion',
-	    L_OCCLUSION: 'Occlusion',
-	    L_NORMAL: 'Normal',
-	    L_KERNAL_RADIUS: 'KernalRadius',
-	    L_MIN_RESOLUTION: 'MinResolution',
-	    L_BLUR: 'Blur',
-	    L_BLUR_RADIUS: 'BlurRadius',
-	    L_BLUR_STD_DEV: 'BlurStdDev',
-	    L_BLUR_DEPTH_CUTOFF: 'BlurDepthCutoff',
-	    L_SMAA: 'SMAA',
-	    L_SSAA: 'SSAA',
-	    L_ONE_SAMPLE: '1 Sample',
-	    L_TWO_SAMPLES: '2 Samples',
-	    L_FOUR_SAMPLES: '4 Samples',
-	    L_EIGHT_SAMPLES: '8 Samples',
-	    L_SIXTEEN_SAMPLES: '16 Samples',
-	    L_THIRTYTWO_SAMPLES: '32 Samples',
-	    L_UNBIASED: 'Unbiased',
-	    L_SSAO: 'SSAO',
-	    L_DEFAULT: 'Default',
-	    L_OCCLUSION_AND_BLUR: 'Occlusion&Blur',
-	    L_TAA: 'TAA',
-	    L_LEVEL: 'Level',
-
-	    // core
-	    L_IS_NOT_AVAILABLE: 'is not available.',
-	    L_SAVE_INTO_INDEXEDDB: 'Saved into indexDB.',
-	    L_CLEAR_INDEXED_DB: 'Clear indexedDB.',
-
-	    // editor
-	    L_SCENE: 'Scene',
-	    L_DEFAULT_CAMERA: 'DefaultCamera',
-	    L_AUDIO_LISTENER: 'AudioListener',
-	    L_ANIMATION_LAYER_1: 'AnimLayer1',
-	    L_ANIMATION_LAYER_2: 'AnimLayer2',
-	    L_ANIMATION_LAYER_3: 'AnimLayer3',
-	    L_AMBIENT: 'Ambient',
-	    L_DIRECTIONAL: 'Directional',
-	    L_OBJECT_NUM: 'Object',
-	    L_VERTEX_NUM: 'Vertex',
-	    L_TRIANGLE_NUM: 'Triangle',
-	    L_THROW_BALL: 'ThrowBall',
-	    L_SELECT: 'Select',
-	    L_TRANSLATE_W: 'Translate(W)',
-	    L_ROTATE_E: 'Rotate(E)',
-	    L_SCALE_R: 'Scale(R)',
-	    L_DRAW_POINT: 'Draw Point',
-	    L_DRAW_LINE: 'Draw Line',
-	    L_DRAW_POLYGON: 'Draw Pologon',
-	    L_SPRAY: 'Spray',
-	    L_POLYGON: 'Polygon',
-	    L_DECAL: 'Decal',
-	    L_UPLOAD_FAILED: 'Upload failed.',
-	    L_CONFIRM: 'Confirm',
-	    L_DELETE: 'Delete',
-	    L_TIME: 'Time',
-	    L_MODEL: 'Model',
-	    L_MAP: 'Map',
-	    L_MATERIAL: 'Material',
-	    L_PARTICLE: 'Particle',
-	    L_PREFAB: 'Prefab',
-	    L_CHARACTER: 'Character',
-	    L_LOG: 'Logs',
-	    L_COLLAPSE: 'Collapse',
-	    L_CLEAR: 'Clear',
-	    L_CLEAR_LOGS: 'Clear Logs',
-	    L_LOAD_SUCCESS: 'Load Successfully!',
-	    L_ILLUSTRATE_DOUBLE_CLICK_ADD_ANIM: 'Illustrate: Double click area below to add animation.',
-	    L_ANIM_LAYER: 'AnimLayer',
-	    L_CHECK_DELETE_LAYER: 'Please check the layer.',
-	    L_DELETE_LAYER_WILL_DELETE_ANIM: 'Delete layer will delete all the anims on the layer. Are you sure?',
-	    L_NO_IMAGE: 'No Image',
-	    L_CLICK_MAP_IN_PANEL: 'Please click the map in the map panel.',
-	    L_ASSETS: 'Assets',
-	    L_EXPORT_GEOMETRY: 'Export Geometry',
-	    L_EXPORT_OBJECT: 'Export Object',
-	    L_EXPORT_GLTF: 'Export GLTF',
-	    L_EXPORT_OBJ: 'Export OBJ',
-	    L_EXPORT_PLY: 'Export PLY',
-	    L_EXPORT_STL_BINARY: 'Export STL Binary',
-	    L_EXPORT_STL: 'Export STL',
-	    L_PLEASE_SELECT_OBJECT: 'Please select object!',
-	    L_OBJECT_SELECTED_IS_NOT_GEOMETRY: 'The object you selected is not geometry.',
-	    L_COMPONENT: 'Component',
-	    L_BACKGROUND_MUSIC: 'Background Music',
-	    L_PARTICLE_EMITTER: 'ParticleEmitter',
-	    L_SKY: 'Sky',
-	    L_FIRE: 'Fire',
-	    L_WATER: 'Water',
-	    L_SMOKE: 'Smoke',
-	    L_CLOTH: 'Cloth',
-	    L_PHYSICS_CLOTH: 'Physics Cloth',
-	    L_ADD_PHYSICS_CLOTH_SUCCESS: 'Add physics cloth successfully',
-	    L_EDIT: 'Edit',
-	    L_UNDO: 'Undo',
-	    L_REDO: 'Redo',
-	    L_CLEAR_HISTORY: 'Clear History',
-	    L_CLONE: 'Clone',
-	    L_HISTORY_WILL_CLEAR: 'Undo/Redo history will be cleared. Are you sure?',
-	    L_GEOMETRY: 'Geometry',
-	    L_GROUP: 'Group',
-	    L_PLANE: 'Plane',
-	    L_BOX: 'Box',
-	    L_CIRCLE: 'Circle',
-	    L_CYLINDER: 'Cylinder',
-	    L_SPHERE: 'Sphere',
-	    L_ICOSAHEDRON: 'Icosahedron',
-	    L_TORUS: 'Torus',
-	    L_TORUS_KNOT: 'Torus Knot',
-	    L_TEAPOT: 'Teapot',
-	    L_LATHE: 'Lathe',
-	    L_SPRITE: 'Sprite',
-	    L_TEXT: 'Text',
-	    L_SPLINE: 'Spline',
-	    L_PLEASE_INPUT: 'Please input',
-	    L_SOME_WORDS: 'Sone Words',
-	    L_HELP: 'Help',
-	    L_SOURCE: 'Source',
-	    L_EXAMPLES: 'Examples',
-	    L_DOCUMENTS: 'Documents',
-	    L_ABOUT: 'About',
-	    L_AUTHOR: 'Author',
-	    L_LISENSE: 'Lisense',
-	    L_LIGHT: 'Light',
-	    L_AMBIENT_LIGHT: 'Ambient Light',
-	    L_DIRECTIONAL_LIGHT: 'Directional Light',
-	    L_POINT_LIGHT: 'Point Light',
-	    L_SPOT_LIGHT: 'Spot Light',
-	    L_HEMISPHERE_LIGHT: 'Hemisphere Light',
-	    L_RECT_AREA_LIGHT: 'Rect Area Light',
-	    L_OPTIONS: 'Options',
-	    L_SURFACE: 'Furface',
-	    L_RENDERER: 'Renderer',
-	    L_NEW: 'New',
-	    L_SAVE_AS: 'Save As',
-	    L_EXPORT_STATIC_WEBSITE: 'Export Static Website',
-	    L_NO_NAME: 'No Name',
-	    L_UNSAVED_WILL_LOSE_CONFIRM: 'All unsaved data will be lost. Are you sure?',
-	    L_SAVE_SCENE: 'Save Scene',
-	    L_NEW_SCENE: 'New Scene',
-	    L_PUBLISH_WEBSITE: 'Publish website',
-	    L_CONFIRM_PUBLISH_WEBSITE: 'Are you sure to publish all scenes and assets?',
-	    L_TERRAIN: 'Terrain',
-	    L_PERLIN_TERRAIN: 'Perlin Terrain',
-	    L_SHADER_TERRAIN: 'Shader Terrain',
-	    L_RAISE_TERRAIN: 'Raise Terrain',
-	    L_REDUCE_TERRAIN: 'Reduce Terrain',
-	    L_PLANT_TREES: 'Plant Trees',
-	    L_SCRIPT_SAVED_SUCCESS: 'Script saved successfully!',
-	    L_EXECUTE_BEFORE_SCENE_RENDER: 'Execute before scene render',
-	    L_EXECUTE_AFTER_SCENE_RENDER: 'Execute after scene render',
-	    L_EXECUTE_EACH_FRAME_DURING_RUNNING: 'Execute each frame during running',
-	    L_EXECUTE_AFTER_PROGRAM_STOP: 'Execute after program stopped',
-	    L_LISTEN_TO_CLICK_EVENT: 'Listen to click event',
-	    L_LISTEN_TO_DBLCLICK_EVENT: 'Listen to dblclick event',
-	    L_LISTEN_TO_KEYDOWN_EVENT: 'Listen to keydown event',
-	    L_LISTEN_TO_KEYUP_EVENT: 'Listen to keyup event',
-	    L_LISTEN_TO_MOUSEDOWN_EVENT: 'Listen to mousedown event',
-	    L_LISTEN_TO_MOUSEMOVE_EVENT: 'Listen to mousemove event',
-	    L_LISTEN_TO_MOUSEUP_EVENT: 'Listen to mouseup event',
-	    L_LISTEN_TO_MOUSEWHEEL_EVENT: 'Listen to mousewheel event',
-	    L_LISTEN_TO_RESIZE_EVENT: 'Listen to resize event',
-	    L_CREATE_SCRIPT: 'Create Script',
-	    L_SHADER_PROGRAM_INFO: 'Shader Program Info',
-	    L_OK: 'OK',
-	    L_SCRIPT_NAME_EXISTED: 'Script name existed.',
-	    L_HISTORY: 'History',
-	    L_HELPERS: 'Helpers',
-	    L_GRID: 'Grid',
-	    L_CAMERA: 'Camera',
-	    L_SKELETON: 'Skeleton',
-	    L_PROPERTY: 'Property',
-	    L_SETTINGS: 'Settings',
-	    L_NEW_SCRIPT: 'New Script',
-	    L_HIERACHY: 'Hierachy',
-	    L_SCRIPT: 'Script',
-	    L_THUMBNAIL: 'Thumbnail',
-	    L_NOT_SET: 'Not Set',
-	    L_CATEGORY: 'Category',
-	    L_OPTIONS_WINDOW: 'Options Window',
-	    L_THEME: 'Theme',
-	    L_LIGHT_COLOR: 'Light Color',
-	    L_DARK_COLOR: 'Dark Color',
-	    L_SHADOW: 'Shadow',
-	    L_DISABLED: 'Disabled',
-	    L_BASIC_SHADOW: 'Basic Shadow',
-	    L_PCF_SHADOW: 'PCF Shadow',
-	    L_PCF_SOFT_SHADOW: 'PCF Soft Shadow',
-	    L_GAMMA_INPUT: 'Gamma Input',
-	    L_GAMMA_OUTPUT: 'Gamma Output',
-	    L_GAMMA_FACTOR: 'Gamma Factor',
-	    L_SAVE_SUCCESS: 'Save Successfully.',
-	    L_TEXTURE_SETTINGS: 'Texture Settings',
-	    L_OFFSET: 'Offset',
-	    L_ROTATE_CENTER: 'Rotate Center',
-	    L_WRAP_S: 'WrapS',
-	    L_CLAMP_TO_EDGE: 'Clamp To Edge',
-	    L_REPEAT: 'Repeat',
-	    L_MIRRORED_REPEAT: 'Mirrored Repeat',
-	    L_WRAP_T: 'WrapT',
-	    L_REPEAT_NUM: 'RepeatNum',
-	    L_FLIP_Y: 'FlipY',
-	    L_MAG_FILTER: 'MagFilter',
-	    L_MIN_FILTER: 'MinFilter',
-	    L_ENCODING: 'Encoding',
-	    L_FORMAT: 'Format',
-	    L_GENERATE_MIPMAPS: 'GenerateMipmaps',
-	    L_MAPPING: 'Mapping',
-	    L_PREMULTIPLY_ALPHA: 'PremultiplyAlpha',
-	    L_UNPACK_ALIGNMENT: 'UnpackAlignment',
-	    L_ANISOTROPY: 'Anisotropy',
-	    L_CATEGORY_EDIT: 'Category Edit',
-	    L_CATEGORY_LIST: 'Category List',
-	    L_PLEASE_SELECT_CATEGORY: 'Please select category.',
-	    L_DELETE_SUCCESS: 'Delete successfully!',
-
-	    // object
-	    L_HALO: 'Halo',
-	    L_FrontSide: 'FrontSide',
-	    L_BackSide: 'BackSide',
-
-	    // ui
-	    L_MESSAGE: 'Message',
-	    L_NO_IMAGE: 'No Image',
-	    L_IMAGE_UPLOAD_SUCCESS: 'Image upload successfully!',
-	    L_IMAGE_UPLOAD_FAILED: 'Image upload failed!',
-	    L_PLEASE_INPUT: 'Please input',
-	    L_SEARCH_CONTENT: 'Search Content',
-	    L_ERROR: 'Error',
-
-	    L_LINE_CURVE: 'Line Curve',
-	    L_CATMULL_ROM_CURVE: 'CatmullRom Curve',
-	    L_QUADRATIC_BEZIER_CURVE: 'QuadraticBezier Curve',
-	    L_CUBIC_BEZIER_CURVE: 'CubicBezier Curve',
-	    L_ELLIPSE_CURVE: 'Ellipse Curve',
-
-	    L_PLAY_FULLSCREEN: 'Play Fullscreen',
-	    L_PLAY_NEW_WINDOW: 'Play New Window',
-
-	    L_TOOL: 'Tool',
-	    L_ARRANGE_MAP: 'Arrange Map',
-	    L_ARRANGE_MESH: 'Arrange Mesh',
-	    L_ARRANGE_THUMBNAIL: 'Arrange Thumbnail',
-
-	    L_EXPORT_SCENE: 'Export Scene',
-	});
-
-	var applyMatrix4 = "\r\nvec3 applyMatrix4(vec3 v, mat4 m) {\r\n    float x = v.x;\r\n    float y = v.y;\r\n    float z = v.z;\r\n    \r\n    float w = 1.0 / ( m[0][3] * x + m[1][3] * y + m[2][3] * z + m[3][3] );\r\n\r\n    return vec3(\r\n        (m[0][0] * x + m[1][0] * y + m[2][0] * z + m[3][0]) * w,\r\n        (m[0][1] * x + m[1][1] * y + m[2][1] * z + m[3][1]) * w,\r\n        (m[0][2] * x + m[1][2] * y + m[2][2] * z + m[3][2] ) * w\r\n    );\r\n}";
-
-	var lengthSq = "\r\nfloat lengthSq(vec3 v) {\r\n    return v.x * v.x + v.y * v.y + v.z * v.z;\r\n}";
-
-	var angleTo = "#include <lengthSq>\r\n\r\n\r\nfloat angleTo(vec3 v1, vec3 v2) {\r\n    float theta = dot(v1, v2) / sqrt(lengthSq(v1) * lengthSq(v2) );\r\n    \r\n    // clamp, to handle numerical problems\r\n    return acos(clamp(theta, -1.0, 1.0));\r\n}";
-
-	var makeOrthographic = "\r\nmat4 makeOrthographic(float left, float right, float top, float bottom, float near, float far) {\r\n    float w = 1.0 / ( right - left );\r\n    float h = 1.0 / ( top - bottom );\r\n    float p = 1.0 / ( far - near );\r\n    \r\n    float x = ( right + left ) * w;\r\n    float y = ( top + bottom ) * h;\r\n    float z = ( far + near ) * p;\r\n\r\n    return mat4(\r\n        2 * w, 0.0,     0.0,      0.0,\r\n        0.0,   2.0 * h, 0.0,      0.0,\r\n        0.0,   0.0,     -2.0 * p, 0.0,\r\n        -x,    -y,      -z,       1.0\r\n    );\r\n}";
-
-	var makePerspective = "\r\nmat4 makePerspective(float left, float right, float top, float bottom, float near, float far) {\r\n    float x = 2.0 * near / ( right - left );\r\n    float y = 2.0 * near / ( top - bottom );\r\n    \r\n    float a = ( right + left ) / ( right - left );\r\n    float b = ( top + bottom ) / ( top - bottom );\r\n    float c = - ( far + near ) / ( far - near );\r\n    float d = - 2.0 * far * near / ( far - near );\r\n\r\n    return mat4(\r\n        x,   0.0, 0.0, 0.0,\r\n        0.0, y,   0.0, 0.0,\r\n        a,   b,   c,   -1.0,\r\n        0.0, 0.0, d,   0.0\r\n    );\r\n}";
-
-	var makePerspective2 = "#include <makePerspective>\r\n\r\n\r\nmat4 makePerspective2(float fov, float aspect, float near, float far) {\r\n    const float DEG2RAD = 0.017453292519943295; // PI / 180\r\n\r\n    float top = near * tan( DEG2RAD * 0.5 * fov );\r\n\tfloat height = 2.0 * top;\r\n\tfloat width = aspect * height;\r\n\tfloat left = - 0.5 * width;\r\n    \r\n    return makePerspective(left, left + width, top, top - height, near, far );\r\n}";
-
-	var determinant = "\r\nfloat determinant(mat4 te) {\r\n    float n11 = te[0][0], n12 = te[1][0], n13 = te[2][0], n14 = te[3][0];\r\n\tfloat n21 = te[0][1], n22 = te[1][1], n23 = te[2][1], n24 = te[3][1];\r\n\tfloat n31 = te[0][2], n32 = te[1][2], n33 = te[2][2], n34 = te[3][2];\r\n\tfloat n41 = te[0][3], n42 = te[1][3], n43 = te[2][3], n44 = te[3][3];\r\n\r\n\t//TODO: make this more efficient\r\n\t//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )\r\n\treturn (\r\n\t\tn41 * (\r\n\t\t\t+ n14 * n23 * n32\r\n\t\t\t - n13 * n24 * n32\r\n\t\t\t - n14 * n22 * n33\r\n\t\t\t + n12 * n24 * n33\r\n\t\t\t + n13 * n22 * n34\r\n\t\t\t - n12 * n23 * n34\r\n\t\t) +\r\n\t\tn42 * (\r\n\t\t\t+ n11 * n23 * n34\r\n\t\t\t - n11 * n24 * n33\r\n\t\t\t + n14 * n21 * n33\r\n\t\t\t - n13 * n21 * n34\r\n\t\t\t + n13 * n24 * n31\r\n\t\t\t - n14 * n23 * n31\r\n\t\t) +\r\n\t\tn43 * (\r\n\t\t\t+ n11 * n24 * n32\r\n\t\t\t - n11 * n22 * n34\r\n\t\t\t - n14 * n21 * n32\r\n\t\t\t + n12 * n21 * n34\r\n\t\t\t + n14 * n22 * n31\r\n\t\t\t - n12 * n24 * n31\r\n\t\t) +\r\n\t\tn44 * (\r\n\t\t\t- n13 * n22 * n31\r\n\t\t\t - n11 * n23 * n32\r\n\t\t\t + n11 * n22 * n33\r\n\t\t\t + n13 * n21 * n32\r\n\t\t\t - n12 * n21 * n33\r\n\t\t\t + n12 * n23 * n31\r\n\t\t)\r\n\t);\r\n}";
-
-	var compose = "\r\nmat4 compose( vec3 position, vec4 quaternion, vec3 scale ) {\r\n\tfloat x = quaternion.x,\r\n          y = quaternion.y,\r\n          z = quaternion.z,\r\n          w = quaternion.w;\r\n\r\n\tfloat x2 = x + x,\r\n          y2 = y + y,\r\n          z2 = z + z;\r\n\r\n\tfloat xx = x * x2, xy = x * y2, xz = x * z2;\r\n\tfloat yy = y * y2, yz = y * z2, zz = z * z2;\r\n\tfloat wx = w * x2, wy = w * y2, wz = w * z2;\r\n\t\r\n    float sx = scale.x, sy = scale.y, sz = scale.z;\r\n\r\n    return mat4(\r\n        ( 1.0 - ( yy + zz ) ) * sx,\r\n        ( xy + wz ) * sx,\r\n        ( xz - wy ) * sx,\r\n        0.0,\r\n        ( xy - wz ) * sy,\r\n        ( 1.0 - ( xx + zz ) ) * sy,\r\n        ( yz + wx ) * sy,\r\n        0.0,\r\n        ( xz + wy ) * sz,\r\n        ( yz - wx ) * sz,\r\n        ( 1.0 - ( xx + yy ) ) * sz,\r\n        0.0,\r\n        position.x,\r\n        position.y,\r\n        position.z,\r\n        1.0\r\n    );\r\n}";
-
-	var decomposeMatrix = "#include <determinant>\r\n\r\n\r\nvoid decomposeMatrix(in mat4 te, out mat4 position, out mat4 rotation, out mat4 scale) {\r\n    float sx = length(vec3(te[0][0], te[0][1], te[0][2]));\r\n    float sy = length(vec3(te[1][0], te[1][1], te[1][2]));\r\n    float sz = length(vec3(te[2][0], te[2][1], te[2][2]));\r\n    \r\n    // if determine is negative, we need to invert one scale\r\n\tfloat det = determinant(te);\r\n    \r\n    if (det < 0.0) sx = -sx;\r\n\r\n\tposition = mat4(\r\n\t\t1.0, 0.0, 0.0, 0.0,\r\n\t\t0.0, 1.0, 0.0, 0.0,\r\n\t\t0.0, 0.0, 1.0, 0.0,\r\n\t\tte[3][0], te[3][1], te[3][2], 1.0\r\n\t);\r\n    \r\n    // scale the rotation part\r\n    float invSX = 1.0 / sx;\r\n\tfloat invSY = 1.0 / sy;\r\n\tfloat invSZ = 1.0 / sz;\r\n\r\n\trotation = mat4(\r\n\t\tte[0][0] * invSX, te[0][1] * invSX, te[0][2] * invSX, 0.0,\r\n\t\tte[1][0] * invSY, te[1][1] * invSY, te[1][2] * invSY, 0.0,\r\n\t\tte[2][0] * invSZ, te[2][1] * invSZ, te[2][2] * invSZ, 0.0,\r\n\t\t0.0,              0.0,              0.0,              1.0\r\n\t);\r\n    \r\n\tscale = mat4(\r\n\t\tsx, 0.0, 0.0, 0.0,\r\n\t\t0.0, sy, 0.0, 0.0,\r\n\t\t0.0, 0.0, sz, 0.0,\r\n\t\t0.0, 0.0, 0.0, 1.0\r\n\t);\r\n}";
-
-	Object.assign(THREE.ShaderChunk, {
-	    // vec3
-	    applyMatrix4: applyMatrix4,
-	    lengthSq: lengthSq,
-	    angleTo: angleTo,
-
-	    // mat4
-	    makeOrthographic: makeOrthographic,
-	    makePerspective: makePerspective,
-	    makePerspective2: makePerspective2,
-	    determinant: determinant,
-	    compose: compose,
-	    decomposeMatrix: decomposeMatrix,
-	});
-
-	var noop = {value: function() {}};
-
-	function dispatch() {
-	  for (var i = 0, n = arguments.length, _ = {}, t; i < n; ++i) {
-	    if (!(t = arguments[i] + "") || (t in _)) throw new Error("illegal type: " + t);
-	    _[t] = [];
-	  }
-	  return new Dispatch(_);
-	}
-
-	function Dispatch(_) {
-	  this._ = _;
-	}
-
-	function parseTypenames(typenames, types) {
-	  return typenames.trim().split(/^|\s+/).map(function(t) {
-	    var name = "", i = t.indexOf(".");
-	    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
-	    if (t && !types.hasOwnProperty(t)) throw new Error("unknown type: " + t);
-	    return {type: t, name: name};
-	  });
-	}
-
-	Dispatch.prototype = dispatch.prototype = {
-	  constructor: Dispatch,
-	  on: function(typename, callback) {
-	    var _ = this._,
-	        T = parseTypenames(typename + "", _),
-	        t,
-	        i = -1,
-	        n = T.length;
-
-	    // If no callback was specified, return the callback of the given type and name.
-	    if (arguments.length < 2) {
-	      while (++i < n) if ((t = (typename = T[i]).type) && (t = get(_[t], typename.name))) return t;
-	      return;
-	    }
-
-	    // If a type was specified, set the callback for the given type and name.
-	    // Otherwise, if a null callback was specified, remove callbacks of the given name.
-	    if (callback != null && typeof callback !== "function") throw new Error("invalid callback: " + callback);
-	    while (++i < n) {
-	      if (t = (typename = T[i]).type) _[t] = set(_[t], typename.name, callback);
-	      else if (callback == null) for (t in _) _[t] = set(_[t], typename.name, null);
-	    }
-
-	    return this;
-	  },
-	  copy: function() {
-	    var copy = {}, _ = this._;
-	    for (var t in _) copy[t] = _[t].slice();
-	    return new Dispatch(copy);
-	  },
-	  call: function(type, that) {
-	    if ((n = arguments.length - 2) > 0) for (var args = new Array(n), i = 0, n, t; i < n; ++i) args[i] = arguments[i + 2];
-	    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
-	    for (t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
-	  },
-	  apply: function(type, that, args) {
-	    if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
-	    for (var t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
-	  }
-	};
-
-	function get(type, name) {
-	  for (var i = 0, n = type.length, c; i < n; ++i) {
-	    if ((c = type[i]).name === name) {
-	      return c.value;
-	    }
-	  }
-	}
-
-	function set(type, name, callback) {
-	  for (var i = 0, n = type.length; i < n; ++i) {
-	    if (type[i].name === name) {
-	      type[i] = noop, type = type.slice(0, i).concat(type.slice(i + 1));
-	      break;
-	    }
-	  }
-	  if (callback != null) type.push({name: name, value: callback});
-	  return type;
-	}
 
 	/**
 	 * 场景序列化信息
@@ -5623,12 +5621,12 @@
 
 	    Object3DSerializer.prototype.fromJSON(json, obj);
 
-	    if (json.background.metadata &&
+	    if (json.background && json.background.metadata &&
 	        (json.background.metadata.generator === 'CubeTextureSerializer' ||
 	            json.background.metadata.generator === 'TextureSerializer')
 	    ) { // 天空盒和背景图片
 	        obj.background = new TexturesSerializer().fromJSON(json.background, undefined, server);
-	    } else { // 纯色
+	    } else if (json.background) { // 纯色
 	        obj.background = new THREE.Color(json.background);
 	    }
 
@@ -9048,7 +9046,7 @@
 	    self.tmpVec = vec4.create();
 	    self.ANIMATED = true;
 
-	    self.dispatch = dispatch('load', 'loadMesh', 'loadTexture', 'loadAnim');
+	    self.dispatch = d3.dispatch('load', 'loadMesh', 'loadTexture', 'loadAnim');
 
 	    self.hiddenBones = null;
 	    var hiddenBones = HiddenBones;
@@ -12836,6 +12834,31 @@
 	};
 
 	/**
+	 * GlobeSerializer
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function GlobeSerializer() {
+	    BaseSerializer.call(this);
+	}
+
+	GlobeSerializer.prototype = Object.create(BaseSerializer.prototype);
+	GlobeSerializer.prototype.constructor = GlobeSerializer;
+
+	GlobeSerializer.prototype.toJSON = function (obj) {
+	    var json = Object3DSerializer.prototype.toJSON.call(this, obj);
+
+	    return json;
+	};
+
+	GlobeSerializer.prototype.fromJSON = function (json, parent) {
+	    var obj = parent === undefined ? new THREE.Bone() : parent;
+
+	    Object3DSerializer.prototype.fromJSON.call(this, json, obj);
+
+	    return obj;
+	};
+
+	/**
 	 * 场景序列化/反序列化类
 	 * @author tengge / https://github.com/tengge1
 	 */
@@ -12933,6 +12956,8 @@
 	            json = (new CubicBezierCurveSerializer()).toJSON(obj);
 	        } else if (obj.userData.type === 'EllipseCurve') {
 	            json = (new EllipseCurveSerializer()).toJSON(obj);
+	        } else if (obj.userData.type === 'Globe') {
+	            json = (new GlobeSerializer()).toJSON(obj);
 	        } else if (obj instanceof THREE.Scene) {
 	            json = (new SceneSerializer()).toJSON(obj);
 	        } else if (obj instanceof THREE.Group) {
@@ -15290,6 +15315,1993 @@
 	};
 
 	/**
+	 * CSS工具类
+	 */
+	var CssUtils = {
+	    /**
+	     * 序列化滤镜
+	     * @param {*} filters 滤镜对象
+	     */
+	    serializeFilter: function (filters) {
+	        var _filters = Object.assign({}, {
+	            hueRotate: filters.hueRotate || 0,
+	            saturate: filters.saturate === undefined ? 1 : filters.saturate,
+	            brightness: filters.brightness === undefined ? 1 : filters.brightness,
+	            blur: filters.blur || 0,
+	            contrast: filters.contrast === undefined ? 1 : filters.contrast,
+	            grayscale: filters.grayscale || 0,
+	            invert: filters.invert || 0,
+	            sepia: filters.sepia || 0,
+	        });
+
+	        return `hue-rotate(${_filters.hueRotate}deg) saturate(${_filters.saturate}) brightness(${_filters.brightness}) ` +
+	            `blur(${_filters.blur}px) contrast(${_filters.contrast}) grayscale(${_filters.grayscale}) invert(${_filters.invert}) sepia(${_filters.sepia})`;
+	    },
+
+	    /**
+	     * 反序列化滤镜
+	     * @param {*} str css滤镜字符串
+	     */
+	    parseFilter: function (str) {
+	        var list = str.split(' ');
+
+	        var filters = {
+	            hueRotate: 0,
+	            saturate: 1,
+	            brightness: 1,
+	            blur: 0,
+	            contrast: 1,
+	            grayscale: 0,
+	            invert: 0,
+	            sepia: 0,
+	        };
+
+	        list.forEach(n => {
+	            if (n.startsWith('hue-rotate')) { // 色调
+	                filters.hueRotate = n.substr(11, n.length - 4);
+	            } else if (n.startsWith('saturate')) { // 饱和度
+	                filters.saturate = n.substr(9, n.length - 1);
+	            } else if (n.startsWith('brightness')) { // 亮度
+	                filters.brightness = n.substr(11, n.length - 1);
+	            } else if (n.startsWith('blur')) { // 模糊
+	                filters.blur = n.substr(5, n.length - 3);
+	            } else if (n.startsWith('contrast')) { // 对比度
+	                filters.contrast = n.substr(9, n.length - 1);
+	            } else if (n.startsWith('grayscale')) {
+	                filters.grayscale = n.substr(10, n.length - 1);
+	            } else if (n.startsWith('invert')) { // 颜色反转
+	                filters.invert = n.substr(7, n.length - 1);
+	            } else if (n.startsWith('sepia')) { // 复古
+	                filters.sepia = n.substr(6, n.length - 1);
+	            }
+	        });
+
+	        return filters;
+	    }
+	};
+
+	var ID$5 = -1;
+
+	/**
+	 * 渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function Renderer(globe) {
+	    this.globe = globe;
+
+	    this.id = `${this.constructor.name}${ID$5--}`;
+
+	    this.camera = this.globe.camera;
+	    this.renderer = this.globe.renderer;
+	    this.gl = this.renderer.context;
+	}
+
+	Renderer.prototype.render = function (layer) {
+
+	};
+
+	Renderer.prototype.dispose = function () {
+	    delete this.camera;
+	    delete this.render;
+	    delete this.gl;
+	    delete this.globe;
+	};
+
+	var BackgroundVertex = "precision highp float;\r\nprecision highp int;\r\n\r\nuniform mat4 modelMatrix;\r\nuniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nattribute vec3 position;\r\n\r\nvarying vec3 vWorldDirection;\r\n\r\nvec3 transformDirection(in vec3 dir, in mat4 matrix) {\r\n    return normalize((matrix * vec4(dir, 0.0)).xyz);\r\n}\r\n\r\nvoid main() {\r\n    vWorldDirection = transformDirection(position, modelMatrix);\r\n    \r\n    vec3 transformed = vec3(position);\r\n    vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);\r\n    gl_Position = projectionMatrix * mvPosition;\r\n\tgl_Position.z = gl_Position.w;\r\n}";
+
+	var BackgroundFragment = "precision highp float;\r\nprecision highp int;\r\n\r\nuniform samplerCube tCube;\r\nuniform float tFlip;\r\n\r\nvarying vec3 vWorldDirection;\r\n\r\nvoid main() {\r\n\tgl_FragColor = textureCube(tCube, vec3(tFlip * vWorldDirection.x, vWorldDirection.yz));\r\n}";
+
+	/**
+	 * 背景渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function BackgroundRenderer(globe) {
+	    Renderer.call(this, globe);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+	    this.buffers = {};
+	    this.texture = null;
+
+	    this.indexCount = 0;
+	    this.modelMatrix = new THREE.Matrix4();
+
+	    this.initProgram();
+	    this.initBuffers();
+	    this.initTextures();
+	}
+
+	BackgroundRenderer.prototype = Object.create(Renderer.prototype);
+	BackgroundRenderer.prototype.constructor = BackgroundRenderer;
+
+	BackgroundRenderer.prototype.initProgram = function () {
+	    var gl = this.gl;
+
+	    // 顶点着色器
+	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	    gl.shaderSource(vertexShader, BackgroundVertex);
+	    gl.compileShader(vertexShader);
+
+	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(vertexShader));
+	        gl.deleteShader(vertexShader);
+	        return;
+	    }
+
+	    // 片源着色器
+	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	    gl.shaderSource(fragmentShader, BackgroundFragment);
+	    gl.compileShader(fragmentShader);
+
+	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(fragmentShader));
+	        gl.deleteShader(fragmentShader);
+	        return;
+	    }
+
+	    // 着色器程序
+	    var program = gl.createProgram();
+	    gl.attachShader(program, vertexShader);
+	    gl.attachShader(program, fragmentShader);
+	    gl.linkProgram(program);
+
+	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+	        console.warn("Could not initialise shaders");
+	        gl.deleteProgram(program);
+	        return;
+	    }
+
+	    // 使用着色器程序
+	    gl.useProgram(program);
+	    this.program = program;
+
+	    // 获取attributes和uniform信息
+	    Object.assign(this.attributes, {
+	        position: gl.getAttribLocation(program, 'position'),
+	    });
+
+	    Object.assign(this.uniforms, {
+	        modelMatrix: gl.getUniformLocation(program, 'modelMatrix'),
+	        modelViewMatrix: gl.getUniformLocation(program, 'modelViewMatrix'),
+	        projectionMatrix: gl.getUniformLocation(program, 'projectionMatrix'),
+
+	        tCube: gl.getUniformLocation(program, 'tCube'),
+	        tFlip: gl.getUniformLocation(program, 'tFlip'),
+	    });
+	};
+
+	BackgroundRenderer.prototype.initBuffers = function () {
+	    var gl = this.gl;
+
+	    var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+	    var attributes = geometry.attributes;
+	    this.indexCount = geometry.index.count;
+
+	    var positionBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.position.array, gl.STATIC_DRAW);
+
+	    var indexBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
+
+	    Object.assign(this.buffers, {
+	        position: positionBuffer,
+	        index: indexBuffer,
+	    });
+	};
+
+	BackgroundRenderer.prototype.initTextures = function () {
+	    var gl = this.gl;
+
+	    var urls = [
+	        'assets/textures/MilkyWay/dark-s_px.jpg',
+	        'assets/textures/MilkyWay/dark-s_nx.jpg',
+	        'assets/textures/MilkyWay/dark-s_py.jpg',
+	        'assets/textures/MilkyWay/dark-s_ny.jpg',
+	        'assets/textures/MilkyWay/dark-s_pz.jpg',
+	        'assets/textures/MilkyWay/dark-s_nz.jpg',
+	    ];
+
+	    // 创建立方体纹理
+	    var texture = gl.createTexture();
+
+	    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+
+	    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+	    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	    gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+
+	    var promises = urls.map(n => {
+	        return this.createImage(n);
+	    });
+
+	    Promise.all(promises).then(imgs => {
+	        gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[0]);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[1]);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[2]);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[3]);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[4]);
+	        gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgs[5]);
+	        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+
+	        this.texture = texture;
+	    });
+	};
+
+	BackgroundRenderer.prototype.createImage = function (url) {
+	    var img = document.createElement('img');
+	    img.src = url;
+
+	    return new Promise(resolve => {
+	        img.onload = () => {
+	            img.onload = null;
+	            resolve(img);
+	        };
+	    });
+	};
+
+	BackgroundRenderer.prototype.render = function () {
+	    var modelViewMatrix = new THREE.Matrix4();
+
+	    return function () {
+	        if (!this.texture) {
+	            return;
+	        }
+
+	        var gl = this.gl;
+	        var camera = this.camera;
+
+	        this.modelMatrix.copyPosition(this.camera.matrixWorld);
+
+	        gl.useProgram(this.program);
+
+	        gl.enable(gl.CULL_FACE);
+	        gl.cullFace(gl.FRONT);
+	        gl.frontFace(gl.CCW);
+	        gl.disable(gl.DEPTH_TEST);
+
+	        modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.modelMatrix);
+
+	        gl.uniformMatrix4fv(this.uniforms.modelMatrix, false, this.modelMatrix.elements);
+	        gl.uniformMatrix4fv(this.uniforms.modelViewMatrix, false, modelViewMatrix.elements);
+	        gl.uniformMatrix4fv(this.uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
+
+	        gl.uniform1f(this.uniforms.tFlip, -1);
+
+	        gl.activeTexture(gl.TEXTURE0);
+	        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.texture);
+	        gl.uniform1i(this.uniforms.tCube, 0);
+
+	        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
+	        gl.enableVertexAttribArray(this.attributes.position);
+	        gl.vertexAttribPointer(this.attributes.position, 3, gl.FLOAT, false, 0, 0);
+
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+	        gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_SHORT, 0);
+
+	        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	    };
+	}();
+
+	BackgroundRenderer.prototype.dispose = function () {
+	    this.gl.deleteProgram(this.program);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+
+	    Object.values(this.buffers).forEach(n => {
+	        this.gl.deleteBuffer(n);
+	    });
+
+	    this.buffers = {};
+
+	    Renderer.prototype.dispose.call(this);
+	};
+
+	var SunVertex = "precision highp float;\r\nprecision highp int;\r\n\r\nuniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nuniform vec3 sunPosition;\r\n\r\nattribute vec3 position;\r\nattribute vec2 uv;\r\n\r\nvarying vec2 vUV;\r\n\r\nvec3 applyMatrix4(vec3 v, mat4 m) {\r\n    float x = v.x;\r\n    float y = v.y;\r\n    float z = v.z;\r\n    \r\n    float w = 1.0 / ( m[0][3] * x + m[1][3] * y + m[2][3] * z + m[3][3] );\r\n\r\n    return vec3(\r\n        (m[0][0] * x + m[1][0] * y + m[2][0] * z + m[3][0]) * w,\r\n        (m[0][1] * x + m[1][1] * y + m[2][1] * z + m[3][1]) * w,\r\n        (m[0][2] * x + m[1][2] * y + m[2][2] * z + m[3][2] ) * w\r\n    );\r\n}\r\n\r\nvoid main() {\r\n    vec3 screenPos = applyMatrix4(applyMatrix4(sunPosition, modelViewMatrix), projectionMatrix);\r\n\r\n    gl_Position = vec4(\r\n        screenPos.x + position.x,\r\n        screenPos.y + position.y,\r\n        screenPos.z + position.z,\r\n        1.0\r\n    );\r\n\r\n    vUV = uv;\r\n}";
+
+	var SunFragment = "precision highp float;\r\nprecision highp int;\r\n\r\nuniform sampler2D map;\r\n\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_FragColor = texture2D(map, vUV);\r\n}";
+
+	/**
+	 * WGS84
+	 * @author tengge / https://github.com/tengge1
+	 * @see https://zhidao.baidu.com/question/535863620.html
+	 */
+	var WGS84 = {
+	    // 长半轴
+	    a: 6378137,
+
+	    // 短半轴
+	    b: 6356752.3142,
+
+	    // 扁率
+	    alpha: 1 / 298.2572236,
+
+	    // 第一偏心率平方 = (a**2 - b**2) / a**2
+	    e2_1: 0.00669437999013,
+
+	    // 第二偏心率平方 = (a**2 - b**2) / b**2
+	    e2_2: 0.006739496742227,
+	};
+
+	/**
+	 * 太阳渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function SunRenderer(globe) {
+	    Renderer.call(this, globe);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+	    this.buffers = {};
+	    this.texture = null;
+
+	    this.indexCount = 0;
+
+	    this.initProgram();
+	    this.initBuffers();
+	    this.initTextures();
+	}
+
+	SunRenderer.prototype = Object.create(Renderer.prototype);
+	SunRenderer.prototype.constructor = SunRenderer;
+
+	SunRenderer.prototype.initProgram = function () {
+	    var gl = this.gl;
+
+	    // 顶点着色器
+	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	    gl.shaderSource(vertexShader, SunVertex);
+	    gl.compileShader(vertexShader);
+
+	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(vertexShader));
+	        gl.deleteShader(vertexShader);
+	        return;
+	    }
+
+	    // 片源着色器
+	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	    gl.shaderSource(fragmentShader, SunFragment);
+	    gl.compileShader(fragmentShader);
+
+	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(fragmentShader));
+	        gl.deleteShader(fragmentShader);
+	        return;
+	    }
+
+	    // 着色器程序
+	    var program = gl.createProgram();
+	    gl.attachShader(program, vertexShader);
+	    gl.attachShader(program, fragmentShader);
+	    gl.linkProgram(program);
+
+	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+	        console.warn("Could not initialise shaders");
+	        gl.deleteProgram(program);
+	        return;
+	    }
+
+	    // 使用着色器程序
+	    gl.useProgram(program);
+	    this.program = program;
+
+	    // 获取attributes和uniform信息
+	    Object.assign(this.attributes, {
+	        position: gl.getAttribLocation(program, 'position'),
+	        uv: gl.getAttribLocation(program, 'uv'),
+	    });
+
+	    Object.assign(this.uniforms, {
+	        modelViewMatrix: gl.getUniformLocation(program, 'modelViewMatrix'),
+	        projectionMatrix: gl.getUniformLocation(program, 'projectionMatrix'),
+	        sunPosition: gl.getUniformLocation(program, 'sunPosition'),
+	        map: gl.getUniformLocation(program, 'map'),
+	    });
+	};
+
+	SunRenderer.prototype.initBuffers = function () {
+	    var gl = this.gl;
+
+	    var geometry = new THREE.PlaneBufferGeometry(0.4, 0.4);
+	    var attributes = geometry.attributes;
+	    this.indexCount = geometry.index.count;
+
+	    var positionBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.position.array, gl.STATIC_DRAW);
+
+	    var uvBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.uv.array, gl.STATIC_DRAW);
+
+	    var indexBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
+
+	    Object.assign(this.buffers, {
+	        position: positionBuffer,
+	        uv: uvBuffer,
+	        index: indexBuffer,
+	    });
+	};
+
+	SunRenderer.prototype.initTextures = function () {
+	    var gl = this.gl;
+
+	    var texture = gl.createTexture();
+	    gl.bindTexture(gl.TEXTURE_2D, texture);
+	    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	    var img = document.createElement('img');
+
+	    img.onload = () => {
+	        img.onload = null;
+	        gl.bindTexture(gl.TEXTURE_2D, texture);
+	        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+	        this.texture = texture;
+	    };
+
+	    img.src = 'assets/textures/lensflare/lensflare0_alpha.png';
+	};
+
+	SunRenderer.prototype.render = function () {
+	    if (!this.texture) {
+	        return;
+	    }
+
+	    var gl = this.gl;
+	    var camera = this.camera;
+
+	    gl.useProgram(this.program);
+
+	    gl.disable(gl.CULL_FACE);
+	    gl.cullFace(gl.FRONT);
+	    gl.frontFace(gl.CCW);
+
+	    gl.enable(gl.DEPTH_TEST);
+	    gl.enable(gl.BLEND);
+	    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+	    gl.uniformMatrix4fv(this.uniforms.modelViewMatrix, false, camera.matrixWorldInverse.elements);
+	    gl.uniformMatrix4fv(this.uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
+	    gl.uniform3f(this.uniforms.sunPosition, this.globe.sunPosition.x, this.globe.sunPosition.y, this.globe.sunPosition.z);
+
+	    gl.activeTexture(gl.TEXTURE0);
+	    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	    gl.uniform1i(this.uniforms.map, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
+	    gl.enableVertexAttribArray(this.attributes.position);
+	    gl.vertexAttribPointer(this.attributes.position, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.uv);
+	    gl.enableVertexAttribArray(this.attributes.uv);
+	    gl.vertexAttribPointer(this.attributes.uv, 2, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+	    gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_SHORT, 0);
+
+	    gl.bindTexture(gl.TEXTURE_2D, null);
+	    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	};
+
+	SunRenderer.prototype.dispose = function () {
+	    this.gl.deleteProgram(this.program);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+
+	    Object.values(this.buffers).forEach(n => {
+	        this.gl.deleteBuffer(n);
+	    });
+
+	    this.buffers = {};
+
+	    Renderer.prototype.dispose.call(this);
+	};
+
+	/**
+	 * 瓦片创建者
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function TileCreator(globe) {
+	    this.globe = globe;
+	    this.options = this.globe.options;
+	    this.camera = this.globe.camera;
+	    this.renderer = this.globe.renderer;
+	}
+
+	TileCreator.prototype.get = function (lon, lat, alt) {
+	    return [];
+	};
+
+	TileCreator.prototype.dispose = function () {
+	    delete this.globe;
+	    delete this.options;
+	    delete this.camera;
+	    delete this.renderer;
+	};
+
+	const RADIAN_PER_DEGREE = Math.PI / 180;
+	const DEGREE_PER_RADIAN = 180 / Math.PI;
+
+	/**
+	 * 经纬度、海拔转笛卡尔坐标
+	 * 坐标系：
+	 * 原点：地心
+	 * x轴：经度0，纬度0
+	 * y轴：指向北极
+	 * z轴：西经90，纬度0
+	 * @param {THREE.Vector3} lonlat 经纬度（弧度）、海拔
+	 * @param {THREE.Vector3} xyz 笛卡尔坐标
+	 */
+	function _lonlatToXYZ(lonlat, xyz) {
+	    var lon = lonlat.x;
+	    var lat = lonlat.y;
+	    var r = WGS84.a + (lonlat.z || 0);
+
+	    if (xyz === undefined) {
+	        xyz = new THREE.Vector3();
+	    }
+
+	    return xyz.set(
+	        r * Math.cos(lat) * Math.cos(lon),
+	        r * Math.sin(lat),
+	        -r * Math.cos(lat) * Math.sin(lon),
+	    );
+	}
+
+	/**
+	 * 经纬度、海拔转笛卡尔坐标
+	 * @param {THREE.Vector3} lonlat 经纬度（角度）、海拔
+	 * @param {THREE.Vector3} xyz 笛卡尔坐标
+	 */
+	function lonlatToXYZ(lonlat, xyz) {
+	    if (xyz === undefined) {
+	        xyz = new THREE.Vector3();
+	    }
+
+	    xyz.set(
+	        lonlat.x * RADIAN_PER_DEGREE,
+	        lonlat.y * RADIAN_PER_DEGREE,
+	        lonlat.z,
+	    );
+
+	    return _lonlatToXYZ(xyz, xyz);
+	}
+
+	/**
+	 * 笛卡尔坐标转经纬度（弧度）、海拔
+	 * @param {THREE.Vector3} xyz 笛卡尔坐标
+	 * @param {THREE.Vector3} lonlat 经纬度（弧度）、海拔
+	 */
+	function _xyzToLonlat(xyz, lonlat) {
+	    var lon = -Math.sign(xyz.z) * Math.acos(xyz.x / Math.sqrt(xyz.x ** 2 + xyz.z ** 2));
+	    var lat = Math.atan(xyz.y / Math.sqrt(xyz.x ** 2 + xyz.z ** 2));
+	    var alt = Math.sqrt(xyz.x ** 2 + xyz.y ** 2 + xyz.z ** 2) - WGS84.a;
+
+	    if (lonlat === undefined) {
+	        lonlat = new THREE.Vector3();
+	    }
+
+	    return lonlat.set(
+	        lon,
+	        lat,
+	        alt,
+	    );
+	}
+
+	/**
+	 * 笛卡尔坐标转经纬度（角度）、海拔
+	 * @param {THREE.Vector3} xyz 笛卡尔坐标
+	 * @param {THREE.Vector3} lonlat 经纬度（角度）、海拔
+	 */
+	function xyzToLonlat(xyz, lonlat) {
+	    if (lonlat === undefined) {
+	        lonlat = new THREE.Vector3();
+	    }
+
+	    _xyzToLonlat(xyz, lonlat);
+	    lonlat.x *= DEGREE_PER_RADIAN;
+	    lonlat.y *= DEGREE_PER_RADIAN;
+
+	    return lonlat;
+	}
+
+	/**
+	 * 层级转海拔
+	 * @param {Number} zoom 层级
+	 */
+	function zoomToAlt(zoom) {
+	    return 7820683 / 2 ** zoom;
+	}
+
+	/**
+	 * 海拔转层级
+	 * @param {Number} alt 海拔
+	 */
+	function altToZoom(alt) {
+	    return Math.log2(7820683 / alt);
+	}
+
+	/**
+	 * 墨卡托投影（弧度）
+	 * @param {Number} lat 纬度（弧度）
+	 * @see https://github.com/d3/d3-geo/blob/master/src/projection/mercator.js
+	 */
+	function _mercatorLat(lat) {
+	    return Math.log(Math.tan((Math.PI / 2 + lat) / 2));
+	}
+
+	/**
+	 * 墨卡托投影（角度）
+	 * @param {Number} lat 纬度（角度）
+	 * @see https://github.com/d3/d3-geo/blob/master/src/projection/mercator.js
+	 */
+	function mercatorLat(lat) {
+	    return _mercatorLat(lat * RADIAN_PER_DEGREE) * DEGREE_PER_RADIAN;
+	}
+
+	/**
+	 * 墨卡托投影反算（弧度）
+	 * @param {Number} y 墨卡托投影Y坐标
+	 * @see https://github.com/d3/d3-geo/blob/master/src/projection/mercator.js
+	 */
+	function _mercatorLatInvert(y) {
+	    return 2 * Math.atan(Math.exp(y)) - Math.PI / 2;
+	}
+
+	/**
+	 * 墨卡托投影反算（角度）
+	 * @param {Number} y 墨卡托投影Y坐标
+	 * @see https://github.com/d3/d3-geo/blob/master/src/projection/mercator.js
+	 */
+	function mercatorLatInvert(y) {
+	    return _mercatorLatInvert(y) * DEGREE_PER_RADIAN;
+	}
+
+	/**
+	 * 计算两个经纬度之间距离(弧度)
+	 * @param {*} lon1 经度1(弧度)
+	 * @param {*} lat1 纬度1(弧度)
+	 * @param {*} lon2 经度2(弧度)
+	 * @param {*} lat2 纬度2(弧度)
+	 * @see https://www.xuebuyuan.com/2173606.html
+	 */
+	function _getDistance(lon1, lat1, lon2, lat2) {
+	    return 2 * 6378137 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2) +
+	        Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lon1 - lon2) / 2), 2)));
+	}
+
+	/**
+	 * 计算两个经纬度之间距离(角度)
+	 * @param {*} lon1 经度1(角度)
+	 * @param {*} lat1 纬度1(角度)
+	 * @param {*} lon2 经度2(角度)
+	 * @param {*} lat2 纬度2(角度)
+	 * @see https://www.xuebuyuan.com/2173606.html
+	 */
+	function getDistance(lon1, lat1, lon2, lat2) {
+	    lon1 *= RADIAN_PER_DEGREE;
+	    lat1 *= RADIAN_PER_DEGREE;
+	    lon2 *= RADIAN_PER_DEGREE;
+	    lat2 *= RADIAN_PER_DEGREE;
+
+	    return _getDistance(lon1, lat1, lon2, lat2);
+	}
+
+	/**
+	 * 数学工具
+	 * @author tengge / https://github.com/tengge1
+	 */
+	var GeoUtils = {
+	    // 经纬度海拔转笛卡尔坐标
+	    _lonlatToXYZ,
+	    lonlatToXYZ,
+
+	    // 笛卡尔坐标转经纬度海拔
+	    _xyzToLonlat,
+	    xyzToLonlat,
+
+	    // 层级转海拔
+	    zoomToAlt,
+
+	    // 海拔转层级
+	    altToZoom,
+
+	    // 墨卡托投影
+	    _mercatorLat,
+	    mercatorLat,
+
+	    // 墨卡托投影反算
+	    _mercatorLatInvert,
+	    mercatorLatInvert,
+
+	    // 计算两个经纬度之间距离
+	    _getDistance,
+	    getDistance,
+	};
+
+	/**
+	 * 瓦片
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
+	function Tile(x = 0, y = 0, z = 0) {
+	    this.x = x;
+	    this.y = y;
+	    this.z = z;
+
+	    this.images = [];
+
+	    this._aabb = this._getBox(x, y, z);
+	    this._center = this._getCenter(this._aabb);
+	}
+
+	/**
+	 * 获取包围盒
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
+	Tile.prototype._getBox = function (x, y, z) {
+	    var size = Math.PI * 2 / 2 ** z;
+	    var minX = -Math.PI + size * x;
+	    var maxX = minX + size;
+	    var maxY = Math.PI - size * y;
+	    var minY = maxY - size;
+
+	    minY = GeoUtils._mercatorLatInvert(minY);
+	    maxY = GeoUtils._mercatorLatInvert(maxY);
+
+	    return new THREE.Box2(
+	        new THREE.Vector2(minX, minY),
+	        new THREE.Vector2(maxX, maxY),
+	    );
+	};
+
+	/**
+	 * 获取中心点
+	 * @param {*} aabb 
+	 */
+	Tile.prototype._getCenter = function (aabb) {
+	    var center = new THREE.Vector2();
+	    return aabb.getCenter(center);
+	};
+
+	/**
+	 * 球形瓦片创建者
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function SphereTileCreator(globe) {
+	    TileCreator.call(this, globe);
+
+	    this.cache = new Map();
+
+	    this._centerZoom = 0;
+	}
+
+	SphereTileCreator.prototype = Object.create(TileCreator.prototype);
+	SphereTileCreator.prototype.constructor = SphereTileCreator;
+
+	SphereTileCreator.prototype.get = function (tiles) {
+	    tiles.length = 0;
+
+	    this._centerZoom = ~~GeoUtils.altToZoom(this.camera.position.length() - WGS84.a) + 3;
+
+	    this.fork(0, 0, 1, tiles);
+	    this.fork(1, 0, 1, tiles);
+	    this.fork(0, 1, 1, tiles);
+	    this.fork(1, 1, 1, tiles);
+
+	    // 排序
+	    tiles = tiles.sort((a, b) => {
+	        if (a.z > b.z) {
+	            return 1;
+	        } else if (a.z < b.z) {
+	            return -1;
+	        } else {
+	            return 0;
+	        }
+	    });
+
+	    // 获取图层数据
+	    tiles.forEach(tile => {
+	        tile.images.length = 0;
+	        this.globe._layers.forEach(n => {
+	            var image = n.get(tile.x, tile.y, tile.z);
+	            if (image) {
+	                tile.images.push(image);
+	            }
+	        });
+	    });
+
+	    return tiles;
+	};
+
+	/**
+	 * 从1层级进行四分，返回满足要求的瓦片
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 * @param {*} tiles 
+	 */
+	SphereTileCreator.prototype.fork = function (x, y, z, tiles) {
+	    var tile = this.getTile(x, y, z);
+
+	    if (!this.isVisible(tile)) {
+	        return;
+	    }
+
+	    tiles.push(tile);
+
+	    if (tile.z > this._centerZoom) {
+	        return;
+	    }
+
+	    this.fork(x * 2, y * 2, z + 1, tiles);
+	    this.fork(x * 2 + 1, y * 2, z + 1, tiles);
+	    this.fork(x * 2, y * 2 + 1, z + 1, tiles);
+	    this.fork(x * 2 + 1, y * 2 + 1, z + 1, tiles);
+	};
+
+	/**
+	 * 获取一个瓦片
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
+	SphereTileCreator.prototype.getTile = function (x, y, z) {
+	    var id = `${x}_${y}_${z}`;
+
+	    var tile = this.cache.get(id);
+
+	    if (!tile) {
+	        tile = new Tile(x, y, z);
+	        this.cache.set(id, tile);
+	    }
+
+	    return tile;
+	};
+
+	/**
+	 * 判断瓦片是否可见：
+	 * 1、材质上的底图已经下载完；
+	 * 2、当前视锥与该瓦片的包围盒相交。
+	 * @param {*} tile 
+	 */
+	SphereTileCreator.prototype.isVisible = function (tile) {
+	    return this.globe.viewer.aabb.intersectsBox(tile._aabb);
+	};
+
+	SphereTileCreator.prototype.dispose = function () {
+	    this.cache.clear();
+	    TileCreator.prototype.dispose.call(this);
+	};
+
+	var TiledVertex = "precision highp float;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\n\r\nuniform mat4 modelMatrix;\r\nuniform mat4 viewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nuniform int x;\r\nuniform int y;\r\nuniform int z;\r\n\r\nvarying vec3 vNormal;\r\nvarying vec2 vUV;\r\n\r\n// 必应地图参数，纬度180是85.05112878的墨卡托投影\r\n#define EARTH_RADIUS 6378137.0\r\n#define MIN_LATITUDE -180.0\r\n#define MAX_LATITUDE 180.0\r\n#define MIN_LONGITUDE -180.0\r\n#define MAX_LONGITUDE 180.0\r\n#define PI 3.141592653589793\r\n\r\nvoid main() {\r\n    // 每个瓦片位置\r\n    float size = pow(2.0, float(z));\r\n    float dlon = (MAX_LONGITUDE - MIN_LONGITUDE) / size;\r\n    float dlat = (MAX_LATITUDE - MIN_LATITUDE) / size;\r\n\r\n    float left = MIN_LONGITUDE + dlon * float(x);\r\n    float top = MAX_LATITUDE - dlat * float(y);\r\n    float right = left + dlon;\r\n    float bottom = top - dlat;\r\n\r\n    // 瓦片上每个小格位置\r\n    // +0.5的原因是：position范围是-0.5到0.5\r\n    float lon = left + (right - left) * (0.5 + position.x);\r\n    float lat = top - (top - bottom) * (0.5 + position.y);\r\n\r\n    lon = lon * PI / 180.0;\r\n    lat = lat * PI / 180.0;\r\n\r\n    // 墨卡托投影反算\r\n    lat = 2.0 * atan(exp(lat)) - PI / 2.0;\r\n\r\n    vec3 transformed = vec3(\r\n        EARTH_RADIUS * cos(lat) * cos(lon),\r\n        EARTH_RADIUS * sin(lat),\r\n        -EARTH_RADIUS * cos(lat) * sin(lon)\r\n    );\r\n\r\n    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(transformed, 1.0);\r\n\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
+
+	var TiledFragment = "precision highp float;\r\n\r\nuniform sampler2D map;\r\n\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_FragColor = texture2D(map, vUV);\r\n}";
+
+	/**
+	 * 瓦片图层渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function TiledLayerRenderer(globe) {
+	    Renderer.call(this, globe);
+
+	    this.creator = new SphereTileCreator(this.globe);
+
+	    this.geometry = new THREE.PlaneBufferGeometry(1, 1, 16, 16);
+	    this.modelMatrix = new THREE.Matrix4();
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+	    this.buffers = {};
+
+	    this.tiles = [];
+
+	    this.initProgram();
+	    this.initBuffers();
+	}
+
+	TiledLayerRenderer.prototype = Object.create(Renderer.prototype);
+	TiledLayerRenderer.prototype.constructor = TiledLayerRenderer;
+
+	TiledLayerRenderer.prototype.initProgram = function () {
+	    var gl = this.gl;
+
+	    // 顶点着色器
+	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	    gl.shaderSource(vertexShader, TiledVertex);
+	    gl.compileShader(vertexShader);
+
+	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(vertexShader));
+	        gl.deleteShader(vertexShader);
+	        return;
+	    }
+
+	    // 片源着色器
+	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	    gl.shaderSource(fragmentShader, TiledFragment);
+	    gl.compileShader(fragmentShader);
+
+	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(fragmentShader));
+	        gl.deleteShader(fragmentShader);
+	        return;
+	    }
+
+	    // 着色器程序
+	    var program = gl.createProgram();
+	    gl.attachShader(program, vertexShader);
+	    gl.attachShader(program, fragmentShader);
+	    gl.linkProgram(program);
+
+	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+	        console.warn("Could not initialise shaders");
+	        gl.deleteProgram(program);
+	        return;
+	    }
+
+	    // 使用着色器程序
+	    gl.useProgram(program);
+	    this.program = program;
+
+	    // 获取attributes和uniform信息
+	    Object.assign(this.attributes, {
+	        position: gl.getAttribLocation(program, 'position'),
+	        normal: gl.getAttribLocation(program, 'normal'),
+	        uv: gl.getAttribLocation(program, 'uv'),
+	    });
+
+	    Object.assign(this.uniforms, {
+	        modelMatrix: gl.getUniformLocation(program, 'modelMatrix'),
+	        viewMatrix: gl.getUniformLocation(program, 'viewMatrix'),
+	        projectionMatrix: gl.getUniformLocation(program, 'projectionMatrix'),
+	        x: gl.getUniformLocation(program, 'x'),
+	        y: gl.getUniformLocation(program, 'y'),
+	        z: gl.getUniformLocation(program, 'z'),
+	        map: gl.getUniformLocation(program, 'map'),
+	    });
+	};
+
+	TiledLayerRenderer.prototype.initBuffers = function () {
+	    var gl = this.gl;
+	    var geometry = this.geometry;
+	    var attributes = geometry.attributes;
+
+	    var positionBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.position.array, gl.STATIC_DRAW);
+
+	    var normalBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.normal.array, gl.STATIC_DRAW);
+
+	    var uvBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.uv.array, gl.STATIC_DRAW);
+
+	    var indexBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
+
+	    Object.assign(this.buffers, {
+	        position: positionBuffer,
+	        normal: normalBuffer,
+	        uv: uvBuffer,
+	        index: indexBuffer,
+	    });
+	};
+
+	TiledLayerRenderer.prototype.render = function () {
+	    this.creator.get(this.tiles);
+	    this.renderMesh();
+	    this.renderer.state.reset();
+	};
+
+	TiledLayerRenderer.prototype.renderMesh = function () {
+	    var gl = this.gl;
+	    var camera = this.camera;
+
+	    gl.useProgram(this.program);
+
+	    gl.enable(gl.CULL_FACE);
+	    gl.cullFace(gl.BACK);
+	    gl.frontFace(gl.CW);
+
+	    gl.enable(gl.DEPTH_TEST);
+	    // gl.depthFunc(gl.LEQUAL);
+	    // gl.depthMask(true);
+	    gl.disable(gl.BLEND);
+
+	    gl.uniformMatrix4fv(this.uniforms.modelMatrix, false, this.modelMatrix.elements);
+	    gl.uniformMatrix4fv(this.uniforms.viewMatrix, false, camera.matrixWorldInverse.elements);
+	    gl.uniformMatrix4fv(this.uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
+	    gl.enableVertexAttribArray(this.attributes.position);
+	    gl.vertexAttribPointer(this.attributes.position, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.normal);
+	    gl.enableVertexAttribArray(this.attributes.normal);
+	    gl.vertexAttribPointer(this.attributes.normal, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.uv);
+	    gl.enableVertexAttribArray(this.attributes.uv);
+	    gl.vertexAttribPointer(this.attributes.uv, 2, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+
+	    // x, y, z
+	    this.tiles.forEach(tile => {
+	        tile.images.forEach(n => {
+	            gl.uniform1i(this.uniforms.x, n._x);
+	            gl.uniform1i(this.uniforms.y, n._y);
+	            gl.uniform1i(this.uniforms.z, n._z);
+
+	            if (!n.texture) {
+	                var texture = gl.createTexture();
+	                gl.activeTexture(gl.TEXTURE0);
+	                gl.bindTexture(gl.TEXTURE_2D, texture);
+	                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+	                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, n);
+
+	                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	                n.texture = texture;
+	            }
+
+	            gl.activeTexture(gl.TEXTURE0);
+	            gl.bindTexture(gl.TEXTURE_2D, n.texture);
+	            gl.uniform1i(this.uniforms.map, 0);
+
+	            gl.drawElements(gl.TRIANGLES, this.geometry.index.count, gl.UNSIGNED_SHORT, 0);
+	        });
+	    });
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	    gl.bindTexture(gl.TEXTURE_2D, null);
+	};
+
+	TiledLayerRenderer.prototype.dispose = function () {
+	    this.gl.deleteProgram(this.program);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+
+	    Object.values(this.buffers).forEach(n => {
+	        this.gl.deleteBuffer(n);
+	    });
+
+	    this.buffers = {};
+
+	    this.creator.dispose();
+
+	    Renderer.prototype.dispose.call(this);
+	};
+
+	var AtmosphereVertex = "attribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec3 uv;\r\n\r\nuniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nvarying vec4 vTransformed;\r\nvarying vec3 vNormal;\r\nvarying vec3 vUV; \r\n\r\nvoid main()\r\n{\r\n    vec4 transformed =  modelViewMatrix * vec4(position, 1.0);\r\n\r\n    gl_Position = projectionMatrix * transformed;\r\n\r\n    vTransformed = transformed;\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
+
+	var AtmosphereFragment = "precision highp float;\r\n\r\nvarying vec4 vTransformed;\r\n\r\n// three.js生成的球体半径是0.5，所以要除以2\r\n#define HALF_EARTH_RADIUS 3189068.5\r\n\r\nvoid main() \r\n{\r\n    float r = sqrt(vTransformed.x * vTransformed.x + vTransformed.y * vTransformed.y);\r\n\r\n    if(r < HALF_EARTH_RADIUS) {\r\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\r\n    } else {\r\n        float rate = (r - HALF_EARTH_RADIUS) / (HALF_EARTH_RADIUS * 1.02);\r\n        //float red = smoothstep(0.0, 1.0, rate);\r\n        //float opacity = smoothstep(1.0, 0.0, rate);\r\n        gl_FragColor = vec4(1.0, 1.0, 1.0, 0.4);\r\n    }\r\n}";
+
+	/**
+	 * 大气层渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function AtmosphereRenderer(globe) {
+	    Renderer.call(this, globe);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+	    this.buffers = {};
+
+	    this.indexCount = 0;
+
+	    this.initProgram();
+	    this.initBuffers();
+	}
+
+	AtmosphereRenderer.prototype = Object.create(Renderer.prototype);
+	AtmosphereRenderer.prototype.constructor = AtmosphereRenderer;
+
+	AtmosphereRenderer.prototype.initProgram = function () {
+	    var gl = this.gl;
+
+	    // 顶点着色器
+	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+	    gl.shaderSource(vertexShader, AtmosphereVertex);
+	    gl.compileShader(vertexShader);
+
+	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(vertexShader));
+	        gl.deleteShader(vertexShader);
+	        return;
+	    }
+
+	    // 片源着色器
+	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+	    gl.shaderSource(fragmentShader, AtmosphereFragment);
+	    gl.compileShader(fragmentShader);
+
+	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	        console.warn(gl.getShaderInfoLog(fragmentShader));
+	        gl.deleteShader(fragmentShader);
+	        return;
+	    }
+
+	    // 着色器程序
+	    var program = gl.createProgram();
+	    gl.attachShader(program, vertexShader);
+	    gl.attachShader(program, fragmentShader);
+	    gl.linkProgram(program);
+
+	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+	        console.warn("Could not initialise shaders");
+	        gl.deleteProgram(program);
+	        return;
+	    }
+
+	    // 使用着色器程序
+	    gl.useProgram(program);
+	    this.program = program;
+
+	    // 获取attributes和uniform信息
+	    Object.assign(this.attributes, {
+	        position: gl.getAttribLocation(program, 'position'),
+	        normal: gl.getAttribLocation(program, 'normal'),
+	        uv: gl.getAttribLocation(program, 'uv'),
+	    });
+
+	    Object.assign(this.uniforms, {
+	        modelViewMatrix: gl.getUniformLocation(program, 'modelViewMatrix'),
+	        projectionMatrix: gl.getUniformLocation(program, 'projectionMatrix'),
+	    });
+	};
+
+	AtmosphereRenderer.prototype.initBuffers = function () {
+	    var gl = this.gl;
+
+	    var geometry = new THREE.SphereBufferGeometry(WGS84.a * 1.02, 32, 32);
+	    var attributes = geometry.attributes;
+	    this.indexCount = geometry.index.count;
+
+	    var positionBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.position.array, gl.STATIC_DRAW);
+
+	    var normalBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.normal.array, gl.STATIC_DRAW);
+
+	    var uvBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+	    gl.bufferData(gl.ARRAY_BUFFER, attributes.uv.array, gl.STATIC_DRAW);
+
+	    var indexBuffer = gl.createBuffer();
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
+
+	    Object.assign(this.buffers, {
+	        position: positionBuffer,
+	        normal: normalBuffer,
+	        uv: uvBuffer,
+	        index: indexBuffer,
+	    });
+	};
+
+	AtmosphereRenderer.prototype.render = function () {
+	    var gl = this.gl;
+	    var camera = this.camera;
+
+	    gl.useProgram(this.program);
+
+	    gl.enable(gl.CULL_FACE);
+	    gl.cullFace(gl.BACK);
+	    gl.frontFace(gl.CCW);
+
+	    gl.enable(gl.DEPTH_TEST);
+	    gl.enable(gl.BLEND);
+	    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+	    gl.uniformMatrix4fv(this.uniforms.modelViewMatrix, false, camera.matrixWorldInverse.elements);
+	    gl.uniformMatrix4fv(this.uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
+	    gl.enableVertexAttribArray(this.attributes.position);
+	    gl.vertexAttribPointer(this.attributes.position, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.normal);
+	    gl.enableVertexAttribArray(this.attributes.normal);
+	    gl.vertexAttribPointer(this.attributes.normal, 3, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.uv);
+	    gl.enableVertexAttribArray(this.attributes.uv);
+	    gl.vertexAttribPointer(this.attributes.uv, 2, gl.FLOAT, false, 0, 0);
+
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+	    gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_SHORT, 0);
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	};
+
+	AtmosphereRenderer.prototype.dispose = function () {
+	    this.gl.deleteProgram(this.program);
+
+	    this.program = null;
+	    this.attributes = {};
+	    this.uniforms = {};
+
+	    Object.values(this.buffers).forEach(n => {
+	        this.gl.deleteBuffer(n);
+	    });
+
+	    this.buffers = {};
+
+	    Renderer.prototype.dispose.call(this);
+	};
+
+	/**
+	 * 所有渲染器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function Renderers(globe) {
+	    Renderer.call(this, globe);
+
+	    this.renderers = [
+	        new BackgroundRenderer(this.globe),
+	        new SunRenderer(this.globe),
+	        new TiledLayerRenderer(this.globe),
+	        //new AtmosphereRenderer(this.globe),
+	    ];
+	}
+
+	Renderers.prototype = Object.create(Renderer.prototype);
+	Renderers.prototype.constructor = Renderers;
+
+	Renderers.prototype.render = function () {
+	    this.renderers.forEach(n => {
+	        n.render();
+	    });
+	};
+
+	Renderers.prototype.dispose = function () {
+	    this.renderers.forEach(n => {
+	        n.dispose();
+	    });
+
+	    this.renderers.length = 0;
+
+	    Renderer.prototype.dispose.call(this);
+	};
+
+	var ID$6 = -1;
+
+	/**
+	 * 查看器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} camera 相机
+	 * @param {*} domElement 文档
+	 */
+	function Viewer(camera, domElement) {
+	    this.camera = camera;
+	    this.domElement = domElement;
+
+	    this.id = `${this.constructor.name}${ID$6--}`;
+
+	    this.oldFar = this.camera.far;
+	    this.camera.far = 20576957;
+	    this.camera.updateProjectionMatrix();
+	}
+	Viewer.prototype.update = function () {
+
+	};
+
+	Viewer.prototype.dispose = function () {
+	    this.camera.far = this.oldFar;
+	    this.camera.updateProjectionMatrix();
+
+	    delete this.oldFar;
+	    delete this.camera;
+	    delete this.domElement;
+	};
+
+	/**
+	 * 轨道查看器
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} camera 相机
+	 * @param {*} domElement 文档
+	 */
+	function OrbitViewer(camera, domElement) {
+	    Viewer.call(this, camera, domElement);
+
+	    this.sphere = new THREE.Sphere(undefined, WGS84.a);
+	    this.ray = new THREE.Ray();
+
+	    this.isDown = false;
+	    this.isPan = false;
+
+	    this.intersectPoint = new THREE.Vector3();
+	    this.aabb = new THREE.Box2(
+	        new THREE.Vector2(-Math.PI, -Math.PI / 2),
+	        new THREE.Vector2(Math.PI, Math.PI / 2),
+	    );
+
+	    this.onMouseDown = this.onMouseDown.bind(this);
+	    this.onMouseMove = this.onMouseMove.bind(this);
+	    this.onMouseUp = this.onMouseUp.bind(this);
+	    this.onMouseWheel = this.onMouseWheel.bind(this);
+
+	    this.domElement.addEventListener('mousedown', this.onMouseDown);
+	    this.domElement.addEventListener('mousemove', this.onMouseMove);
+	    document.body.addEventListener('mouseup', this.onMouseUp);
+	    this.domElement.addEventListener('mousewheel', this.onMouseWheel);
+	}
+	OrbitViewer.prototype = Object.create(Viewer.prototype);
+	OrbitViewer.prototype.constructor = OrbitViewer;
+
+	OrbitViewer.prototype.onMouseDown = function (event) {
+	    this.isDown = true;
+	    this.isPan = false;
+	};
+
+	OrbitViewer.prototype.onMouseMove = function () {
+	    var lastIntersectPoint = new THREE.Vector3();
+
+	    var unit1 = new THREE.Vector3();
+	    var unit2 = new THREE.Vector3();
+
+	    var yAxis = new THREE.Vector3(0, 1, 0);
+	    var minAngle = 45 * Math.PI / 180;
+	    var maxAngle = 135 * Math.PI / 180;
+	    var axis = new THREE.Vector3();
+
+	    var quat = new THREE.Quaternion();
+	    var dir = new THREE.Vector3();
+
+	    return function (event) {
+	        if (!this.isDown) {
+	            return;
+	        }
+
+	        if (!this.isPan) {
+	            if (!this.intersectSphere(event.offsetX, event.offsetY, this.intersectPoint)) { // 鼠标在地球外
+	                return;
+	            }
+
+	            this.isPan = true;
+	            lastIntersectPoint.copy(this.intersectPoint);
+	            return;
+	        }
+
+	        if (!this.intersectSphere(event.offsetX, event.offsetY, this.intersectPoint)) { // 鼠标在地球外
+	            return;
+	        }
+
+	        unit1.copy(lastIntersectPoint).normalize();
+	        unit2.copy(this.intersectPoint).normalize();
+
+	        // unit2与y轴夹角不能太小和太大
+	        var angle = unit2.angleTo(yAxis);
+
+	        if (angle && Math.abs(angle) < minAngle) {
+	            axis.crossVectors(unit2, yAxis);
+	            axis.normalize();
+	            unit2.copy(yAxis);
+	            unit2.applyAxisAngle(axis, -angle);
+	        }
+
+	        if (angle && Math.abs(angle) > maxAngle) {
+	            axis.crossVectors(unit2, yAxis);
+	            axis.normalize();
+	            unit2.copy(yAxis);
+	            unit2.applyAxisAngle(axis, -angle);
+	        }
+
+	        // 计算相机新位置
+	        quat.setFromUnitVectors(unit2, unit1);
+
+	        var distance = this.camera.position.length();
+	        dir.copy(this.camera.position).normalize();
+	        dir.applyQuaternion(quat).normalize();
+
+	        this.camera.position.set(
+	            distance * dir.x,
+	            distance * dir.y,
+	            distance * dir.z,
+	        );
+
+	        this.camera.lookAt(this.sphere.center);
+
+	        lastIntersectPoint.copy(this.intersectPoint);
+	    };
+	}();
+
+	OrbitViewer.prototype.onMouseUp = function (event) {
+	    this.isDown = false;
+	    this.isPan = false;
+	    this._updateAABB();
+	};
+
+	OrbitViewer.prototype.onMouseWheel = function () {
+	    var dir = new THREE.Vector3();
+
+	    return function (event) {
+	        var delta = -event.wheelDelta;
+
+	        var distance = dir.copy(this.camera.position).length();
+	        dir.copy(this.camera.position).normalize();
+
+	        if (distance < WGS84.a) {
+	            distance = WGS84.a;
+	        }
+
+	        var d = delta * (distance - WGS84.a) / 1000;
+
+	        var d_1 = GeoUtils.zoomToAlt(-1) + WGS84.a;
+
+	        if (distance + d >= d_1) { // 最远0层级距离
+	            d = 0;
+	        }
+
+	        this.camera.position.set(
+	            this.camera.position.x + d * dir.x,
+	            this.camera.position.y + d * dir.y,
+	            this.camera.position.z + d * dir.z,
+	        );
+
+	        this._updateAABB();
+	    };
+	}();
+
+	/**
+	 * 计算屏幕坐标与地球表面交点
+	 * @param {float} x 屏幕坐标X
+	 * @param {float} y 屏幕坐标Y
+	 * @param {THREE.Vector3} intersectPoint 计算出的碰撞点
+	 */
+	OrbitViewer.prototype.intersectSphere = function () {
+	    var projectionMatrixInverse = new THREE.Matrix4();
+	    var matrixWorld = new THREE.Matrix4();
+
+	    return function (x, y, intersectPoint) {
+	        if (!this.isPan) {
+	            projectionMatrixInverse.getInverse(this.camera.projectionMatrix);
+	            matrixWorld.copy(this.camera.matrixWorld);
+	        }
+
+	        this.ray.origin.set(
+	            x / this.domElement.clientWidth * 2 - 1, -y / this.domElement.clientHeight * 2 + 1,
+	            0.1,
+	        );
+	        this.ray.direction.copy(this.ray.origin);
+	        this.ray.direction.z = 1;
+
+	        this.ray.origin.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld);
+	        this.ray.direction.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld).sub(this.ray.origin).normalize();
+
+	        return this.ray.intersectSphere(this.sphere, intersectPoint);
+	    };
+	}();
+
+	/**
+	 * 计算当前视锥内的经纬度范围
+	 */
+	OrbitViewer.prototype._updateAABB = function () {
+	    var min = new THREE.Vector3();
+	    var max = new THREE.Vector3();
+
+	    return function () {
+	        if (!this.intersectSphere(0, this.domElement.clientHeight, min)) { // 未发生碰撞
+	            this.aabb.min.set(-Math.PI, -Math.PI / 2);
+	            this.aabb.max.set(Math.PI, Math.PI / 2);
+	            return;
+	        }
+
+	        this.intersectSphere(this.domElement.clientWidth, 0, max);
+
+	        GeoUtils._xyzToLonlat(min, min);
+	        GeoUtils._xyzToLonlat(max, max);
+
+	        this.aabb.min.copy(min);
+	        this.aabb.max.copy(max);
+	    };
+	}();
+
+	OrbitViewer.prototype.setPosition = function (lon, lat, alt) {
+	    var xyz = GeoUtils.lonlatToXYZ(new THREE.Vector3(lon, lat, alt));
+	    this.camera.position.copy(xyz);
+	    this.camera.lookAt(new THREE.Vector3());
+	};
+
+	OrbitViewer.prototype.getPosition = function () {
+
+	};
+
+	OrbitViewer.prototype.update = function () {
+
+	};
+
+	OrbitViewer.prototype.dispose = function () {
+	    this.domElement.removeEventListener('mousedown', this.onMouseDown);
+	    this.domElement.removeEventListener('mousemove', this.onMouseMove);
+	    document.body.removeEventListener('mouseup', this.onMouseUp);
+	    this.domElement.removeEventListener('mousewheel', this.onMouseWheel);
+
+	    Viewer.prototype.dispose.call(this);
+	};
+
+	var ID$7 = -1;
+
+	/**
+	 * 图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function Layer(globe) {
+	    this.globe = globe;
+
+	    this.id = `${this.constructor.name}${ID$7--}`;
+	    this.name = this.constructor.name;
+	}
+
+	/**
+	 * 获取某个经纬度范围内的资源
+	 * @param {THREE.Box2} aabb 
+	 */
+	Layer.prototype.get = function (aabb) {
+
+	};
+
+	/**
+	 * 释放该图层所有资源
+	 */
+	Layer.prototype.dispose = function () {
+	    delete this.globe;
+	};
+
+	/**
+	 * 图片图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function ImageLayer(globe) {
+	    Layer.call(this, globe);
+	}
+
+	ImageLayer.prototype = Object.create(Layer.prototype);
+	ImageLayer.prototype.constructor = ImageLayer;
+
+	/**
+	 * 瓦片缓存
+	 */
+	function TileCache() {
+	    this.cache = new Map();
+	}
+	TileCache.prototype.get = function (x, y, z) {
+	    var cache = this.cache.get(z);
+
+	    if (!cache) {
+	        return cache;
+	    }
+
+	    cache = cache.get(y);
+
+	    if (!cache) {
+	        return cache;
+	    }
+
+	    return cache.get(x);
+	};
+
+	TileCache.prototype.set = function (x, y, z, data) {
+	    var zcache = this.cache.get(z);
+
+	    if (!zcache) {
+	        zcache = new Map();
+	        this.cache.set(z, zcache);
+	    }
+
+	    var ycache = zcache.get(y);
+
+	    if (!ycache) {
+	        ycache = new Map();
+	        zcache.set(y, ycache);
+	    }
+
+	    ycache.set(x, data);
+	};
+
+	TileCache.prototype.clear = function () {
+	    this.cache.clear();
+	};
+
+	/**
+	 * 图片瓦片图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function TiledImageLayer(globe) {
+	    ImageLayer.call(this, globe);
+
+	    this.cache = new TileCache();
+	}
+
+	TiledImageLayer.prototype = Object.create(ImageLayer.prototype);
+	TiledImageLayer.prototype.constructor = TiledImageLayer;
+
+	/**
+	 * 由子类实现，返回下载图片的url
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
+	TiledImageLayer.prototype.getUrl = function (x, y, z) {
+	    return null;
+	};
+
+	/**
+	 * 获取图片数据
+	 * @param {*} x 
+	 * @param {*} y 
+	 * @param {*} z 
+	 */
+	TiledImageLayer.prototype.get = function (x, y, z) {
+	    var img = this.cache.get(x, y, z);
+
+	    if (img && img.loaded) {
+	        return img;
+	    }
+
+	    if (img && (img.loading || img.error)) {
+	        return null;
+	    }
+
+	    if (this.globe.thread < this.globe.options.maxThread) {
+	        this._createImage(x, y, z);
+	    }
+
+	    return null;
+	};
+
+
+	TiledImageLayer.prototype._createImage = function (x, y, z) {
+	    var url = this.getUrl(x, y, z);
+
+	    if (!url) {
+	        console.warn(`TiledImageLayer: url is not defined.`);
+	        return null;
+	    }
+
+	    var img = document.createElement('img');
+
+	    img._x = x;
+	    img._y = y;
+	    img._z = z;
+	    img.crossOrigin = 'anonymous';
+	    img.loading = true;
+
+	    this.cache.set(x, y, z, img);
+
+	    img.onload = () => {
+	        img.onload = null;
+	        img.onerror = null;
+
+	        img.loaded = true;
+	        delete img.loading;
+
+	        // 避免下载过程中，切换地图，导致报错。
+	        if (this.globe) {
+	            this.globe.thread--;
+	        }
+	    };
+
+	    img.onerror = () => {
+	        img.onload = null;
+	        img.onerror = null;
+
+	        img.error = true;
+	        delete img.loading;
+
+	        if (this.globe) {
+	            this.globe.thread--;
+	        }
+	    };
+
+	    img.src = url;
+	    this.globe.thread++;
+	};
+
+	/**
+	 * 谷歌瓦片图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function GoogleTiledLayer(globe) {
+	    TiledImageLayer.call(this, globe);
+
+	    this.name = 'google';
+	}
+
+	GoogleTiledLayer.prototype = Object.create(TiledImageLayer.prototype);
+	GoogleTiledLayer.prototype.constructor = GoogleTiledLayer;
+
+	GoogleTiledLayer.prototype.getUrl = function (x, y, z) {
+	    return `http://www.google.cn/maps/vt?lyrs=s@821&gl=cn&x=${x}&y=${y}&z=${z}`;
+	};
+
+	/**
+	 * 天地图瓦片图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function TiandituTiledLayer(globe) {
+	    TiledImageLayer.call(this, globe);
+
+	    this.name = 'tianditu';
+	}
+
+	TiandituTiledLayer.prototype = Object.create(TiledImageLayer.prototype);
+	TiandituTiledLayer.prototype.constructor = TiandituTiledLayer;
+
+	TiandituTiledLayer.prototype.getUrl = function (x, y, z) {
+	    return `http://t6.tianditu.gov.cn/DataServer?T=img_w&x=${x}&y=${y}&l=${z}&tk=85a57b38db5ed01efb7e999f6b097746`;
+	};
+
+	/**
+	 * 必应瓦片图层
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} globe 
+	 */
+	function BingTiledLayer(globe) {
+	    TiledImageLayer.call(this, globe);
+
+	    this.name = 'bing';
+	}
+
+	BingTiledLayer.prototype = Object.create(TiledImageLayer.prototype);
+	BingTiledLayer.prototype.constructor = BingTiledLayer;
+
+	BingTiledLayer.prototype.getUrl = function (x, y, z) {
+	    return `http://t0.ssl.ak.tiles.virtualearth.net/tiles/a${this.tileXYToQuadKey(x, y, z)}.jpeg?g=5793`;
+	};
+
+	/**
+	 * Converts tile XY coordinates into a QuadKey at a specified level of detail.
+	 * @param {*} tileX Tile X coordinate.
+	 * @param {*} tileY Tile Y coordinate.
+	 * @param {*} levelOfDetail evel of detail, from 1 (lowest detail) to 23 (highest detail).
+	 * @see https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+	 */
+	BingTiledLayer.prototype.tileXYToQuadKey = function (tileX, tileY, levelOfDetail) {
+	    let quadKey = '';
+	    let digit;
+	    let mask;
+	    for (let i = levelOfDetail; i > 0; i--) {
+	        digit = '0';
+	        mask = 1 << (i - 1);
+	        if ((tileX & mask) != 0) {
+	            digit++;
+	        }
+	        if ((tileY & mask) != 0) {
+	            digit++;
+	            digit++;
+	        }
+	        quadKey += digit;
+	    }
+	    return quadKey;
+	};
+
+	/**
+	 * 地球
+	 * @author tengge / https://github.com/tengge1
+	 * @param {THREE.PerspectiveCamera} camera 相机
+	 * @param {THREE.WebGLRenderer} renderer 渲染器
+	 * @param {Object} options 配置
+	 * @param {String} options.server 服务端配置
+	 * @param {Number} options.maxThread 最大工作线程数，避免任务创建过多，导致地图卡顿
+	 */
+	function Globe(camera, renderer, options = {}) {
+	    THREE.Object3D.call(this);
+
+	    options.server = options.server || location.origin;
+	    options.maxThread = options.maxThread || 10;
+
+	    this.name = L_GLOBE;
+
+	    this.userData.type = 'Globe';
+
+	    this.camera = camera;
+	    this.renderer = renderer;
+	    this.options = options;
+
+	    this.thread = 0; // 当前线程总数
+	    this.matrixAutoUpdate = false;
+
+	    this.time = new Date();
+	    this.timeZone = this.time.getTimezoneOffset() / 60; // minutes
+	    this.sunPosition = new THREE.Vector3();
+
+	    // 不能命名为layers，否则跟three.js的layers冲突
+	    this._layers = [
+	        new GoogleTiledLayer(this),
+	        //new TiandituTiledLayer(this),
+	        // new BingTiledLayer(this),
+	    ];
+
+	    this.renderers = new Renderers(this);
+	    this.viewer = new OrbitViewer(this.camera, this.renderer.domElement);
+
+	    // 默认位置
+	    var lon = 0;
+	    var lat = 0;
+	    var alt = GeoUtils.zoomToAlt(-1);
+	    this.viewer.setPosition(lon, lat, alt);
+	}
+
+	Globe.prototype = Object.create(THREE.Object3D.prototype);
+	Globe.prototype.constructor = Globe;
+
+	/**
+	 * 设置背景
+	 * @param {*} type 背景类型，支持google、tianditu、bing
+	 */
+	Globe.prototype.setBackground = function (type) {
+	    var newLayerName = 'google';
+
+	    switch (type) {
+	        case 'bing':
+	            newLayerName = 'bing';
+	            break;
+	        case 'tianditu':
+	            newLayerName = 'tianditu';
+	            break;
+	        default:
+	            newLayerName = 'google';
+	            break;
+	    }
+
+	    var layer = this._layers[0];
+
+	    if (newLayerName === layer.name) {
+	        return;
+	    }
+
+	    var newLayer = null;
+
+	    switch (newLayerName) {
+	        case 'google':
+	            newLayer = new GoogleTiledLayer(this);
+	            break;
+	        case 'tianditu':
+	            newLayer = new TiandituTiledLayer(this);
+	            break;
+	        case 'bing':
+	            newLayer = new BingTiledLayer(this);
+	            break;
+	    }
+
+	    this._layers[0] = newLayer;
+	    layer.dispose();
+	};
+
+	Globe.prototype.getBackground = function () {
+	    var layer = this._layers[0];
+	    return layer.name;
+	};
+
+	/**
+	 * 需要由应用程序连续调用
+	 */
+	Globe.prototype.update = function () {
+	    this.time = new Date();
+
+	    var hour = this.time.getHours() + this.timeZone;
+
+	    var angle = Math.PI * 2 / 24 * hour;
+	    var x = -WGS84.a * 10 * Math.cos(angle);
+	    var z = WGS84.a * 10 * Math.sin(angle);
+
+	    this.sunPosition.set(x, 0, z);
+
+	    this.renderers.render();
+	    this.viewer.update();
+	};
+
+	/**
+	 * 光线投射
+	 * @param {*} raycaster 
+	 * @param {*} intersects 
+	 */
+	Globe.prototype.raycast = function () {
+	    var geometry = new THREE.SphereBufferGeometry(WGS84.a, 32, 32);
+	    var material = new THREE.MeshBasicMaterial();
+	    var mesh = new THREE.Mesh(geometry, material);
+
+	    return function (raycaster, intersects) {
+	        return mesh.raycast(raycaster, intersects);
+	    };
+	}();
+
+	/**
+	 * 释放占用的所有资源
+	 */
+	Globe.prototype.dispose = function () {
+	    this.renderers.dispose();
+	    this.viewer.dispose();
+
+	    this._layers.forEach(n => {
+	        n.dispose();
+	    });
+
+	    delete this._layers;
+	    delete this.renderers;
+	    delete this.viewer;
+
+	    delete this.camera;
+	    delete this.renderer;
+	};
+
+	/**
 	 * 播放器
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author tengge / https://github.com/tengge1
@@ -15307,7 +17319,7 @@
 
 	    this.options = options;
 
-	    this.dispatch = new dispatch([
+	    this.dispatch = new d3.dispatch([
 	        'init'
 	    ]);
 	    this.call = this.dispatch.call.bind(this.dispatch);
@@ -15316,6 +17328,8 @@
 	    this.scene = null;
 	    this.camera = null;
 	    this.renderer = null;
+
+	    this.gis = null;
 
 	    this.loader = new PlayerLoader(this);
 	    this.event = new PlayerEvent(this);
@@ -15434,6 +17448,11 @@
 
 	    var container = UI$1.get('player', this.id);
 
+	    if (this.gis) {
+	        this.gis.dispose();
+	        this.gis = null;
+	    }
+
 	    container.dom.removeChild(this.renderer.domElement);
 	    container.dom.style.display = 'none';
 
@@ -15478,7 +17497,13 @@
 	    var listener = obj.audioListener || new THREE.AudioListener();
 	    this.camera.add(listener);
 
+	    this.renderer.domElement.style.filter = CssUtils.serializeFilter(obj.options);
+
 	    this.scene = obj.scene || new THREE.Scene();
+
+	    if (obj.options.sceneType === 'GIS') {
+	        this.gis = new Globe(this.camera, this.renderer, obj.options);
+	    }
 	};
 
 	Player.prototype.animate = function () {
@@ -15497,6 +17522,10 @@
 	    this.playerRenderer.update(this.clock, deltaTime);
 	    this.animation.update(this.clock, deltaTime);
 	    this.physics.update(this.clock, deltaTime);
+
+	    if (this.gis) {
+	        this.gis.update();
+	    }
 
 	    if (this.stats) {
 	        this.stats.end();
@@ -15690,7 +17719,7 @@
 	    'enableThrowBall', // 是否允许扔小球
 	];
 
-	var ID$5 = -1;
+	var ID$8 = -1;
 
 	/**
 	 * 事件基类
@@ -15698,7 +17727,7 @@
 	 */
 	function BaseEvent(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$5--}`;
+	    this.id = `${this.constructor.name}${ID$8--}`;
 	}
 
 	BaseEvent.prototype.start = function () {
@@ -16022,6 +18051,36 @@
 	    renderer.setSize(width, height);
 
 	    this.app.call('render', this);
+	};
+
+	/**
+	 * 滤镜事件
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} app 
+	 */
+	function FilterEvent(app) {
+	    BaseEvent.call(this, app);
+	}
+
+	FilterEvent.prototype = Object.create(BaseEvent.prototype);
+	FilterEvent.prototype.constructor = FilterEvent;
+
+	FilterEvent.prototype.start = function () {
+	    this.app.on(`editorCleared.${this.id}`, this.onEditorCleared.bind(this));
+	    this.app.on(`optionsChanged.${this.id}`, this.onOptionsChanged.bind(this));
+	};
+
+	FilterEvent.prototype.stop = function () {
+	    this.app.on(`editorCleared.${this.id}`, null);
+	    this.app.on(`optionsChanged.${this.id}`, null);
+	};
+
+	FilterEvent.prototype.onEditorCleared = function () {
+	    this.app.editor.renderer.domElement.style.filter = '';
+	};
+
+	FilterEvent.prototype.onOptionsChanged = function (options) {
+	    this.app.editor.renderer.domElement.style.filter = CssUtils.serializeFilter(options);
 	};
 
 	/**
@@ -16717,7 +18776,7 @@
 	 */
 	function EventDispatcher(app) {
 	    this.app = app;
-	    this.dispatch = dispatch.apply(dispatch, EventList);
+	    this.dispatch = d3.dispatch.apply(d3.dispatch, EventList);
 	    this.addDomEventListener();
 
 	    this.events = [
@@ -16726,6 +18785,7 @@
 	        new KeyDownEvent(this.app),
 	        new RenderEvent(this.app),
 	        new ResizeEvent(this.app),
+	        new FilterEvent(this.app),
 
 	        // viewport中的事件
 	        new TransformControlsEvent(this.app),
@@ -16963,7 +19023,7 @@
 	 * @param {*} url 地址
 	 * @param {*} callback 回调函数
 	 */
-	function get$1(url, callback) {
+	function get(url, callback) {
 	    ajax({
 	        url: url,
 	        callback: callback
@@ -17007,9 +19067,63 @@
 	 */
 	const Ajax = {
 	    ajax: ajax,
-	    get: get$1,
+	    get: get,
 	    getJson: getJson,
 	    post: post
+	};
+
+	/**
+	 * GIS场景
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} app 
+	 */
+	function Scene(app) {
+	    this.app = app;
+	}
+
+	Scene.prototype.start = function () {
+	    var editor = this.app.editor;
+
+	    this.oldBackground = editor.scene.background;
+	    editor.scene.background = null;
+	    editor.sceneHelpers.visible = false;
+
+	    editor.controls.enabled = false;
+	    editor.controls.dispose();
+	    editor.transformControls.enabled = false;
+
+	    this.app.editor.showViewHelper = false;
+
+	    this.globe = new Globe(editor.camera, editor.renderer, {
+	        server: this.app.options.server,
+	    });
+	    editor.scene.add(this.globe);
+	    this.oldSceneBeforeRender = editor.scene.onBeforeRender;
+	    editor.scene.onBeforeRender = this.update.bind(this);
+	};
+
+	Scene.prototype.update = function () {
+	    this.globe.update();
+	};
+
+	Scene.prototype.stop = function () {
+	    this.app.on(`afterRender.${this.id}`, null);
+	    this.globe.dispose();
+	    delete this.globe;
+
+	    var editor = this.app.editor;
+
+	    editor.scene.onBeforeRender = this.oldSceneBeforeRender;
+	    delete this.oldSceneBeforeRender;
+
+	    editor.background = this.oldBackground;
+
+	    editor.sceneHelpers.visible = true;
+
+	    editor.controls = new THREE.EditorControls(editor.camera, editor.renderer.domElement);
+	    editor.transformControls.enabled = true;
+
+	    this.app.editor.showViewHelper = true;
 	};
 
 	/**
@@ -17039,9 +19153,37 @@
 	            cls: 'options',
 	            children: [{
 	                xtype: 'div',
-	                html: L_NEW,
 	                cls: 'option',
-	                onClick: this.newScene.bind(this)
+	                style: {
+	                    cursor: 'default'
+	                },
+	                children: [{
+	                    xtype: 'div',
+	                    children: [{
+	                        xtype: 'html',
+	                        html: L_NEW
+	                    }, {
+	                        xtype: 'icon',
+	                        icon: 'icon-right-triangle',
+	                        style: {
+	                            float: 'right'
+	                        }
+	                    }]
+	                }, {
+	                    xtype: 'div',
+	                    cls: 'sub-menu',
+	                    children: [{
+	                        xtype: 'div',
+	                        cls: 'option',
+	                        html: L_EMPTY_SCENE,
+	                        onClick: this.createEmptyScene.bind(this),
+	                    }, {
+	                        xtype: 'div',
+	                        cls: 'option',
+	                        html: L_GIS_SCENE,
+	                        onClick: this.createGISScene.bind(this),
+	                    }]
+	                }],
 	            }, {
 	                xtype: 'div',
 	                html: L_SAVE,
@@ -17066,9 +19208,9 @@
 	    container.render();
 	};
 
-	// ---------------------------- 新建场景 ---------------------------------
+	// ---------------------------- 新建空场景 ---------------------------------
 
-	SceneMenu.prototype.newScene = function () {
+	SceneMenu.prototype.createEmptyScene = function () {
 	    var editor = this.app.editor;
 
 	    if (editor.sceneID == null) {
@@ -17076,17 +19218,37 @@
 	        editor.sceneID = null;
 	        editor.sceneName = null;
 	        document.title = L_NO_NAME;
+	        UI$1.msg(L_CREATE_EMPTY_SCENE_SUCCESS);
 	        return;
 	    }
 
-	    UI$1.confirm(L_CONFIRM, L_UNSAVED_WILL_LOSE_CONFIRM, function (event, btn) {
+	    UI$1.confirm(L_CONFIRM, L_UNSAVED_WILL_LOSE_CONFIRM, (event, btn) => {
 	        if (btn === 'ok') {
 	            editor.clear();
 	            editor.sceneID = null;
 	            editor.sceneName = null;
+	            this.app.options.sceneType = 'Empty';
 	            document.title = L_NO_NAME;
+	            this.app.editor.camera.userData.control = 'OrbitControls';
 	        }
 	    });
+	};
+
+	// --------------------------- 新建GIS场景 -------------------------------------
+
+	SceneMenu.prototype.createGISScene = function () {
+	    if (this.app.editor.gis) {
+	        this.app.editor.gis.stop();
+	    }
+
+	    this.app.editor.gis = new Scene(this.app);
+	    this.app.editor.gis.start();
+
+	    this.app.options.sceneType = 'GIS';
+
+	    this.app.editor.camera.userData.control = '';
+
+	    this.app.call(`sceneGraphChanged`, this);
 	};
 
 	// --------------------------- 保存场景 ----------------------------------------
@@ -17840,13 +20002,13 @@
 	    var fontSize = 64;
 
 	    var ctx = canvas.getContext('2d');
-	    ctx.font = `${fontSize}px sans-serif`;
+	    ctx.font = `${fontSize}px 'Microsoft YaHei'`;
 
 	    var textMetrics = ctx.measureText(text);
-	    canvas.width = StringUtils.makePowOfTwo(textMetrics.width);
+	    canvas.width = textMetrics.width;
 	    canvas.height = fontSize;
 	    ctx.textBaseline = 'hanging';
-	    ctx.font = `${fontSize}px sans-serif`; // 重新设置画布大小，前面设置的ctx属性全部失效
+	    ctx.font = `${fontSize}px 'Microsoft YaHei'`; // 重新设置画布大小，前面设置的ctx属性全部失效
 
 	    ctx.fillStyle = 'rgba(0,0,0,0)';
 	    ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -17854,6 +20016,7 @@
 	    ctx.fillText(text, (canvas.width - textMetrics.width) / 2, 0);
 
 	    var map = new THREE.CanvasTexture(canvas);
+	    map.minFilter = THREE.LinearFilter;
 
 	    var geometry = new THREE.PlaneBufferGeometry(canvas.width / 10, canvas.height / 10);
 	    var material = new THREE.MeshBasicMaterial({
@@ -17870,7 +20033,31 @@
 	Text$1.prototype = Object.create(THREE.Mesh.prototype);
 	Text$1.prototype.constructor = Text$1;
 
-	var ID$6 = -1;
+	Text$1.prototype.updateText = function (text) {
+	    this.name = text;
+
+	    var canvas = this.material.map.image;
+
+	    var fontSize = 64;
+
+	    var ctx = canvas.getContext('2d');
+	    ctx.font = `${fontSize}px 'Microsoft YaHei'`;
+
+	    var textMetrics = ctx.measureText(text);
+	    canvas.width = textMetrics.width;
+	    canvas.height = fontSize;
+	    ctx.textBaseline = 'hanging';
+	    ctx.font = `${fontSize}px 'Microsoft YaHei'`; // 重新设置画布大小，前面设置的ctx属性全部失效
+
+	    ctx.fillStyle = 'rgba(0,0,0,0)';
+	    ctx.fillRect(0, 0, canvas.width, canvas.height);
+	    ctx.fillStyle = 'rgba(255,255,255,1)';
+	    ctx.fillText(text, (canvas.width - textMetrics.width) / 2, 0);
+
+	    this.material.map.needsUpdate = true;
+	};
+
+	var ID$9 = -1;
 
 	/**
 	 * 帮助器基类
@@ -17879,7 +20066,7 @@
 	 */
 	function BaseHelper(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$6--}`;
+	    this.id = `${this.constructor.name}${ID$9--}`;
 	}
 
 	/**
@@ -17899,6 +20086,7 @@
 
 	/**
 	 * 曲线帮助器基类
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function SplineHelper(app) {
@@ -19172,514 +21360,6 @@
 
 	};
 
-	var ID$7 = -1;
-
-	/**
-	 * 图层
-	 */
-	function Layer() {
-	    this.id = `${this.constructor.name}${ID$7--}`;
-	    this.name = this.constructor.name;
-	}
-
-	Layer.prototype.dispose = function () {
-
-	};
-
-	/**
-	 * 瓦片图层
-	 */
-	function TiledLayer() {
-	    Layer.call(this);
-
-	    this.tree = rbush();
-	}
-
-	TiledLayer.prototype = Object.create(Layer.prototype);
-	TiledLayer.prototype.constructor = TiledLayer;
-
-	TiledLayer.prototype.add = function (tile) {
-	    var item = Object.assign({}, tile.aabb, {
-	        data: tile
-	    });
-
-	    this.tree.insert(item);
-	};
-
-	TiledLayer.prototype.remove = function (tile) {
-	    this.tree.remove(tile);
-	};
-
-	TiledLayer.prototype.clear = function () {
-	    this.tree.clear();
-	};
-
-	TiledLayer.prototype.all = function () {
-	    return this.tree.all();
-	};
-
-	TiledLayer.prototype.search = function (aabb) {
-	    return this.tree.search(aabb);
-	};
-
-	TiledLayer.prototype.collide = function (aabb) {
-	    return tree.collides({ minX: 40, minY: 20, maxX: 80, maxY: 70 });
-	};
-
-	TiledLayer.prototype.dispose = function () {
-
-	};
-
-	/**
-	 * 必应地图图层
-	 */
-	function BingTiledLayer() {
-	    TiledLayer.call(this);
-	}
-
-	BingTiledLayer.prototype = Object.create(TiledLayer.prototype);
-	BingTiledLayer.prototype.constructor = BingTiledLayer;
-
-	var ID$8 = -1;
-
-	/**
-	 * 渲染器
-	 * @param {*} camera 
-	 * @param {*} renderer 
-	 */
-	function Renderer(camera, renderer) {
-	    this.camera = camera;
-	    this.renderer = renderer;
-	    this.id = `${this.constructor.name}${ID$8--}`;
-	}
-
-	Renderer.prototype.render = function (layer) {
-
-	};
-
-	Renderer.prototype.dispose = function () {
-	    delete this.camera;
-	    delete this.render;
-	};
-
-	/**
-	 * 地球几何体
-	 */
-	function GlobeGeometry() {
-	    THREE.PlaneBufferGeometry.call(this, 1, 1, 16, 16);
-	}
-
-	GlobeGeometry.prototype = Object.create(THREE.PlaneBufferGeometry.prototype);
-	GlobeGeometry.prototype.constructor = GlobeGeometry;
-
-	var GlobeVertex = "uniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\n\r\nvarying vec3 vNormal;\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    vec3 transformed = vec3(position);\r\n\r\n    transformed.z = sqrt(1.0 * 1.0 - transformed.x * transformed.x - transformed.y * transformed.y);\r\n\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);\r\n\r\n    vNormal = normal;\r\n    vUV = uv;\r\n}";
-
-	var GlobeFragment = "precision highp float;\r\n\r\nuniform sampler2D map;\r\n\r\nvarying vec2 vUV;\r\n\r\nvoid main() {\r\n    gl_FragColor = texture2D(map, vUV);\r\n}";
-
-	//------------------------------------------------------------------------------
-	// <copyright company="Microsoft">
-	//     Copyright (c) 2006-2009 Microsoft Corporation.  All rights reserved.
-	// </copyright>
-	//------------------------------------------------------------------------------
-
-	// https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
-
-	const EarthRadius = 6378137;
-	const MinLatitude = -85.05112878;
-	const MaxLatitude = 85.05112878;
-	const MinLongitude = -180;
-	const MaxLongitude = 180;
-
-	class BingTileSystem {
-	    /// <summary>
-	    /// Clips a number to the specified minimum and maximum values.
-	    /// </summary>
-	    /// <param name="n">The number to clip.</param>
-	    /// <param name="minValue">Minimum allowable value.</param>
-	    /// <param name="maxValue">Maximum allowable value.</param>
-	    /// <returns>The clipped value.</returns>
-	    clip(n, minValue, maxValue) {
-	        return Math.min(Math.max(n, minValue), maxValue);
-	    }
-
-	    /// <summary>
-	    /// Determines the map width and height (in pixels) at a specified level
-	    /// of detail.
-	    /// </summary>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>The map width and height in pixels.</returns>
-	    mapSize(levelOfDetail) {
-	        return parseInt(256 << levelOfDetail);
-	    }
-
-	    /// <summary>
-	    /// Determines the ground resolution (in meters per pixel) at a specified
-	    /// latitude and level of detail.
-	    /// </summary>
-	    /// <param name="latitude">Latitude (in degrees) at which to measure the
-	    /// ground resolution.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>The ground resolution, in meters per pixel.</returns>
-	    groundResolution(latitude, levelOfDetail) {
-	        latitude = this.clip(latitude, MinLatitude, MaxLatitude);
-	        return Math.cos(latitude * Math.PI / 180) * 2 * Math.PI * EarthRadius / this.mapSize(levelOfDetail);
-	    }
-
-	    /// <summary>
-	    /// Determines the map scale at a specified latitude, level of detail,
-	    /// and screen resolution.
-	    /// </summary>
-	    /// <param name="latitude">Latitude (in degrees) at which to measure the
-	    /// map scale.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <param name="screenDpi">Resolution of the screen, in dots per inch.</param>
-	    /// <returns>The map scale, expressed as the denominator N of the ratio 1 : N.</returns>
-	    mapScale(latitude, levelOfDetail, screenDpi) {
-	        return GroundResolution(latitude, levelOfDetail) * screenDpi / 0.0254;
-	    }
-
-	    /// <summary>
-	    /// Converts a point from latitude/longitude WGS-84 coordinates (in degrees)
-	    /// into pixel XY coordinates at a specified level of detail.
-	    /// </summary>
-	    /// <param name="longitude">Longitude of the point, in degrees.</param>
-	    /// <param name="latitude">Latitude of the point, in degrees.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>the [X,Y] coordinate in pixels.</returns>
-	    longLatToPixelXY(longitude, latitude, levelOfDetail) {
-	        latitude = this.clip(latitude, MinLatitude, MaxLatitude);
-	        longitude = this.clip(longitude, MinLongitude, MaxLongitude);
-
-	        let x = (longitude + 180) / 360;
-	        let sinLatitude = Math.sin(latitude * Math.PI / 180);
-	        let y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
-
-	        let mapSize = this.mapSize(levelOfDetail);
-	        let pixelX = parseInt(this.clip(x * mapSize + 0.5, 0, mapSize - 1));
-	        let pixelY = parseInt(this.clip(y * mapSize + 0.5, 0, mapSize - 1));
-	        return [pixelX, pixelY];
-	    }
-
-	    /// <summary>
-	    /// Converts a pixel from pixel XY coordinates at a specified level of detail
-	    /// into latitude/longitude WGS-84 coordinates (in degrees).
-	    /// </summary>
-	    /// <param name="pixelX">X coordinate of the point, in pixels.</param>
-	    /// <param name="pixelY">Y coordinates of the point, in pixels.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>the [latitude,longitude] in degrees.</returns>
-	    pixelXYToLongLat(pixelX, pixelY, levelOfDetail) {
-	        let mapSize = this.mapSize(levelOfDetail);
-	        let x = (this.clip(pixelX, 0, mapSize - 1) / mapSize) - 0.5;
-	        let y = 0.5 - (this.clip(pixelY, 0, mapSize - 1) / mapSize);
-
-	        let latitude = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
-	        let longitude = 360 * x;
-	        return [longitude, latitude];
-	    }
-
-	    /// <summary>
-	    /// Converts pixel XY coordinates into tile XY coordinates of the tile containing
-	    /// the specified pixel.
-	    /// </summary>
-	    /// <param name="pixelX">Pixel X coordinate.</param>
-	    /// <param name="pixelY">Pixel Y coordinate.</param>
-	    /// <returns>the tile [X,Y] coordinate.</returns>
-	    pixelXYToTileXY(pixelX, pixelY) {
-	        let tileX = pixelX / 256;
-	        let tileY = pixelY / 256;
-	        return [tileX, tileY];
-	    }
-
-	    /// <summary>
-	    /// Converts tile XY coordinates into pixel XY coordinates of the upper-left pixel
-	    /// of the specified tile.
-	    /// </summary>
-	    /// <param name="tileX">Tile X coordinate.</param>
-	    /// <param name="tileY">Tile Y coordinate.</param>
-	    /// <returns>the pixel [X,Y] coordinate.</returns>
-	    tileXYToPixelXY(tileX, tileY) {
-	        let pixelX = tileX * 256;
-	        let pixelY = tileY * 256;
-	        return [pixelX, pixelY];
-	    }
-
-	    /// <summary>
-	    /// Converts tile XY coordinates into a QuadKey at a specified level of detail.
-	    /// </summary>
-	    /// <param name="tileX">Tile X coordinate.</param>
-	    /// <param name="tileY">Tile Y coordinate.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>A string containing the QuadKey.</returns>
-	    tileXYToQuadKey(tileX, tileY, levelOfDetail) {
-	        let quadKey = '';
-	        let digit;
-	        let mask;
-	        for (let i = levelOfDetail; i > 0; i--) {
-	            digit = '0';
-	            mask = 1 << (i - 1);
-	            if ((tileX & mask) != 0) {
-	                digit++;
-	            }
-	            if ((tileY & mask) != 0) {
-	                digit++;
-	                digit++;
-	            }
-	            quadKey += digit;
-	        }
-	        return quadKey;
-	    }
-
-	    /// <summary>
-	    /// Converts a QuadKey into tile XY coordinates.
-	    /// </summary>
-	    /// <param name="quadKey">QuadKey of the tile.</param>
-	    /// <returns>the tile X coordinate,the tile Y coordinate, the level of detail.</returns>
-	    quadKeyToTileXY(quadKey) {
-	        let tileX = tileY = 0;
-	        let levelOfDetail = quadKey.Length;
-	        for (i = levelOfDetail; i > 0; i--) {
-	            mask = 1 << (i - 1);
-	            switch (quadKey[levelOfDetail - i]) {
-	                case '0':
-	                    break;
-	                case '1':
-	                    tileX |= mask;
-	                    break;
-	                case '2':
-	                    tileY |= mask;
-	                    break;
-	                case '3':
-	                    tileX |= mask;
-	                    tileY |= mask;
-	                    break;
-	                default:
-	                    throw new ArgumentException("Invalid QuadKey digit sequence.");
-	            }
-	        }
-	        return [tileX, tileY, levelOfDetail];
-	    }
-
-	    /// <summary>
-	    /// Converts tile XY coordinates to url.
-	    /// </summary>
-	    /// <param name="tileX">Tile X coordinate.</param>
-	    /// <param name="tileY">Tile Y coordinate.</param>
-	    /// <param name="levelOfDetail">Level of detail, from 1 (lowest detail)
-	    /// to 23 (highest detail).</param>
-	    /// <returns>url of the tile</returns>
-	    tileXYToUrl(tileX, tileY, levelOfDetail) {
-	        let key = this.tileXYToQuadKey(tileX, tileY, parseInt(levelOfDetail));
-	        return `http://t0.ssl.ak.tiles.virtualearth.net/tiles/a${key}.jpeg?g=5793`;
-	    }
-	}
-
-	/**
-	 * 地球材质
-	 */
-	function GlobeMaterial() {
-	    var url = (new BingTileSystem()).tileXYToUrl(0, 0, 1);
-
-	    THREE.RawShaderMaterial.call(this, {
-	        vertexShader: GlobeVertex,
-	        fragmentShader: GlobeFragment,
-	        uniforms: {
-	            map: {
-	                type: 't',
-	                value: new THREE.TextureLoader().load(url)
-	            }
-	        },
-	        side: THREE.DoubleSide,
-	    });
-	}
-
-	GlobeMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
-	GlobeMaterial.prototype.constructor = GlobeMaterial;
-
-	/**
-	 * 瓦片图层渲染器
-	 * @param {*} camera 
-	 * @param {*} renderer 
-	 */
-	function TiledLayerRenderer(camera, renderer) {
-	    Renderer.call(this, camera, renderer);
-
-	    var geometry = new GlobeGeometry();
-	    var material = new GlobeMaterial();
-
-	    var gl = this.renderer.context;
-
-	    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-	    gl.shaderSource(vertexShader, material.vertexShader);
-	    gl.compileShader(vertexShader);
-
-	    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-	        console.warn(gl.getShaderInfoLog(vertexShader));
-	        return;
-	    }
-
-	    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-	    gl.shaderSource(fragmentShader, material.fragmentShader);
-	    gl.compileShader(fragmentShader);
-
-	    if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-	        console.warn(gl.getShaderInfoLog(fragmentShader));
-	        return;
-	    }
-
-	    var program = gl.createProgram();
-	    gl.attachShader(program, vertexShader);
-	    gl.attachShader(program, fragmentShader);
-	    gl.linkProgram(program);
-
-	    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-	        console.warn("Could not initialise shaders");
-	        return;
-	    }
-
-	    gl.useProgram(program);
-
-	    var positionAttr = gl.getAttribLocation(program, 'position');
-	    var normalAttr = gl.getAttribLocation(program, 'normal');
-	    var uvAttr = gl.getAttribLocation(program, 'uv');
-
-	    var modelViewMatrixUniform = gl.getUniformLocation(program, 'modelViewMatrix');
-	    var projectionMatrixUniform = gl.getUniformLocation(program, 'projectionMatrix');
-
-	    var mapUniform = gl.getUniformLocation(program, 'map');
-
-	    var positionBuffer = gl.createBuffer();
-	    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.position.array, gl.STATIC_DRAW);
-
-	    var normalBuffer = gl.createBuffer();
-	    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.normal.array, gl.STATIC_DRAW);
-
-	    var uvBuffer = gl.createBuffer();
-	    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-	    gl.bufferData(gl.ARRAY_BUFFER, geometry.attributes.uv.array, gl.STATIC_DRAW);
-
-	    var indexBuffer = gl.createBuffer();
-	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-	    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.index.array, gl.STATIC_DRAW);
-
-	    var texture = gl.createTexture();
-
-	    texture.image = document.createElement('img');
-	    texture.image.crossOrigin = "anonymous";
-
-	    texture.image.onload = function () {
-	        texture.image.onload = null;
-
-	        gl.bindTexture(gl.TEXTURE_2D, texture);
-	        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-	        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, texture.image);
-
-	        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-
-	        gl.bindTexture(gl.TEXTURE_2D, null);
-	    };
-
-	    texture.image.src = 'http://t0.ssl.ak.tiles.virtualearth.net/tiles/a0.jpeg?g=5793';
-
-	    this.program = program;
-
-	    this.positionAttr = positionAttr;
-	    this.normalAttr = normalAttr;
-	    this.uvAttr = uvAttr;
-
-	    this.modelViewMatrixUniform = modelViewMatrixUniform;
-	    this.projectionMatrixUniform = projectionMatrixUniform;
-	    this.mapUniform = mapUniform;
-
-	    this.positionBuffer = positionBuffer;
-	    this.normalBuffer = normalBuffer;
-	    this.uvBuffer = uvBuffer;
-	    this.indexBuffer = indexBuffer;
-
-	    this.texture = texture;
-
-	    this.geometry = geometry;
-	    this.material = material;
-	}
-
-	TiledLayerRenderer.prototype = Object.create(Renderer.prototype);
-	TiledLayerRenderer.prototype.constructor = TiledLayerRenderer;
-
-	TiledLayerRenderer.prototype.render = function (layer) {
-	    if (!this.program) {
-	        return;
-	    }
-
-	    var camera = this.camera;
-	    var renderer = this.renderer;
-
-	    var gl = renderer.context;
-
-	    renderer.state.useProgram(this.program);
-
-	    gl.uniformMatrix4fv(this.modelViewMatrixUniform, false, camera.matrixWorldInverse.elements);
-	    gl.uniformMatrix4fv(this.projectionMatrixUniform, false, camera.projectionMatrix.elements);
-
-	    if (this.texture.image.complete) {
-	        gl.activeTexture(gl.TEXTURE0);
-	        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-	        gl.uniform1i(this.mapUniform, 0);
-	    }
-
-	    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-	    gl.enableVertexAttribArray(this.positionAttr);
-	    gl.vertexAttribPointer(this.positionAttr, 3, gl.FLOAT, false, 0, 0);
-
-	    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-	    gl.enableVertexAttribArray(this.normalAttr);
-	    gl.vertexAttribPointer(this.normalAttr, 3, gl.FLOAT, false, 0, 0);
-
-	    gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
-	    gl.enableVertexAttribArray(this.uvAttr);
-	    gl.vertexAttribPointer(this.uvAttr, 2, gl.FLOAT, false, 0, 0);
-
-	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-
-	    gl.drawElements(gl.TRIANGLES, this.geometry.index.count, gl.UNSIGNED_SHORT, 0);
-	};
-
-	/**
-	 * 地球
-	 * @param {*} camera 
-	 * @param {*} renderer 
-	 */
-	function Globe(camera, renderer) {
-	    this.camera = camera;
-	    this.renderer = renderer;
-	}
-
-	Globe.prototype.create = function () {
-	    this.layer = new BingTiledLayer();
-	    this.tiledLayerRenderer = new TiledLayerRenderer(this.camera, this.renderer);
-	};
-
-	Globe.prototype.update = function () {
-	    this.tiledLayerRenderer.render(this.layer);
-	};
-
-	Globe.prototype.dispose = function () {
-	    this.layer.dispose();
-	    this.tiledLayerRenderer.dispose();
-	    delete this.layer;
-	    delete this.tiledLayerRenderer;
-	    delete this.camera;
-	    delete this.renderer;
-	};
-
 	/**
 	 * 组件菜单
 	 * @author tengge / https://github.com/tengge1
@@ -19740,11 +21420,6 @@
 	                html: L_CLOTH,
 	                cls: 'option',
 	                onClick: this.onAddCloth.bind(this)
-	            }, {
-	                xtype: 'div',
-	                html: '地球(测试)',
-	                cls: 'option',
-	                onClick: this.onAddEarth.bind(this)
 	            }]
 	        }]
 	    });
@@ -19836,16 +21511,6 @@
 	    cloth.name = L_CLOTH;
 
 	    editor.execute(new AddObjectCommand(cloth));
-	};
-
-	// ----------------------------- 地球 --------------------------------------
-
-	ComponentMenu.prototype.onAddEarth = function () {
-	    if (this.globe === undefined) {
-	        this.globe = new Globe(this.app.editor.camera, this.app.editor.renderer);
-	        this.globe.create();
-	        this.app.on(`afterRender.Globe`, this.globe.update.bind(this.globe));
-	    }
 	};
 
 	/**
@@ -20005,7 +21670,7 @@
 	                xtype: 'hr'
 	            }, {
 	                xtype: 'div',
-	                html: '导出编辑器',
+	                html: L_EXPORT_EDITOR,
 	                cls: 'option',
 	                onClick: this.onExportEditor.bind(this)
 	            }]
@@ -20081,166 +21746,146 @@
 	};
 
 	/**
-	 * 选项窗口
+	 * 外观选项窗口
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} options 
 	 */
-	function OptionsWindow(options) {
+	function SurfacePanel(options) {
 	    UI$1.Control.call(this, options);
 	    this.app = options.app;
 	}
 
-	OptionsWindow.prototype = Object.create(UI$1.Control.prototype);
-	OptionsWindow.prototype.constructor = OptionsWindow;
+	SurfacePanel.prototype = Object.create(UI$1.Control.prototype);
+	SurfacePanel.prototype.constructor = SurfacePanel;
 
-	OptionsWindow.prototype.render = function () {
-	    var app = this.app;
-	    var editor = app.editor;
-	    var scene = editor.scene;
-	    var renderer = editor.renderer;
-	    var shadowMap = renderer.shadowMap;
-
-	    this.window = UI$1.create({
-	        xtype: 'window',
-	        parent: this.app.container,
-	        title: L_OPTIONS_WINDOW,
-	        width: '500px',
-	        height: '300px',
-	        bodyStyle: {
-	            padding: 0
-	        },
-	        shade: false,
+	SurfacePanel.prototype.render = function () {
+	    UI$1.create({
+	        xtype: 'div',
+	        id: 'panel',
+	        scope: this.id,
+	        parent: this.parent,
+	        style: this.style,
 	        children: [{
-	            xtype: 'div',
-	            cls: 'tabs',
+	            xtype: 'row',
 	            children: [{
-	                xtype: 'text',
-	                id: 'surfaceTab',
+	                xtype: 'label',
+	                text: L_THEME
+	            }, {
+	                xtype: 'select',
+	                id: 'theme',
 	                scope: this.id,
-	                text: L_SURFACE,
-	                cls: 'selected',
-	                onClick: () => {
-	                    this.changeTab(L_SURFACE);
-	                }
-	            }, {
-	                xtype: 'text',
-	                id: 'rendererTab',
-	                scope: this.id,
-	                text: L_RENDERER,
-	                onClick: () => {
-	                    this.changeTab(L_RENDERER);
-	                }
+	                options: {
+	                    'assets/css/light.css': L_LIGHT_COLOR,
+	                    'assets/css/dark.css': L_DARK_COLOR
+	                },
+	                style: {
+	                    width: '150px'
+	                },
+	                onChange: this.save.bind(this)
 	            }]
-	        }, { // 外观选项卡
-	            xtype: 'div',
-	            id: 'surfacePanel',
-	            scope: this.id,
-	            cls: 'TabPanel',
-	            children: [{
-	                xtype: 'row',
-	                children: [{
-	                    xtype: 'label',
-	                    text: L_THEME
-	                }, {
-	                    xtype: 'select',
-	                    id: 'theme',
-	                    scope: this.id,
-	                    options: {
-	                        'assets/css/light.css': L_LIGHT_COLOR,
-	                        'assets/css/dark.css': L_DARK_COLOR
-	                    },
-	                    style: {
-	                        width: '150px'
-	                    }
-	                }]
-	            }]
-	        }, { // 渲染器选项卡
-	            xtype: 'div',
-	            id: 'rendererPanel',
-	            scope: this.id,
-	            cls: 'TabPanel',
-	            style: {
-	                display: 'none'
-	            },
-	            children: [{
-	                xtype: 'row',
-	                children: [{
-	                    xtype: 'label',
-	                    text: L_SHADOW
-	                }, {
-	                    xtype: 'select',
-	                    id: 'shadowMapType',
-	                    scope: this.id,
-	                    options: {
-	                        [-1]: L_DISABLED,
-	                        [THREE.BasicShadowMap]: L_BASIC_SHADOW, // 0
-	                        [THREE.PCFShadowMap]: L_PCF_SHADOW, // 1
-	                        [THREE.PCFSoftShadowMap]: L_PCF_SOFT_SHADOW // 2
-	                    }
-	                }]
-	            }, {
-	                xtype: 'row',
-	                children: [{
-	                    xtype: 'label',
-	                    text: L_GAMMA_INPUT
-	                }, {
-	                    xtype: 'boolean',
-	                    id: 'gammaInput',
-	                    scope: this.id,
-	                }]
-	            }, {
-	                xtype: 'row',
-	                children: [{
-	                    xtype: 'label',
-	                    text: L_GAMMA_OUTPUT
-	                }, {
-	                    xtype: 'boolean',
-	                    id: 'gammaOutput',
-	                    scope: this.id,
-	                }]
-	            }, {
-	                xtype: 'row',
-	                children: [{
-	                    xtype: 'label',
-	                    text: L_GAMMA_FACTOR
-	                }, {
-	                    xtype: 'number',
-	                    id: 'gammaFactor',
-	                    scope: this.id,
-	                }]
-	            }]
-	        }],
-	        buttons: [{
-	            xtype: 'button',
-	            text: L_SAVE,
-	            onClick: () => {
-	                this.save();
-	            }
-	        }, {
-	            xtype: 'button',
-	            text: L_CANCEL,
-	            onClick: () => {
-	                this.hide();
-	            }
 	        }]
-	    });
-	    this.window.render();
+	    }).render();
+
+	    this.dom = UI$1.get('panel', this.id).dom;
 	};
 
-	OptionsWindow.prototype.show = function () {
-	    this.window.show();
-
+	SurfacePanel.prototype.update = function () {
 	    var theme = UI$1.get('theme', this.id);
-	    var shadowMapType = UI$1.get('shadowMapType', this.id);
-	    var gammaInput = UI$1.get('gammaInput', this.id);
-	    var gammaOutput = UI$1.get('gammaOutput', this.id);
-	    var gammaFactor = UI$1.get('gammaFactor', this.id);
 
 	    if (!this.app.storage.get('theme')) {
 	        this.app.storage.set('theme', 'assets/css/light.css');
 	    }
 
 	    theme.setValue(this.app.storage.get('theme'));
+	};
+
+	SurfacePanel.prototype.save = function () {
+	    var theme = UI$1.get('theme', this.id).getValue();
+	    this.app.storage.set('theme', theme);
+	    document.getElementById('theme').href = theme;
+	};
+
+	/**
+	 * 渲染器选项窗口
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function RendererPanel(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	RendererPanel.prototype = Object.create(UI$1.Control.prototype);
+	RendererPanel.prototype.constructor = RendererPanel;
+
+	RendererPanel.prototype.render = function () {
+	    UI$1.create({
+	        xtype: 'div',
+	        id: 'panel',
+	        scope: this.id,
+	        parent: this.parent,
+	        style: this.style,
+	        children: [{
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_SHADOW
+	            }, {
+	                xtype: 'select',
+	                id: 'shadowMapType',
+	                scope: this.id,
+	                options: {
+	                    [-1]: L_DISABLED,
+	                    [THREE.BasicShadowMap]: L_BASIC_SHADOW, // 0
+	                    [THREE.PCFShadowMap]: L_PCF_SHADOW, // 1
+	                    [THREE.PCFSoftShadowMap]: L_PCF_SOFT_SHADOW // 2
+	                },
+	                onChange: this.save.bind(this),
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_GAMMA_INPUT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'gammaInput',
+	                scope: this.id,
+	                onChange: this.save.bind(this),
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_GAMMA_OUTPUT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'gammaOutput',
+	                scope: this.id,
+	                onChange: this.save.bind(this),
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_GAMMA_FACTOR
+	            }, {
+	                xtype: 'number',
+	                id: 'gammaFactor',
+	                scope: this.id,
+	                onChange: this.save.bind(this),
+	            }]
+	        }]
+	    }).render();
+
+	    this.dom = UI$1.get('panel', this.id).dom;
+	};
+
+	RendererPanel.prototype.update = function () {
+	    var shadowMapType = UI$1.get('shadowMapType', this.id);
+	    var gammaInput = UI$1.get('gammaInput', this.id);
+	    var gammaOutput = UI$1.get('gammaOutput', this.id);
+	    var gammaFactor = UI$1.get('gammaFactor', this.id);
 
 	    var renderer = this.app.editor.renderer;
 
@@ -20255,31 +21900,7 @@
 	    gammaFactor.setValue(renderer.gammaFactor);
 	};
 
-	OptionsWindow.prototype.hide = function () {
-	    this.window.hide();
-	};
-
-	OptionsWindow.prototype.changeTab = function (name) {
-	    if (name === L_SURFACE) {
-	        UI$1.get('surfaceTab', this.id).dom.classList.add('selected');
-	        UI$1.get('rendererTab', this.id).dom.classList.remove('selected');
-	        UI$1.get('surfacePanel', this.id).dom.style.display = '';
-	        UI$1.get('rendererPanel', this.id).dom.style.display = 'none';
-	    } else if (name === L_RENDERER) {
-	        UI$1.get('surfaceTab', this.id).dom.classList.remove('selected');
-	        UI$1.get('rendererTab', this.id).dom.classList.add('selected');
-	        UI$1.get('surfacePanel', this.id).dom.style.display = 'none';
-	        UI$1.get('rendererPanel', this.id).dom.style.display = '';
-	    }
-	};
-
-	OptionsWindow.prototype.save = function () {
-	    // 主题
-	    var theme = UI$1.get('theme', this.id).getValue();
-	    this.app.storage.set('theme', theme);
-	    document.getElementById('theme').href = theme;
-
-	    // 渲染器
+	RendererPanel.prototype.save = function () {
 	    var shadowMapType = parseInt(UI$1.get('shadowMapType', this.id).getValue());
 	    var gammaInput = UI$1.get('gammaInput', this.id).getValue();
 	    var gammaOutput = UI$1.get('gammaOutput', this.id).getValue();
@@ -20299,9 +21920,536 @@
 
 	    renderer.dispose();
 
-	    // 隐藏窗口
-	    this.hide();
-	    UI$1.msg(L_SAVE_SUCCESS);
+	    Object.assign(this.app.options, {
+	        shadowMapType,
+	        gammaInput,
+	        gammaOutput,
+	        gammaFactor
+	    });
+	};
+
+	/**
+	 * 帮助选项窗口
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function HelperPanel(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	HelperPanel.prototype = Object.create(UI$1.Control.prototype);
+	HelperPanel.prototype.constructor = HelperPanel;
+
+	HelperPanel.prototype.render = function () {
+	    UI$1.create({
+	        xtype: 'div',
+	        id: 'panel',
+	        scope: this.id,
+	        parent: this.parent,
+	        style: this.style,
+	        children: [{
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_GRID
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showGrid',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_CAMERA
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showCamera',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_POINT_LIGHT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showPointLight',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_DIRECTIONAL_LIGHT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showDirectionalLight',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_SPOT_LIGHT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showSpotLight',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_HEMISPHERE_LIGHT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showHemisphereLight',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_RECT_AREA_LIGHT
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showRectAreaLight',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_SKELETON
+	            }, {
+	                xtype: 'boolean',
+	                id: 'showSkeleton',
+	                scope: this.id,
+	                onChange: this.save.bind(this)
+	            }]
+	        }]
+	    }).render();
+
+	    this.dom = UI$1.get('panel', this.id).dom;
+	};
+
+	HelperPanel.prototype.update = function () {
+	    var showGrid = UI$1.get('showGrid', this.id);
+	    showGrid.setValue(this.app.storage.get('showGrid') === true);
+
+	    var showCamera = UI$1.get('showCamera', this.id);
+	    showCamera.setValue(this.app.storage.get('showCamera') === true);
+
+	    var showPointLight = UI$1.get('showPointLight', this.id);
+	    showPointLight.setValue(this.app.storage.get('showPointLight') === true);
+
+	    var showDirectionalLight = UI$1.get('showDirectionalLight', this.id);
+	    showDirectionalLight.setValue(this.app.storage.get('showDirectionalLight') === true);
+
+	    var showSpotLight = UI$1.get('showSpotLight', this.id);
+	    showSpotLight.setValue(this.app.storage.get('showSpotLight') === true);
+
+	    var showHemisphereLight = UI$1.get('showHemisphereLight', this.id);
+	    showHemisphereLight.setValue(this.app.storage.get('showHemisphereLight') === true);
+
+	    var showRectAreaLight = UI$1.get('showRectAreaLight', this.id);
+	    showRectAreaLight.setValue(this.app.storage.get('showRectAreaLight') === true);
+
+	    var showSkeleton = UI$1.get('showSkeleton', this.id);
+	    showSkeleton.setValue(this.app.storage.get('showSkeleton') === true);
+	};
+
+	HelperPanel.prototype.save = function () {
+	    var showGrid = UI$1.get('showGrid', this.id).getValue();
+	    if (showGrid !== this.app.storage.get('showGrid')) {
+	        this.app.storage.set('showGrid', showGrid);
+	        this.app.call(`storageChanged`, this, 'showGrid', showGrid);
+	    }
+
+	    var showCamera = UI$1.get('showCamera', this.id).getValue();
+	    if (showCamera !== this.app.storage.get('showCamera')) {
+	        this.app.storage.set('showCamera', showCamera);
+	        this.app.call(`storageChanged`, this, 'showCamera', showCamera);
+	    }
+
+	    var showPointLight = UI$1.get('showPointLight', this.id).getValue();
+	    if (showPointLight !== this.app.storage.get('showPointLight')) {
+	        this.app.storage.set('showPointLight', showPointLight);
+	        this.app.call(`storageChanged`, this, 'showPointLight', showPointLight);
+	    }
+
+	    var showDirectionalLight = UI$1.get('showDirectionalLight', this.id).getValue();
+	    if (showDirectionalLight !== this.app.storage.get('showDirectionalLight')) {
+	        this.app.storage.set('showDirectionalLight', showDirectionalLight);
+	        this.app.call(`storageChanged`, this, 'showDirectionalLight', showDirectionalLight);
+	    }
+
+	    var showSpotLight = UI$1.get('showSpotLight', this.id).getValue();
+	    if (showSpotLight !== this.app.storage.get('showSpotLight')) {
+	        this.app.storage.set('showSpotLight', showSpotLight);
+	        this.app.call(`storageChanged`, this, 'showSpotLight', showSpotLight);
+	    }
+
+	    var showHemisphereLight = UI$1.get('showHemisphereLight', this.id).getValue();
+	    if (showHemisphereLight !== this.app.storage.get('showHemisphereLight')) {
+	        this.app.storage.set('showHemisphereLight', showHemisphereLight);
+	        this.app.call(`storageChanged`, this, 'showHemisphereLight', showHemisphereLight);
+	    }
+
+	    var showRectAreaLight = UI$1.get('showRectAreaLight', this.id).getValue();
+	    if (showRectAreaLight !== this.app.storage.get('showRectAreaLight')) {
+	        this.app.storage.set('showRectAreaLight', showRectAreaLight);
+	        this.app.call(`storageChanged`, this, 'showRectAreaLight', showRectAreaLight);
+	    }
+
+	    var showSkeleton = UI$1.get('showSkeleton', this.id).getValue();
+	    if (showSkeleton !== this.app.storage.get('showSkeleton')) {
+	        this.app.storage.set('showSkeleton', showSkeleton);
+	        this.app.call(`storageChanged`, this, 'showSkeleton', showSkeleton);
+	    }
+	};
+
+	/**
+	 * 滤镜选项窗口
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function FilterPanel(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	FilterPanel.prototype = Object.create(UI$1.Control.prototype);
+	FilterPanel.prototype.constructor = FilterPanel;
+
+	FilterPanel.prototype.render = function () {
+	    UI$1.create({
+	        xtype: 'div',
+	        id: 'panel',
+	        scope: this.id,
+	        parent: this.parent,
+	        style: this.style,
+	        children: [{
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_HUE
+	            }, {
+	                xtype: 'int',
+	                id: 'hue',
+	                scope: this.id,
+	                range: [0, 360],
+	                step: 10,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_SATURATE
+	            }, {
+	                xtype: 'number',
+	                id: 'saturate',
+	                scope: this.id,
+	                range: [0, 4],
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_BRIGHTNESS
+	            }, {
+	                xtype: 'number',
+	                id: 'brightness',
+	                scope: this.id,
+	                range: [0, 4],
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_BLUR
+	            }, {
+	                xtype: 'number',
+	                id: 'blur',
+	                scope: this.id,
+	                range: [0, 20],
+	                step: 1,
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_CONTRAST
+	            }, {
+	                xtype: 'number',
+	                id: 'contrast',
+	                scope: this.id,
+	                range: [0, 4],
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_GRAYSCALE
+	            }, {
+	                xtype: 'number',
+	                id: 'grayscale',
+	                scope: this.id,
+	                range: [0, 1],
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_INVERT
+	            }, {
+	                xtype: 'number',
+	                id: 'invert',
+	                scope: this.id,
+	                range: [0, 1],
+	                onChange: this.save.bind(this)
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_SEPIA
+	            }, {
+	                xtype: 'number',
+	                id: 'sepia',
+	                scope: this.id,
+	                range: [0, 1],
+	                onChange: this.save.bind(this)
+	            }]
+	        }]
+	    }).render();
+
+	    this.dom = UI$1.get('panel', this.id).dom;
+	};
+
+	FilterPanel.prototype.update = function () {
+	    var hue = UI$1.get('hue', this.id);
+	    var saturate = UI$1.get('saturate', this.id);
+	    var brightness = UI$1.get('brightness', this.id);
+	    var blur = UI$1.get('blur', this.id);
+	    var contrast = UI$1.get('contrast', this.id);
+	    var grayscale = UI$1.get('grayscale', this.id);
+	    var invert = UI$1.get('invert', this.id);
+	    var sepia = UI$1.get('sepia', this.id);
+
+	    var renderer = this.app.editor.renderer;
+	    var filters = CssUtils.parseFilter(renderer.domElement.style.filter);
+	    hue.setValue(filters.hueRotate);
+	    saturate.setValue(filters.saturate);
+	    brightness.setValue(filters.brightness);
+	    blur.setValue(filters.blur);
+	    contrast.setValue(filters.contrast);
+	    grayscale.setValue(filters.grayscale);
+	    invert.setValue(filters.invert);
+	    sepia.setValue(filters.sepia);
+	};
+
+	FilterPanel.prototype.save = function () {
+	    var hue = UI$1.get('hue', this.id);
+	    var saturate = UI$1.get('saturate', this.id);
+	    var brightness = UI$1.get('brightness', this.id);
+	    var blur = UI$1.get('blur', this.id);
+	    var contrast = UI$1.get('contrast', this.id);
+	    var grayscale = UI$1.get('grayscale', this.id);
+	    var invert = UI$1.get('invert', this.id);
+	    var sepia = UI$1.get('sepia', this.id);
+
+	    var filters = {
+	        hueRotate: hue.getValue(),
+	        saturate: saturate.getValue(),
+	        brightness: brightness.getValue(),
+	        blur: blur.getValue(),
+	        contrast: contrast.getValue(),
+	        grayscale: grayscale.getValue(),
+	        invert: invert.getValue(),
+	        sepia: sepia.getValue(),
+	    };
+
+	    Object.assign(this.app.options, {
+	        hueRotate: filters.hueRotate,
+	        saturate: filters.saturate,
+	        brightness: filters.brightness,
+	        blur: filters.blur,
+	        contrast: filters.contrast,
+	        grayscale: filters.grayscale,
+	        invert: filters.invert,
+	        sepia: filters.sepia,
+	    });
+
+	    var renderer = this.app.editor.renderer;
+
+	    renderer.domElement.style.filter = CssUtils.serializeFilter(filters);
+	};
+
+	/**
+	 * 选项窗口
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function OptionsWindow(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	    this.tab = L_SURFACE;
+	}
+
+	OptionsWindow.prototype = Object.create(UI$1.Control.prototype);
+	OptionsWindow.prototype.constructor = OptionsWindow;
+
+	OptionsWindow.prototype.render = function () {
+	    this.surfacePanel = new SurfacePanel({
+	        app: this.app
+	    });
+	    this.rendererPanel = new RendererPanel({
+	        app: this.app
+	    });
+	    this.helperPanel = new HelperPanel({
+	        app: this.app
+	    });
+	    this.filterPanel = new FilterPanel({
+	        app: this.app
+	    });
+
+	    this.window = UI$1.create({
+	        xtype: 'window',
+	        parent: this.app.container,
+	        title: L_OPTIONS_WINDOW,
+	        width: '800px',
+	        height: '450px',
+	        bodyStyle: {
+	            padding: 0
+	        },
+	        shade: false,
+	        children: [{
+	            xtype: 'div',
+	            cls: 'tabs',
+	            children: [{
+	                xtype: 'text',
+	                id: 'surfaceTab',
+	                scope: this.id,
+	                text: L_SURFACE,
+	                cls: 'selected',
+	                onClick: () => {
+	                    this.changeTab(L_SURFACE);
+	                }
+	            }, {
+	                xtype: 'text',
+	                id: 'helperTab',
+	                scope: this.id,
+	                text: L_HELPERS,
+	                onClick: () => {
+	                    this.changeTab(L_HELPERS);
+	                }
+	            }, {
+	                xtype: 'text',
+	                id: 'rendererTab',
+	                scope: this.id,
+	                text: L_RENDERER,
+	                onClick: () => {
+	                    this.changeTab(L_RENDERER);
+	                }
+	            }, {
+	                xtype: 'text',
+	                id: 'filterTab',
+	                scope: this.id,
+	                text: L_FILTER,
+	                onClick: () => {
+	                    this.changeTab(L_FILTER);
+	                }
+	            }]
+	        },
+	        this.surfacePanel,
+	        this.helperPanel,
+	        this.rendererPanel,
+	        this.filterPanel,
+	        ]
+	    });
+	    this.window.render();
+	};
+
+	OptionsWindow.prototype.show = function () {
+	    this.window.show();
+	    this.update();
+	};
+
+	OptionsWindow.prototype.hide = function () {
+	    this.window.hide();
+	};
+
+	OptionsWindow.prototype.changeTab = function (name) {
+	    this.tab = name;
+
+	    var surfaceTab = UI$1.get('surfaceTab', this.id);
+	    var helperTab = UI$1.get('helperTab', this.id);
+	    var rendererTab = UI$1.get('rendererTab', this.id);
+	    var filterTab = UI$1.get('filterTab', this.id);
+
+	    surfaceTab.dom.classList.remove('selected');
+	    helperTab.dom.classList.remove('selected');
+	    rendererTab.dom.classList.remove('selected');
+	    filterTab.dom.classList.remove('selected');
+
+	    this.surfacePanel.dom.style.display = 'none';
+	    this.helperPanel.dom.style.display = 'none';
+	    this.rendererPanel.dom.style.display = 'none';
+	    this.filterPanel.dom.style.display = 'none';
+
+	    switch (this.tab) {
+	        case L_SURFACE:
+	            surfaceTab.dom.classList.add('selected');
+	            this.surfacePanel.dom.style.display = '';
+	            break;
+	        case L_HELPERS:
+	            helperTab.dom.classList.add('selected');
+	            this.helperPanel.dom.style.display = '';
+	            break;
+	        case L_RENDERER:
+	            rendererTab.dom.classList.add('selected');
+	            this.rendererPanel.dom.style.display = '';
+	            break;
+	        case L_FILTER:
+	            filterTab.dom.classList.add('selected');
+	            this.filterPanel.dom.style.display = '';
+	            break;
+	    }
+
+	    this.update();
+	};
+
+	OptionsWindow.prototype.update = function () {
+	    switch (this.tab) {
+	        case L_SURFACE:
+	            this.surfacePanel.update();
+	            break;
+	        case L_HELPERS:
+	            this.helperPanel.update();
+	            break;
+	        case L_RENDERER:
+	            this.rendererPanel.update();
+	            break;
+	        case L_FILTER:
+	            this.filterPanel.update();
+	            break;
+	    }
 	};
 
 	/**
@@ -20337,8 +22485,20 @@
 	            }, {
 	                xtype: 'div',
 	                cls: 'option',
+	                html: L_HELPERS,
+	                onClick: this.onHelperOptions.bind(this)
+	            }, {
+	                xtype: 'hr'
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
 	                html: L_RENDERER,
 	                onClick: this.onRendererOptions.bind(this)
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_FILTER,
+	                onClick: this.onFilterOptions.bind(this)
 	            }]
 	        }]
 	    });
@@ -20350,22 +22510,52 @@
 
 	OptionsMenu.prototype.onSurfaceOptions = function () {
 	    if (this.optionsWindow === undefined) {
-	        this.optionsWindow = new OptionsWindow({ app: this.app });
+	        this.optionsWindow = new OptionsWindow({
+	            app: this.app
+	        });
 	        this.optionsWindow.render();
 	    }
 	    this.optionsWindow.show();
-	    this.optionsWindow.changeTab(L_OPTIONS);
+	    this.optionsWindow.changeTab(L_SURFACE);
 	};
 
 	// ---------------------------------- 渲染器选项 -------------------------------------
 
 	OptionsMenu.prototype.onRendererOptions = function () {
 	    if (this.optionsWindow === undefined) {
-	        this.optionsWindow = new OptionsWindow({ app: this.app });
+	        this.optionsWindow = new OptionsWindow({
+	            app: this.app
+	        });
 	        this.optionsWindow.render();
 	    }
 	    this.optionsWindow.show();
 	    this.optionsWindow.changeTab(L_RENDERER);
+	};
+
+	// ------------------------------- 帮助器选项 -----------------------------------------
+
+	OptionsMenu.prototype.onHelperOptions = function () {
+	    if (this.optionsWindow === undefined) {
+	        this.optionsWindow = new OptionsWindow({
+	            app: this.app
+	        });
+	        this.optionsWindow.render();
+	    }
+	    this.optionsWindow.show();
+	    this.optionsWindow.changeTab(L_HELPERS);
+	};
+
+	// ------------------------------ 滤镜选项 ---------------------------------------------
+
+	OptionsMenu.prototype.onFilterOptions = function () {
+	    if (this.optionsWindow === undefined) {
+	        this.optionsWindow = new OptionsWindow({
+	            app: this.app
+	        });
+	        this.optionsWindow.render();
+	    }
+	    this.optionsWindow.show();
+	    this.optionsWindow.changeTab(L_FILTER);
 	};
 
 	/**
@@ -20434,6 +22624,102 @@
 	    });
 
 	    container.render();
+	};
+
+	/**
+	 * 测试菜单
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function TestMenu(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	TestMenu.prototype = Object.create(UI$1.Control.prototype);
+	TestMenu.prototype.constructor = TestMenu;
+
+	TestMenu.prototype.render = function () {
+	    var container = UI$1.create({
+	        xtype: 'div',
+	        parent: this.parent,
+	        cls: 'menu',
+	        children: [{
+	            xtype: 'div',
+	            cls: 'title',
+	            html: 'Test'
+	        }, {
+	            xtype: 'div',
+	            cls: 'options',
+	            children: [{
+	                xtype: 'div',
+	                cls: 'option',
+	                html: 'Hello World',
+	                onClick: this.hello.bind(this),
+	            }]
+	        }]
+	    });
+
+	    container.render();
+	};
+
+	TestMenu.prototype.showWin = function () {
+	    if (this.win === undefined) {
+	        this.win = UI$1.create({
+	            xtype: 'window',
+	            title: 'Data Visualization',
+	            id: 'dataVisualWin',
+	            scope: this.id,
+	            width: '800px',
+	            height: '500px',
+	            shade: false,
+	            containerStyle: {
+	                display: 'flex',
+	                flexDirection: 'column',
+	            },
+	            bodyStyle: {
+	                padding: 0,
+	            },
+	            children: [{
+	                xtype: 'div',
+	                id: 'container',
+	                scope: this.id,
+	                style: {
+	                    width: '100%',
+	                    height: '100%',
+	                },
+	            }]
+	        });
+	        this.win.render();
+	    }
+
+	    this.win.show();
+	};
+
+	TestMenu.prototype.clearContent = function () {
+	    var container = UI$1.get('container', this.id);
+
+	    while (container.dom.children.length) {
+	        container.dom.removeChild(container.dom.children[0]);
+	    }
+	};
+
+	TestMenu.prototype.hello = function () {
+	    this.showWin();
+	    this.clearContent();
+
+	    var container = UI$1.get('container', this.id);
+
+	    var svg = d3.select(container.dom)
+	        .append('svg')
+	        .attr('width', 500)
+	        .attr('height', 500);
+
+	    var circle = svg.append('circle')
+	        .attr('cx', 100)
+	        .attr('cy', 100)
+	        .attr('r', 50)
+	        .attr('fill', '#f00');
 	};
 
 	/**
@@ -20561,6 +22847,7 @@
 	            new ToolMenu(params),
 	            new OptionsMenu(params),
 	            new HelpMenu(params),
+	            new TestMenu(params),
 
 	            // 右侧
 	            new StatusMenu(params)
@@ -20575,7 +22862,7 @@
 	 * Port from https://github.com/mapbox/earcut (v2.1.2)
 	 */
 
-	var ID$9 = -1;
+	var ID$a = -1;
 
 	/**
 	 * 工具基类
@@ -20583,9 +22870,9 @@
 	 */
 	function BaseTool(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$9--}`;
+	    this.id = `${this.constructor.name}${ID$a--}`;
 
-	    this.dispatch = dispatch('end');
+	    this.dispatch = d3.dispatch('end');
 
 	    this.call = this.dispatch.call.bind(this.dispatch);
 	    this.on = this.dispatch.on.bind(this.dispatch);
@@ -21376,6 +23663,11 @@
 	    var editor = this.app.editor;
 
 	    editor.execute(new SetValueCommand(this.selected, 'name', name.getValue()));
+
+	    // bug: https://gitee.com/tengge1/ShadowEditor/issues/IV1V3
+	    if (this.selected instanceof Text$1) {
+	        this.selected.updateText(name.getValue());
+	    }
 	};
 
 	BasicComponent.prototype.onChangeVisible = function () {
@@ -21547,7 +23839,7 @@
 	TransformComponent.prototype.updateUI = function () {
 	    var container = UI.get('transformPanel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected) {
+	    if (editor.selected && !editor.selected.isGlobe) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -26743,7 +29035,7 @@
 	PhysicsWorldComponent.prototype.updateUI = function () {
 	    var container = UI.get('objectPanel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -27727,7 +30019,7 @@
 	SceneComponent.prototype.updateUI = function () {
 	    var container = UI.get('scenePanel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -31491,7 +33783,7 @@
 	DotScreenComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -31608,7 +33900,7 @@
 	RgbShiftComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -31725,7 +34017,7 @@
 	AfterimageComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -31866,7 +34158,7 @@
 	BokehComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -31979,7 +34271,7 @@
 	FxaaComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32091,7 +34383,7 @@
 	GlitchComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32319,7 +34611,7 @@
 	HalftoneComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32488,7 +34780,7 @@
 	SsaaComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32609,7 +34901,7 @@
 	PixelComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32849,7 +35141,7 @@
 	SaoComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -32990,7 +35282,7 @@
 	SmaaComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -33150,7 +35442,7 @@
 	SsaoComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -33299,7 +35591,7 @@
 	TaaComponent.prototype.updateUI = function () {
 	    var container = UI.get('panel', this.id);
 	    var editor = this.app.editor;
-	    if (editor.selected && editor.selected instanceof THREE.Scene) {
+	    if (editor.selected && editor.selected === editor.scene) {
 	        container.dom.style.display = '';
 	    } else {
 	        container.dom.style.display = 'none';
@@ -34438,6 +36730,96 @@
 	};
 
 	/**
+	 * GIS基本组件
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function GisBasicComponent(options) {
+	    BaseComponent.call(this, options);
+	    this.selected = null;
+	}
+
+	GisBasicComponent.prototype = Object.create(BaseComponent.prototype);
+	GisBasicComponent.prototype.constructor = GisBasicComponent;
+
+	GisBasicComponent.prototype.render = function () {
+	    var data = {
+	        xtype: 'div',
+	        id: 'panel',
+	        scope: this.id,
+	        parent: this.parent,
+	        cls: 'Panel',
+	        style: {
+	            borderTop: 0,
+	            display: 'none'
+	        },
+	        children: [{
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                style: {
+	                    color: '#555',
+	                    fontWeight: 'bold'
+	                },
+	                text: L_GIS_COMPONENT
+	            }]
+	        }, {
+	            xtype: 'row',
+	            children: [{
+	                xtype: 'label',
+	                text: L_TILE_MAP
+	            }, {
+	                xtype: 'select',
+	                id: 'bakcground',
+	                scope: this.id,
+	                options: {
+	                    google: L_GOOGLE_MAP,
+	                    bing: L_BING_MAP,
+	                    tianditu: L_TIANDITU_MAP,
+	                },
+	                onChange: this.onChangeBackground.bind(this),
+	            }]
+	        }]
+	    };
+
+	    var control = UI.create(data);
+	    control.render();
+
+	    this.app.on(`objectSelected.${this.id}`, this.onObjectSelected.bind(this));
+	    this.app.on(`objectChanged.${this.id}`, this.onObjectChanged.bind(this));
+	};
+
+	GisBasicComponent.prototype.onObjectSelected = function () {
+	    this.updateUI();
+	};
+
+	GisBasicComponent.prototype.onObjectChanged = function () {
+	    this.updateUI();
+	};
+
+	GisBasicComponent.prototype.updateUI = function () {
+	    var container = UI.get('panel', this.id);
+	    var editor = this.app.editor;
+	    if (editor.selected && editor.selected.userData.type === 'Globe') {
+	        container.dom.style.display = '';
+	    } else {
+	        container.dom.style.display = 'none';
+	        return;
+	    }
+
+	    this.selected = editor.selected;
+
+	    var bakcground = UI.get('bakcground', this.id);
+
+	    bakcground.setValue(this.selected.getBackground());
+	};
+
+	GisBasicComponent.prototype.onChangeBackground = function () {
+	    var bakcground = UI.get('bakcground', this.id).getValue();
+	    this.selected.setBackground(bakcground);
+	};
+
+	/**
 	 * 属性面板
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author tengge / https://github.com/tengge1
@@ -34468,6 +36850,8 @@
 	            new TrackballControlComponent({ app: this.app }),
 	            new ReflectorComponent({ app: this.app }),
 	            new PhysicsWorldComponent({ app: this.app }),
+
+	            new GisBasicComponent({ app: this.app }),
 
 	            // 后期处理
 	            new DotScreenComponent({ app: this.app }),
@@ -34508,7 +36892,7 @@
 	            new SoftVolumeComponent({ app: this.app }),
 
 	            new GeometryComponent({ app: this.app }),
-	            new MaterialComponent({ app: this.app })
+	            new MaterialComponent({ app: this.app }),
 	        ]
 	    };
 
@@ -35289,247 +37673,6 @@
 	};
 
 	/**
-	 * 设置面板
-	 * @author tengge / https://github.com/tengge1
-	 */
-	function SettingPanel(options) {
-	    UI$1.Control.call(this, options);
-	    this.app = options.app;
-	}
-	SettingPanel.prototype = Object.create(UI$1.Control.prototype);
-	SettingPanel.prototype.constructor = SettingPanel;
-
-	SettingPanel.prototype.render = function () {
-	    var data = {
-	        xtype: 'div',
-	        parent: this.parent,
-	        cls: 'Panel',
-	        style: {
-	            borderTop: 0,
-	            paddingTop: '20px'
-	        },
-	        children: [{
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                style: {
-	                    color: '#555',
-	                    fontWeight: 'bold'
-	                },
-	                text: L_HELPERS
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_GRID
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showGrid',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_CAMERA
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showCamera',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_POINT_LIGHT
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showPointLight',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_DIRECTIONAL_LIGHT
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showDirectionalLight',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_SPOT_LIGHT
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showSpotLight',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_HEMISPHERE_LIGHT
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showHemisphereLight',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_RECT_AREA_LIGHT
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showRectAreaLight',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }, {
-	            xtype: 'row',
-	            children: [{
-	                xtype: 'label',
-	                text: L_SKELETON
-	            }, {
-	                xtype: 'boolean',
-	                id: 'showSkeleton',
-	                scope: this.id,
-	                onChange: this.update.bind(this)
-	            }]
-	        }]
-	    };
-
-	    var control = UI$1.create(data);
-	    control.render();
-
-	    // 为各种设置设定默认值
-	    if (this.app.storage.get('showGrid') === undefined) {
-	        this.app.storage.set('showGrid', true);
-	    }
-
-	    if (this.app.storage.get('showCamera') === undefined) {
-	        this.app.storage.set('showCamera', false);
-	    }
-
-	    if (this.app.storage.get('showPointLight') === undefined) {
-	        this.app.storage.set('showPointLight', true);
-	    }
-
-	    if (this.app.storage.get('showDirectionalLight') === undefined) {
-	        this.app.storage.set('showDirectionalLight', true);
-	    }
-
-	    if (this.app.storage.get('showSpotLight') === undefined) {
-	        this.app.storage.set('showSpotLight', true);
-	    }
-
-	    if (this.app.storage.get('showHemisphereLight') === undefined) {
-	        this.app.storage.set('showHemisphereLight', true);
-	    }
-
-	    if (this.app.storage.get('showRectAreaLight') === undefined) {
-	        this.app.storage.set('showRectAreaLight', true);
-	    }
-
-	    if (this.app.storage.get('showSkeleton') === undefined) {
-	        this.app.storage.set('showSkeleton', false);
-	    }
-
-	    this.app.on(`tabSelected.${this.id}`, this.onTabSelected.bind(this));
-	};
-
-	SettingPanel.prototype.onTabSelected = function (tabName) {
-	    if (tabName !== 'setting') {
-	        return;
-	    }
-
-	    var showGrid = UI$1.get('showGrid', this.id);
-	    showGrid.setValue(this.app.storage.get('showGrid') === true);
-
-	    var showCamera = UI$1.get('showCamera', this.id);
-	    showCamera.setValue(this.app.storage.get('showCamera') === true);
-
-	    var showPointLight = UI$1.get('showPointLight', this.id);
-	    showPointLight.setValue(this.app.storage.get('showPointLight') === true);
-
-	    var showDirectionalLight = UI$1.get('showDirectionalLight', this.id);
-	    showDirectionalLight.setValue(this.app.storage.get('showDirectionalLight') === true);
-
-	    var showSpotLight = UI$1.get('showSpotLight', this.id);
-	    showSpotLight.setValue(this.app.storage.get('showSpotLight') === true);
-
-	    var showHemisphereLight = UI$1.get('showHemisphereLight', this.id);
-	    showHemisphereLight.setValue(this.app.storage.get('showHemisphereLight') === true);
-
-	    var showRectAreaLight = UI$1.get('showRectAreaLight', this.id);
-	    showRectAreaLight.setValue(this.app.storage.get('showRectAreaLight') === true);
-
-	    var showSkeleton = UI$1.get('showSkeleton', this.id);
-	    showSkeleton.setValue(this.app.storage.get('showSkeleton') === true);
-	};
-
-	SettingPanel.prototype.update = function () {
-	    // 帮助器
-	    var showGrid = UI$1.get('showGrid', this.id).getValue();
-	    if (showGrid !== this.app.storage.get('showGrid')) {
-	        this.app.storage.set('showGrid', showGrid);
-	        this.app.call(`storageChanged`, this, 'showGrid', showGrid);
-	    }
-
-	    var showCamera = UI$1.get('showCamera', this.id).getValue();
-	    if (showCamera !== this.app.storage.get('showCamera')) {
-	        this.app.storage.set('showCamera', showCamera);
-	        this.app.call(`storageChanged`, this, 'showCamera', showCamera);
-	    }
-
-	    var showPointLight = UI$1.get('showPointLight', this.id).getValue();
-	    if (showPointLight !== this.app.storage.get('showPointLight')) {
-	        this.app.storage.set('showPointLight', showPointLight);
-	        this.app.call(`storageChanged`, this, 'showPointLight', showPointLight);
-	    }
-
-	    var showDirectionalLight = UI$1.get('showDirectionalLight', this.id).getValue();
-	    if (showDirectionalLight !== this.app.storage.get('showDirectionalLight')) {
-	        this.app.storage.set('showDirectionalLight', showDirectionalLight);
-	        this.app.call(`storageChanged`, this, 'showDirectionalLight', showDirectionalLight);
-	    }
-
-	    var showSpotLight = UI$1.get('showSpotLight', this.id).getValue();
-	    if (showSpotLight !== this.app.storage.get('showSpotLight')) {
-	        this.app.storage.set('showSpotLight', showSpotLight);
-	        this.app.call(`storageChanged`, this, 'showSpotLight', showSpotLight);
-	    }
-
-	    var showHemisphereLight = UI$1.get('showHemisphereLight', this.id).getValue();
-	    if (showHemisphereLight !== this.app.storage.get('showHemisphereLight')) {
-	        this.app.storage.set('showHemisphereLight', showHemisphereLight);
-	        this.app.call(`storageChanged`, this, 'showHemisphereLight', showHemisphereLight);
-	    }
-
-	    var showRectAreaLight = UI$1.get('showRectAreaLight', this.id).getValue();
-	    if (showRectAreaLight !== this.app.storage.get('showRectAreaLight')) {
-	        this.app.storage.set('showRectAreaLight', showRectAreaLight);
-	        this.app.call(`storageChanged`, this, 'showRectAreaLight', showRectAreaLight);
-	    }
-
-	    var showSkeleton = UI$1.get('showSkeleton', this.id).getValue();
-	    if (showSkeleton !== this.app.storage.get('showSkeleton')) {
-	        this.app.storage.set('showSkeleton', showSkeleton);
-	        this.app.call(`storageChanged`, this, 'showSkeleton', showSkeleton);
-	    }
-	};
-
-	/**
 	 * 历史记录面板
 	 * @author dforrer / https://github.com/dforrer
 	 * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
@@ -35656,14 +37799,6 @@
 	                }
 	            }, {
 	                xtype: 'text',
-	                id: 'settingTab',
-	                scope: this.id,
-	                text: L_SETTINGS,
-	                onClick: () => {
-	                    this.app.call('tabSelected', this, 'setting');
-	                }
-	            }, {
-	                xtype: 'text',
 	                id: 'historyTab',
 	                scope: this.id,
 	                text: L_HISTORY,
@@ -35684,13 +37819,6 @@
 	            scope: this.id,
 	            children: [
 	                new AnimationPanel({ app: this.app })
-	            ]
-	        }, {
-	            xtype: 'div',
-	            id: 'settingPanel',
-	            scope: this.id,
-	            children: [
-	                new SettingPanel({ app: this.app })
 	            ]
 	        }, {
 	            xtype: 'div',
@@ -35717,7 +37845,6 @@
 	    var tabNames = [
 	        'property',
 	        'animation',
-	        'setting',
 	        'history'
 	    ];
 	    if (tabNames.indexOf(tabName) === -1) {
@@ -35726,22 +37853,18 @@
 
 	    var propertyTab = UI$1.get('propertyTab', this.id);
 	    var animationTab = UI$1.get('animationTab', this.id);
-	    var settingTab = UI$1.get('settingTab', this.id);
 	    var historyTab = UI$1.get('historyTab', this.id);
 
 	    var propertyPanel = UI$1.get('propertyPanel', this.id);
 	    var animationPanel = UI$1.get('animationPanel', this.id);
-	    var settingPanel = UI$1.get('settingPanel', this.id);
 	    var historyPanel = UI$1.get('historyPanel', this.id);
 
 	    propertyTab.dom.className = '';
 	    animationTab.dom.className = '';
-	    settingTab.dom.className = '';
 	    historyTab.dom.className = '';
 
 	    propertyPanel.dom.style.display = 'none';
 	    animationPanel.dom.style.display = 'none';
-	    settingPanel.dom.style.display = 'none';
 	    historyPanel.dom.style.display = 'none';
 
 	    switch (tabName) {
@@ -35752,10 +37875,6 @@
 	        case 'animation':
 	            animationTab.dom.className = 'selected';
 	            animationPanel.dom.style.display = '';
-	            break;
-	        case 'setting':
-	            settingTab.dom.className = 'selected';
-	            settingPanel.dom.style.display = '';
 	            break;
 	        case 'history':
 	            historyTab.dom.className = 'selected';
@@ -35882,6 +38001,7 @@
 	            xtype: 'tree',
 	            id: 'tree',
 	            scope: this.id,
+	            cls: 'Tree Hierachy',
 	            onClick: this.onClick.bind(this),
 	            onDblClick: this.onDblClick.bind(this),
 	            onDrag: this.onDrag.bind(this),
@@ -35939,6 +38059,7 @@
 	    var list = [{
 	        value: camera.uuid,
 	        text: camera.name,
+	        cls: 'Camera',
 	        children: []
 	    }];
 
@@ -35951,11 +38072,26 @@
 	HierachyPanel.prototype._parseData = function (obj, list) {
 	    var scene = this.app.editor.scene;
 
+	    var cls = null;
+
+	    if (obj === scene) {
+	        cls = 'Scene';
+	    } else if (obj instanceof THREE.Line) {
+	        cls = 'Line';
+	    } else if (obj instanceof THREE.Light) {
+	        cls = 'Light';
+	    } else if (obj instanceof THREE.Points) {
+	        cls = 'Points';
+	    } else {
+	        cls = 'Default';
+	    }
+
 	    var data = {
 	        value: obj.uuid,
 	        text: obj.name,
 	        expand: obj === scene,
 	        draggable: obj !== scene,
+	        cls: cls,
 	        children: []
 	    };
 	    list.push(data);
@@ -36510,7 +38646,7 @@ void main()	{
 	    control.render();
 	};
 
-	var ID$a = -1;
+	var ID$b = -1;
 
 	const STOP = 0;
 	const PLAY = 1;
@@ -36877,7 +39013,7 @@ void main()	{
 	        var animation = {
 	            id: null,
 	            uuid: THREE.Math.generateUUID(),
-	            name: `${L_ANIMATION}${ID$a--}`,
+	            name: `${L_ANIMATION}${ID$b--}`,
 	            target: null,
 	            type: 'Tween',
 	            beginTime: event.offsetX / timeline.scale,
@@ -37652,6 +39788,14 @@ void main()	{
 
 	            if (obj.options) {
 	                this.app.call('optionsChanged', this, this.app.options);
+
+	                if (obj.options.sceneType === 'GIS') {
+	                    if (this.app.editor.gis) {
+	                        this.app.editor.gis.stop();
+	                    }
+	                    this.app.editor.gis = new Scene(this.app);
+	                    this.app.editor.gis.start();
+	                }
 	            }
 
 	            if (obj.scripts) {
@@ -41238,6 +43382,7 @@ void main()	{
 
 	/**
 	 * 网格帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function GridHelper(app) {
@@ -41286,6 +43431,7 @@ void main()	{
 
 	/**
 	 * 相机帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function CameraHelper(app) {
@@ -41334,6 +43480,7 @@ void main()	{
 
 	/**
 	 * 具有一定体积的点光源帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} light 
 	 * @param {*} sphereSize 
 	 * @param {*} color 
@@ -41375,6 +43522,7 @@ void main()	{
 
 	/**
 	 * 点光源帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function PointLightHelpers(app) {
@@ -41462,6 +43610,7 @@ void main()	{
 
 	/**
 	 * 具有一定体积的平行光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} light 
 	 * @param {*} size 
 	 * @param {*} color 
@@ -41503,6 +43652,7 @@ void main()	{
 
 	/**
 	 * 平行光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function DirectionalLightHelpers(app) {
@@ -41589,6 +43739,7 @@ void main()	{
 
 	/**
 	 * 具有一定体积的半球光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} light 
 	 * @param {*} size 
 	 * @param {*} color 
@@ -41630,6 +43781,7 @@ void main()	{
 
 	/**
 	 * 半球光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function HemisphereLightHelpers(app) {
@@ -41716,6 +43868,7 @@ void main()	{
 
 	/**
 	 * 具有一定体积的矩形光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} light 
 	 * @param {*} color 
 	 */
@@ -41760,6 +43913,7 @@ void main()	{
 
 	/**
 	 * 矩形光帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function RectAreaLightHelpers(app) {
@@ -41847,6 +44001,7 @@ void main()	{
 
 	/**
 	 * 具有一定体积的聚光灯帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} light 
 	 * @param {*} color 
 	 */
@@ -41887,6 +44042,7 @@ void main()	{
 
 	/**
 	 * 聚光灯帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function SpotLightHelpers(app) {
@@ -41978,6 +44134,7 @@ void main()	{
 
 	/**
 	 * 视角帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function ViewHelper(app) {
@@ -42118,6 +44275,10 @@ void main()	{
 	};
 
 	ViewHelper.prototype.onAfterRender = function () {
+	    if (!this.app.editor.showViewHelper) {
+	        return;
+	    }
+
 	    var renderer = this.app.editor.renderer;
 
 	    // 最后绘制而且清空深度缓冲，保证视角控件不会被其他物体遮挡
@@ -42190,6 +44351,7 @@ void main()	{
 
 	/**
 	 * 选择帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function SelectHelper(app) {
@@ -42331,6 +44493,7 @@ void main()	{
 
 	/**
 	 * 所有帮助器
+	 * @author tengge / https://github.com/tengge1
 	 * @param {*} app 
 	 */
 	function Helpers(app) {
@@ -42453,6 +44616,8 @@ void main()	{
 	    var light = new THREE.DirectionalLight(0xffffff, 1.0);
 	    light.position.z = 10;
 	    this.sceneHelpers.add(light);
+
+	    this.showViewHelper = true;
 
 	    // 事件
 	    this.app.on(`appStarted.${this.id}`, this.onAppStarted.bind(this));
@@ -42772,6 +44937,7 @@ void main()	{
 
 	    // 存储
 	    this.storage = new Storage();
+	    this.initStorage();
 
 	    // 包管理器
 	    this.packageManager = new PackageManager();
@@ -42821,6 +44987,40 @@ void main()	{
 	    // 编辑器
 	    this.editor = new Editor(this);
 	}
+
+	Application.prototype.initStorage = function () {
+	    if (this.storage.get('showGrid') === undefined) {
+	        this.storage.set('showGrid', true);
+	    }
+
+	    if (this.storage.get('showCamera') === undefined) {
+	        this.storage.set('showCamera', false);
+	    }
+
+	    if (this.storage.get('showPointLight') === undefined) {
+	        this.storage.set('showPointLight', true);
+	    }
+
+	    if (this.storage.get('showDirectionalLight') === undefined) {
+	        this.storage.set('showDirectionalLight', true);
+	    }
+
+	    if (this.storage.get('showSpotLight') === undefined) {
+	        this.storage.set('showSpotLight', true);
+	    }
+
+	    if (this.storage.get('showHemisphereLight') === undefined) {
+	        this.storage.set('showHemisphereLight', true);
+	    }
+
+	    if (this.storage.get('showRectAreaLight') === undefined) {
+	        this.storage.set('showRectAreaLight', true);
+	    }
+
+	    if (this.storage.get('showSkeleton') === undefined) {
+	        this.storage.set('showSkeleton', false);
+	    }
+	};
 
 	// ------------------------- 程序控制 -------------------------------
 
@@ -42901,6 +45101,7 @@ void main()	{
 	exports.Window = Window;
 	exports.UI = UI$1;
 	exports.Player = Player;
+	exports.GeoUtils = GeoUtils;
 	exports.Application = Application;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
