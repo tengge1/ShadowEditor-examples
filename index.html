@@ -119,7 +119,7 @@
             <div class="title">三维GIS</div>
         </div>
     </div>
-    <iframe id="content" src="editor.html" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+    <iframe id="content" src="" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
     <a href="https://github.com/tengge1/ShadowEditor" id="forkMe">
         <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149"
             class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
@@ -133,6 +133,25 @@
                 document.querySelector('#content').src = `view.html?sceneFile=${id}`;
             }
         });
+
+        var getQueryString = name => {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        };
+
+        var start = () => {
+            var sceneID = getQueryString('sceneID');
+
+            if (sceneID) { // 打开场景
+                document.querySelector('#content').src = `view.html?sceneFile=${sceneID}`;
+            } else { // 打开编辑器
+                document.querySelector('#content').src = `editor.html`;
+            }
+        };
+
+        window.onload = start;
     </script>
 </body>
 
