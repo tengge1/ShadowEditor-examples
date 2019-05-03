@@ -624,6 +624,32 @@
 	    L_GOOGLE_MAP: 'Google Map',
 	    L_BING_MAP: 'Bing Map',
 	    L_TIANDITU_MAP: 'Tianditu Map',
+
+	    L_VISUAL: 'Visual',
+	    L_DATA_SOURCE_MANAGE: 'Data Source Manage',
+	    L_SIDEBAR: 'Sidebar',
+	    L_PANEL: 'Panel',
+	    L_BAR_CHART: 'Bar Chart',
+	    L_TWO_D: '2D',
+	    L_BUTTON: 'Button',
+	    L_LABEL: 'Label',
+	    L_HORIZONTAL_LINE: 'Horizontal Line',
+	    L_VERTICAL_LINE: 'Vertical Line',
+	    L_DATE_WEEK: 'Date',
+	    L_TIME_DISK: 'Time Disk',
+	    L_KEY_VALUE_LABEL: 'Key Value Label',
+	    L_FORM_PANEL: 'Form Panel',
+	    L_GAUGE: 'Gauge',
+	    L_HISTOGRAM: 'Histogram',
+	    L_LINECHART: 'Line Chart',
+	    L_SCATTER_PLOT: 'Scatter Plot',
+	    L_PIE_CHART: 'Pie Chart',
+	    L_CHORD_GRAPH: 'Chord Graph',
+	    L_FORCE_DIRECTED_GRAPH: 'Force Directed Graph',
+	    L_TREE_DIAGRAM: 'Tree Diagram',
+	    L_CLUSTER_DIAGRAM: 'Cluster Diagram',
+	    L_PACK_DIAGRAM: 'Pack Diagram',
+	    L_PARTITION_DIAGRAM: 'Partition Diagram',
 	});
 
 	var applyMatrix4 = "\r\nvec3 applyMatrix4(vec3 v, mat4 m) {\r\n    float x = v.x;\r\n    float y = v.y;\r\n    float z = v.z;\r\n    \r\n    float w = 1.0 / ( m[0][3] * x + m[1][3] * y + m[2][3] * z + m[3][3] );\r\n\r\n    return vec3(\r\n        (m[0][0] * x + m[1][0] * y + m[2][0] * z + m[3][0]) * w,\r\n        (m[0][1] * x + m[1][1] * y + m[2][1] * z + m[3][1]) * w,\r\n        (m[0][2] * x + m[1][2] * y + m[2][2] * z + m[3][2] ) * w\r\n    );\r\n}";
@@ -4165,6 +4191,123 @@
 
 	UI$1.addXType('icon', Icon);
 
+	/**
+	 * 进度条
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function ProgressBar(options = {}) {
+	    Control.call(this, options);
+
+	    this.max = options.max || 100;
+	    this.current = options.current || 0;
+
+	    this.cls = options.cls || 'ProgressBar';
+	    this.style = options.style || null;
+	}
+
+	ProgressBar.prototype = Object.create(Control.prototype);
+	ProgressBar.prototype.constructor = ProgressBar;
+
+	ProgressBar.prototype.render = function () {
+	    this.dom = document.createElement('div');
+	    this.parent.appendChild(this.dom);
+
+	    if (this.cls) {
+	        this.dom.className = this.cls;
+	    }
+
+	    if (this.style) {
+	        Object.assign(this.dom.style, this.style);
+	    }
+
+	    this.bar = document.createElement('div');
+	    this.dom.appendChild(this.bar);
+
+	    this.bar.className = 'Bar';
+	};
+
+	ProgressBar.prototype.getCurrent = function () {
+	    return this.current;
+	};
+
+	ProgressBar.prototype.setCurrent = function (value) {
+	    this.current = value;
+
+	    this.bar.style.width = (this.current / this.max * 100) + '%';
+	};
+
+	UI$1.addXType('progressbar', ProgressBar);
+
+	const svgNS$1 = 'http://www.w3.org/2000/svg';
+	const xlinkNS$1 = "http://www.w3.org/1999/xlink";
+
+	/**
+	 * SVG
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function SVG(options) {
+	    Control.call(this, options);
+	}
+	SVG.prototype = Object.create(Control.prototype);
+	SVG.prototype.constructor = SVG;
+
+	SVG.prototype.render = function () {
+	    this.dom = document.createElementNS(svgNS$1, 'svg');
+	    this.parent.appendChild(this.dom);
+
+	    if (this.attr) {
+	        Object.keys(this.attr).forEach(n => {
+	            if (n.startsWith('xlink')) {
+	                this.dom.setAttributeNS(xlinkNS$1, n, this.attr[n]);
+	            } else {
+	                this.dom.setAttribute(n, this.attr[n]);
+	            }
+	        });
+	    }
+
+	    if (this.prop) {
+	        Object.assign(this.dom, this.prop);
+	    }
+
+	    if (this.cls) {
+	        this.dom.className = this.cls;
+	    }
+
+	    if (this.style) {
+	        Object.assign(this.dom.style, this.style);
+	    }
+
+	    this.children.forEach(n => {
+	        var obj = UI$1.create(n);
+	        obj.parent = this.dom;
+	        obj.render();
+	    });
+	};
+
+	UI$1.addXType('svg', SVG);
+
+	const svgNS$2 = 'http://www.w3.org/2000/svg';
+
+	/**
+	 * Defs
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function Defs(options) {
+	    Control.call(this, options);
+	}
+	Defs.prototype = Object.create(Control.prototype);
+	Defs.prototype.constructor = Defs;
+
+	Defs.prototype.render = function () {
+	    this.dom = document.createElementNS(svgNS$2, 'defs');
+	    this.parent.appendChild(this.dom);
+	};
+
+	UI$1.addXType('defs', Defs);
+
 	// 添加一些实用功能
 	Object.assign(UI$1, {
 	    Control: Control,
@@ -4248,6 +4391,641 @@
 	});
 
 	window.UI = UI$1;
+
+	const PackageList = [{
+	    name: 'NRRDLoader',
+	    assets: [
+	        'assets/js/Volume.js',
+	        'assets/js/VolumeSlice.js',
+	        'assets/js/loaders/NRRDLoader.js'
+	    ]
+	}, {
+	    name: '3MFLoader',
+	    assets: [
+	        'assets/js/loaders/3MFLoader.js'
+	    ]
+	}, {
+	    name: 'AMFLoader',
+	    assets: [
+	        'assets/js/loaders/AMFLoader.js'
+	    ]
+	}, {
+	    name: 'AssimpLoader',
+	    assets: [
+	        'assets/js/loaders/AssimpLoader.js'
+	    ]
+	}, {
+	    name: 'AWDLoader',
+	    assets: [
+	        'assets/js/loaders/AWDLoader.js'
+	    ]
+	}, {
+	    name: 'BabylonLoader',
+	    assets: [
+	        'assets/js/loaders/BabylonLoader.js'
+	    ]
+	}, {
+	    name: 'BinaryLoader',
+	    assets: [
+	        'assets/js/loaders/BinaryLoader.js'
+	    ]
+	}, {
+	    name: 'BVHLoader',
+	    assets: [
+	        'assets/js/loaders/BVHLoader.js'
+	    ]
+	}, {
+	    name: 'ColladaLoader',
+	    assets: [
+	        'assets/js/loaders/ColladaLoader.js'
+	    ]
+	}, {
+	    name: 'FBXLoader',
+	    assets: [
+	        'assets/js/curves/NURBSCurve.js',
+	        'assets/js/curves/NURBSUtils.js',
+	        'assets/js/loaders/FBXLoader.js'
+	    ]
+	}, {
+	    name: 'GCodeLoader',
+	    assets: [
+	        'assets/js/loaders/GCodeLoader.js'
+	    ]
+	}, {
+	    name: 'DRACOLoader',
+	    assets: [
+	        'assets/js/loaders/DRACOLoader.js'
+	    ]
+	}, {
+	    name: 'GLTFLoader',
+	    assets: [
+	        'assets/js/loaders/GLTFLoader.js'
+	    ]
+	}, {
+	    name: 'LegacyJSONLoader',
+	    assets: [
+	        'assets/js/loaders/deprecated/LegacyJSONLoader.js'
+	    ]
+	}, {
+	    name: 'KMZLoader',
+	    assets: [
+	        'assets/js/loaders/KMZLoader.js'
+	    ]
+	}, {
+	    name: 'MD2Loader',
+	    assets: [
+	        'assets/js/loaders/MD2Loader.js',
+	        'assets/js/MD2Character.js'
+	    ]
+	}, {
+	    name: 'OBJLoader',
+	    assets: [
+	        'assets/js/loaders/OBJLoader.js'
+	    ]
+	}, {
+	    name: 'PCDLoader',
+	    assets: [
+	        'assets/js/loaders/PCDLoader.js'
+	    ]
+	}, {
+	    name: 'PDBLoader',
+	    assets: [
+	        'assets/js/loaders/PDBLoader.js'
+	    ]
+	}, {
+	    name: 'PLYLoader',
+	    assets: [
+	        'assets/js/loaders/PLYLoader.js'
+	    ]
+	}, {
+	    name: 'PRWMLoader',
+	    assets: [
+	        'assets/js/loaders/PRWMLoader.js'
+	    ]
+	}, {
+	    name: 'STLLoader',
+	    assets: [
+	        'assets/js/loaders/STLLoader.js'
+	    ]
+	}, {
+	    name: 'TDSLoader',
+	    assets: [
+	        'assets/js/loaders/TDSLoader.js'
+	    ]
+	}, {
+	    name: 'VRMLoader',
+	    assets: [
+	        'assets/js/loaders/VRMLoader.js'
+	    ]
+	}, {
+	    name: 'VRMLLoader',
+	    assets: [
+	        'assets/js/loaders/VRMLLoader.js'
+	    ]
+	}, {
+	    name: 'VTKLoader',
+	    assets: [
+	        'assets/js/loaders/VTKLoader.js'
+	    ]
+	}, {
+	    name: 'CTMLoader',
+	    assets: [
+	        'assets/js/ctm.js',
+	        'assets/js/loaders/ctm/CTMLoader.js'
+	    ]
+	}, {
+	    name: 'XLoader',
+	    assets: [
+	        'assets/js/loaders/XLoader.js'
+	    ]
+	}, {
+	    name: 'SEA3D',
+	    assets: [
+	        'assets/js/loaders/sea3d/SEA3D.js',
+	        'assets/js/loaders/sea3d/SEA3DLZMA.js',
+	        'assets/js/loaders/sea3d/SEA3DLoader.js',
+	        'assets/js/libs/draco/draco_decoder.js',
+	        'assets/js/loaders/sea3d/SEA3DDraco.js'
+	    ]
+	}, {
+	    name: 'lzma',
+	    assets: [
+	        'assets/js/lzma.js'
+	    ]
+	}, {
+	    name: 'codemirror',
+	    assets: [
+	        'assets/css/codemirror.css',
+	        'assets/css/theme/monokai.css',
+	        'assets/js/codemirror.js',
+	        'assets/js/mode/javascript.js',
+	        'assets/js/mode/glsl.js'
+	    ]
+	}, {
+	    name: 'codemirror-addon',
+	    assets: [
+	        'assets/css/addon/dialog.css',
+	        'assets/css/addon/show-hint.css',
+	        'assets/css/addon/tern.css',
+	        'assets/js/addon/dialog.js',
+	        'assets/js/addon/show-hint.js'
+	    ]
+	}, {
+	    name: 'esprima',
+	    assets: [
+	        'assets/js/esprima.js'
+	    ]
+	}, {
+	    name: 'jsonlint',
+	    assets: [
+	        'assets/js/jsonlint.js'
+	    ]
+	}, {
+	    name: 'glslprep',
+	    assets: [
+	        'assets/js/glslprep.min.js'
+	    ]
+	}, {
+	    name: 'acorn',
+	    assets: [
+	        'assets/js/acorn/acorn.js',
+	        'assets/js/acorn/acorn_loose.js',
+	        'assets/js/acorn/walk.js'
+	    ]
+	}, {
+	    name: 'ternjs',
+	    assets: [
+	        'assets/js/addon/tern.js',
+	        'assets/js/ternjs/polyfill.js',
+	        'assets/js/ternjs/signal.js',
+	        'assets/js/ternjs/tern.js',
+	        'assets/js/ternjs/def.js',
+	        'assets/js/ternjs/comment.js',
+	        'assets/js/ternjs/infer.js',
+	        'assets/js/ternjs/doc_comment.js',
+	        'assets/js/tern-threejs/threejs.js'
+	    ]
+	}, {
+	    name: 'line',
+	    assets: [
+	        'assets/js/lines/LineSegmentsGeometry.js',
+	        'assets/js/lines/LineGeometry.js',
+	        'assets/js/lines/WireframeGeometry2.js',
+	        'assets/js/lines/LineMaterial.js',
+	        'assets/js/lines/LineSegments2.js',
+	        'assets/js/lines/Line2.js',
+	        'assets/js/lines/Wireframe.js'
+	    ]
+	}, {
+	    name: 'GLTFExporter',
+	    assets: [
+	        'assets/js/exporters/GLTFExporter.js'
+	    ]
+	}, {
+	    name: 'OBJExporter',
+	    assets: [
+	        'assets/js/exporters/OBJExporter.js'
+	    ]
+	}, {
+	    name: 'PLYExporter',
+	    assets: [
+	        'assets/js/exporters/PLYExporter.js'
+	    ]
+	}, {
+	    name: 'STLBinaryExporter',
+	    assets: [
+	        'assets/js/exporters/STLBinaryExporter.js'
+	    ]
+	}, {
+	    name: 'STLExporter',
+	    assets: [
+	        'assets/js/exporters/STLExporter.js'
+	    ]
+	}, {
+	    name: 'MMD',
+	    assets: [
+	        'assets/js/libs/mmdparser.min.js',
+	        'assets/js/loaders/MMDLoader.js',
+	        'assets/js/animation/CCDIKSolver.js',
+	        'assets/js/animation/MMDPhysics.js',
+	        'assets/js/animation/MMDAnimationHelper.js'
+	    ]
+	}, {
+	    name: 'gl-matrix',
+	    assets: [
+	        'assets/js/libs/gl-matrix.js'
+	    ]
+	}, {
+	    name: 'pako',
+	    assets: [
+	        'assets/js/libs/pako.js'
+	    ]
+	}, {
+	    name: 'NormalMapShader',
+	    assets: [
+	        'assets/js/shaders/NormalMapShader.js'
+	    ]
+	}, {
+	    name: 'FXAAShader',
+	    assets: [
+	        'assets/js/shaders/FXAAShader.js'
+	    ]
+	}, {
+	    name: 'DotScreenShader',
+	    assets: [
+	        'assets/js/shaders/DotScreenShader.js'
+	    ]
+	}, {
+	    name: 'RGBShiftShader',
+	    assets: [
+	        'assets/js/shaders/RGBShiftShader.js'
+	    ]
+	}, {
+	    name: 'AfterimageShader',
+	    assets: [
+	        'assets/js/shaders/AfterimageShader.js'
+	    ]
+	}, {
+	    name: 'BokehShader',
+	    assets: [
+	        'assets/js/shaders/BokehShader.js'
+	    ]
+	}, {
+	    name: 'DigitalGlitch',
+	    assets: [
+	        'assets/js/shaders/DigitalGlitch.js'
+	    ]
+	}, {
+	    name: 'HalftoneShader',
+	    assets: [
+	        'assets/js/shaders/HalftoneShader.js'
+	    ]
+	}, {
+	    name: 'DepthLimitedBlurShader',
+	    assets: [
+	        'assets/js/shaders/DepthLimitedBlurShader.js'
+	    ]
+	}, {
+	    name: 'UnpackDepthRGBAShader',
+	    assets: [
+	        'assets/js/shaders/UnpackDepthRGBAShader.js'
+	    ]
+	}, {
+	    name: 'PixelShader',
+	    assets: [
+	        'assets/js/shaders/PixelShader.js'
+	    ]
+	}, {
+	    name: 'SAOShader',
+	    assets: [
+	        'assets/js/shaders/SAOShader.js'
+	    ]
+	}, {
+	    name: 'SMAAShader',
+	    assets: [
+	        'assets/js/shaders/SMAAShader.js'
+	    ]
+	}, {
+	    name: 'SSAOShader',
+	    assets: [
+	        'assets/js/shaders/SSAOShader.js'
+	    ]
+	}, {
+	    name: 'MaskPass',
+	    assets: [
+	        'assets/js/postprocessing/MaskPass.js'
+	    ]
+	}, {
+	    name: 'AfterimagePass',
+	    assets: [
+	        'assets/js/postprocessing/AfterimagePass.js'
+	    ]
+	}, {
+	    name: 'BokehPass',
+	    assets: [
+	        'assets/js/postprocessing/BokehPass.js'
+	    ]
+	}, {
+	    name: 'GlitchPass',
+	    assets: [
+	        'assets/js/postprocessing/GlitchPass.js'
+	    ]
+	}, {
+	    name: 'HalftonePass',
+	    assets: [
+	        'assets/js/postprocessing/HalftonePass.js'
+	    ]
+	}, {
+	    name: 'SSAARenderPass',
+	    assets: [
+	        'assets/js/postprocessing/SSAARenderPass.js'
+	    ]
+	}, {
+	    name: 'SAOPass',
+	    assets: [
+	        'assets/js/postprocessing/SAOPass.js'
+	    ]
+	}, {
+	    name: 'SMAAPass',
+	    assets: [
+	        'assets/js/postprocessing/SMAAPass.js'
+	    ]
+	}, {
+	    name: 'SSAOPass',
+	    assets: [
+	        'assets/js/postprocessing/SSAOPass.js'
+	    ]
+	}, {
+	    name: 'TAARenderPass',
+	    assets: [
+	        'assets/js/postprocessing/TAARenderPass.js'
+	    ]
+	}, {
+	    name: 'CopyShader',
+	    assets: [
+	        'assets/js/shaders/CopyShader.js'
+	    ]
+	}, {
+	    name: 'EffectComposer',
+	    assets: [
+	        'assets/js/postprocessing/EffectComposer.js'
+	    ]
+	}, {
+	    name: 'RenderPass',
+	    assets: [
+	        'assets/js/postprocessing/RenderPass.js'
+	    ]
+	}, {
+	    name: 'ShaderPass',
+	    assets: [
+	        'assets/js/postprocessing/ShaderPass.js'
+	    ]
+	}, {
+	    name: 'OutlinePass',
+	    assets: [
+	        'assets/js/postprocessing/OutlinePass.js'
+	    ]
+	}, {
+	    name: 'SAOPass',
+	    assets: [
+	        'assets/js/postprocessing/SAOPass.js'
+	    ]
+	}, {
+	    name: 'SSAOPass',
+	    assets: [
+	        'assets/js/postprocessing/SSAOPass.js'
+	    ]
+	}, {
+	    name: 'FirstPersonControls',
+	    assets: [
+	        'assets/js/controls/FirstPersonControls.js'
+	    ]
+	}, {
+	    name: 'FlyControls',
+	    assets: [
+	        'assets/js/controls/FlyControls.js'
+	    ]
+	}, {
+	    name: 'EditorControls',
+	    assets: [
+	        'assets/js/controls/EditorControls.js'
+	    ]
+	}, {
+	    name: 'OrbitControls',
+	    assets: [
+	        'assets/js/controls/OrbitControls.js'
+	    ]
+	}, {
+	    name: 'PointerLockControls',
+	    assets: [
+	        'assets/js/controls/PointerLockControls.js'
+	    ]
+	}, {
+	    name: 'TrackballControls',
+	    assets: [
+	        'assets/js/controls/TrackballControls.js'
+	    ]
+	}, {
+	    name: 'TransformControls',
+	    assets: [
+	        'assets/js/controls/TransformControls.js'
+	    ]
+	}, {
+	    name: 'SPE',
+	    assets: [
+	        'assets/js/SPE.js'
+	    ]
+	}, {
+	    name: 'VolumetricFire',
+	    assets: [
+	        'assets/js/VolumetricFire.js'
+	    ]
+	}, {
+	    name: 'ammo',
+	    assets: [
+	        'assets/js/libs/ammo.js'
+	    ]
+	}];
+
+	/**
+	 * CSS下载器
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function CssLoader() {
+
+	}
+	CssLoader.prototype.load = function (url) {
+	    var head = document.getElementsByTagName('head')[0];
+	    var link = document.createElement('link');
+	    link.type = 'text/css';
+	    link.rel = 'stylesheet';
+	    link.href = url;
+	    head.appendChild(link);
+
+	    return new Promise(resolve => {
+	        link.onload = event => {
+	            link.onload = link.onerror = null;
+	            resolve(link);
+	        };
+	        link.onerror = event => {
+	            link.onload = link.onerror = null;
+	            console.warn(`CssLoader: ${url} loaded failed.`);
+	            resolve(null);
+	        };
+	    });
+	};
+
+	/**
+	 * JS下载器
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function JsLoader() {
+	    this.assets = [];
+	}
+	JsLoader.prototype.load = function (url) {
+	    var data = {
+	        url,
+	        script: null
+	    };
+	    this.assets.push(data);
+	    return new Promise(resolve => {
+	        fetch(url).then(response => {
+	            if (response.ok) {
+	                response.text().then(text => {
+	                    data.script = text;
+	                    resolve(data);
+	                });
+	            } else {
+	                console.warn(`JsLoader: ${url} loaded failed.`);
+	                resolve(null);
+	            }
+	        }).catch(() => {
+	            console.warn(`JsLoader: ${url} loaded failed.`);
+	            resolve(null);
+	        });
+	    });
+	};
+
+	JsLoader.prototype.eval = function () {
+	    var eval2 = eval;
+
+	    var script = '';
+
+	    this.assets.forEach(n => {
+	        if (n.script) {
+	            script += n.script + '\n';
+	        }
+	    });
+
+	    if (script) {
+	        eval2.call(window, script);
+	    }
+	};
+
+	const loaded = new Map();
+
+	/**
+	 * 包管理器
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function PackageManager() {
+
+	}
+	/**
+	 * 加载包
+	 * @param {*} names 包名或包名列表
+	 */
+	PackageManager.prototype.require = function (names) {
+	    names = Array.isArray(names) ? names : [names];
+
+	    var promises = [];
+
+	    names.forEach(n => {
+	        if (loaded.has(n) && loaded.get(n).loading === true) {
+	            promises.push(loaded.get(n).promise);
+	        } else if (!loaded.has(n)) {
+	            var promise = Promise.all(promises).then(() => {
+	                var packages = PackageList.filter(m => m.name === n);
+	                if (packages.length === 0) {
+	                    console.warn(`PackageManager: ${n} does not exist.`);
+	                    return;
+	                } else if (packages.length > 1) {
+	                    console.warn(`PackageManager: Package name ${n} duplicated.`);
+	                }
+
+	                var assets = [];
+
+	                packages.forEach(m => {
+	                    assets.push.apply(assets, m.assets);
+	                });
+
+	                return this._load(assets).then(() => {
+	                    loaded.set(n, {
+	                        loading: false,
+	                        loaded: true,
+	                        promise: null,
+	                    });
+	                    return new Promise(resolve => {
+	                        resolve();
+	                    });
+	                });
+	            });
+	            loaded.set(n, {
+	                loading: true,
+	                loaded: false,
+	                promise: promise,
+	            });
+	            promises.push(promise);
+	        }
+	    });
+
+	    return Promise.all(promises);
+	};
+
+	PackageManager.prototype._load = function (assets = []) {
+	    var cssLoader = new CssLoader();
+	    var jsLoader = new JsLoader();
+
+	    var promises = assets.map(n => {
+	        if (n.toLowerCase().endsWith('.css')) {
+	            return cssLoader.load(n);
+	        } else if (n.toLowerCase().endsWith('.js')) {
+	            return jsLoader.load(n);
+	        } else {
+	            console.warn(`PackageManager: unknown assets ${n}.`);
+	            return new Promise(resolve => {
+	                resolve();
+	            });
+	        }
+	    });
+
+	    return Promise.all(promises).then(() => {
+	        jsLoader.eval();
+	        return new Promise(resolve => {
+	            resolve();
+	        });
+	    });
+	};
 
 	/**
 	 * 场景序列化信息
@@ -6530,636 +7308,6 @@
 	    obj.z = json.z;
 
 	    return obj;
-	};
-
-	const PackageList = [{
-	    name: 'NRRDLoader',
-	    assets: [
-	        'assets/js/Volume.js',
-	        'assets/js/VolumeSlice.js',
-	        'assets/js/loaders/NRRDLoader.js'
-	    ]
-	}, {
-	    name: '3MFLoader',
-	    assets: [
-	        'assets/js/loaders/3MFLoader.js'
-	    ]
-	}, {
-	    name: 'AMFLoader',
-	    assets: [
-	        'assets/js/loaders/AMFLoader.js'
-	    ]
-	}, {
-	    name: 'AssimpLoader',
-	    assets: [
-	        'assets/js/loaders/AssimpLoader.js'
-	    ]
-	}, {
-	    name: 'AWDLoader',
-	    assets: [
-	        'assets/js/loaders/AWDLoader.js'
-	    ]
-	}, {
-	    name: 'BabylonLoader',
-	    assets: [
-	        'assets/js/loaders/BabylonLoader.js'
-	    ]
-	}, {
-	    name: 'BinaryLoader',
-	    assets: [
-	        'assets/js/loaders/BinaryLoader.js'
-	    ]
-	}, {
-	    name: 'BVHLoader',
-	    assets: [
-	        'assets/js/loaders/BVHLoader.js'
-	    ]
-	}, {
-	    name: 'ColladaLoader',
-	    assets: [
-	        'assets/js/loaders/ColladaLoader.js'
-	    ]
-	}, {
-	    name: 'FBXLoader',
-	    assets: [
-	        'assets/js/curves/NURBSCurve.js',
-	        'assets/js/curves/NURBSUtils.js',
-	        'assets/js/loaders/FBXLoader.js'
-	    ]
-	}, {
-	    name: 'GCodeLoader',
-	    assets: [
-	        'assets/js/loaders/GCodeLoader.js'
-	    ]
-	}, {
-	    name: 'DRACOLoader',
-	    assets: [
-	        'assets/js/loaders/DRACOLoader.js'
-	    ]
-	}, {
-	    name: 'GLTFLoader',
-	    assets: [
-	        'assets/js/loaders/GLTFLoader.js'
-	    ]
-	}, {
-	    name: 'LegacyJSONLoader',
-	    assets: [
-	        'assets/js/loaders/deprecated/LegacyJSONLoader.js'
-	    ]
-	}, {
-	    name: 'KMZLoader',
-	    assets: [
-	        'assets/js/loaders/KMZLoader.js'
-	    ]
-	}, {
-	    name: 'MD2Loader',
-	    assets: [
-	        'assets/js/loaders/MD2Loader.js',
-	        'assets/js/MD2Character.js'
-	    ]
-	}, {
-	    name: 'OBJLoader',
-	    assets: [
-	        'assets/js/loaders/OBJLoader.js'
-	    ]
-	}, {
-	    name: 'PCDLoader',
-	    assets: [
-	        'assets/js/loaders/PCDLoader.js'
-	    ]
-	}, {
-	    name: 'PDBLoader',
-	    assets: [
-	        'assets/js/loaders/PDBLoader.js'
-	    ]
-	}, {
-	    name: 'PLYLoader',
-	    assets: [
-	        'assets/js/loaders/PLYLoader.js'
-	    ]
-	}, {
-	    name: 'PRWMLoader',
-	    assets: [
-	        'assets/js/loaders/PRWMLoader.js'
-	    ]
-	}, {
-	    name: 'STLLoader',
-	    assets: [
-	        'assets/js/loaders/STLLoader.js'
-	    ]
-	}, {
-	    name: 'TDSLoader',
-	    assets: [
-	        'assets/js/loaders/TDSLoader.js'
-	    ]
-	}, {
-	    name: 'VRMLoader',
-	    assets: [
-	        'assets/js/loaders/VRMLoader.js'
-	    ]
-	}, {
-	    name: 'VRMLLoader',
-	    assets: [
-	        'assets/js/loaders/VRMLLoader.js'
-	    ]
-	}, {
-	    name: 'VTKLoader',
-	    assets: [
-	        'assets/js/loaders/VTKLoader.js'
-	    ]
-	}, {
-	    name: 'CTMLoader',
-	    assets: [
-	        'assets/js/ctm.js',
-	        'assets/js/loaders/ctm/CTMLoader.js'
-	    ]
-	}, {
-	    name: 'XLoader',
-	    assets: [
-	        'assets/js/loaders/XLoader.js'
-	    ]
-	}, {
-	    name: 'SEA3D',
-	    assets: [
-	        'assets/js/loaders/sea3d/SEA3D.js',
-	        'assets/js/loaders/sea3d/SEA3DLZMA.js',
-	        'assets/js/loaders/sea3d/SEA3DLoader.js',
-	        'assets/js/libs/draco/draco_decoder.js',
-	        'assets/js/loaders/sea3d/SEA3DDraco.js'
-	    ]
-	}, {
-	    name: 'lzma',
-	    assets: [
-	        'assets/js/lzma.js'
-	    ]
-	}, {
-	    name: 'codemirror',
-	    assets: [
-	        'assets/css/codemirror.css',
-	        'assets/css/theme/monokai.css',
-	        'assets/js/codemirror.js',
-	        'assets/js/mode/javascript.js',
-	        'assets/js/mode/glsl.js'
-	    ]
-	}, {
-	    name: 'codemirror-addon',
-	    assets: [
-	        'assets/css/addon/dialog.css',
-	        'assets/css/addon/show-hint.css',
-	        'assets/css/addon/tern.css',
-	        'assets/js/addon/dialog.js',
-	        'assets/js/addon/show-hint.js'
-	    ]
-	}, {
-	    name: 'esprima',
-	    assets: [
-	        'assets/js/esprima.js'
-	    ]
-	}, {
-	    name: 'jsonlint',
-	    assets: [
-	        'assets/js/jsonlint.js'
-	    ]
-	}, {
-	    name: 'glslprep',
-	    assets: [
-	        'assets/js/glslprep.min.js'
-	    ]
-	}, {
-	    name: 'acorn',
-	    assets: [
-	        'assets/js/acorn/acorn.js',
-	        'assets/js/acorn/acorn_loose.js',
-	        'assets/js/acorn/walk.js'
-	    ]
-	}, {
-	    name: 'ternjs',
-	    assets: [
-	        'assets/js/addon/tern.js',
-	        'assets/js/ternjs/polyfill.js',
-	        'assets/js/ternjs/signal.js',
-	        'assets/js/ternjs/tern.js',
-	        'assets/js/ternjs/def.js',
-	        'assets/js/ternjs/comment.js',
-	        'assets/js/ternjs/infer.js',
-	        'assets/js/ternjs/doc_comment.js',
-	        'assets/js/tern-threejs/threejs.js'
-	    ]
-	}, {
-	    name: 'line',
-	    assets: [
-	        'assets/js/lines/LineSegmentsGeometry.js',
-	        'assets/js/lines/LineGeometry.js',
-	        'assets/js/lines/WireframeGeometry2.js',
-	        'assets/js/lines/LineMaterial.js',
-	        'assets/js/lines/LineSegments2.js',
-	        'assets/js/lines/Line2.js',
-	        'assets/js/lines/Wireframe.js'
-	    ]
-	}, {
-	    name: 'GLTFExporter',
-	    assets: [
-	        'assets/js/exporters/GLTFExporter.js'
-	    ]
-	}, {
-	    name: 'OBJExporter',
-	    assets: [
-	        'assets/js/exporters/OBJExporter.js'
-	    ]
-	}, {
-	    name: 'PLYExporter',
-	    assets: [
-	        'assets/js/exporters/PLYExporter.js'
-	    ]
-	}, {
-	    name: 'STLBinaryExporter',
-	    assets: [
-	        'assets/js/exporters/STLBinaryExporter.js'
-	    ]
-	}, {
-	    name: 'STLExporter',
-	    assets: [
-	        'assets/js/exporters/STLExporter.js'
-	    ]
-	}, {
-	    name: 'MMD',
-	    assets: [
-	        'assets/js/libs/mmdparser.min.js',
-	        'assets/js/loaders/MMDLoader.js',
-	        'assets/js/animation/CCDIKSolver.js',
-	        'assets/js/animation/MMDPhysics.js',
-	        'assets/js/animation/MMDAnimationHelper.js'
-	    ]
-	}, {
-	    name: 'gl-matrix',
-	    assets: [
-	        'assets/js/libs/gl-matrix.js'
-	    ]
-	}, {
-	    name: 'pako',
-	    assets: [
-	        'assets/js/libs/pako.js'
-	    ]
-	}, {
-	    name: 'NormalMapShader',
-	    assets: [
-	        'assets/js/shaders/NormalMapShader.js'
-	    ]
-	}, {
-	    name: 'FXAAShader',
-	    assets: [
-	        'assets/js/shaders/FXAAShader.js'
-	    ]
-	}, {
-	    name: 'DotScreenShader',
-	    assets: [
-	        'assets/js/shaders/DotScreenShader.js'
-	    ]
-	}, {
-	    name: 'RGBShiftShader',
-	    assets: [
-	        'assets/js/shaders/RGBShiftShader.js'
-	    ]
-	}, {
-	    name: 'AfterimageShader',
-	    assets: [
-	        'assets/js/shaders/AfterimageShader.js'
-	    ]
-	}, {
-	    name: 'BokehShader',
-	    assets: [
-	        'assets/js/shaders/BokehShader.js'
-	    ]
-	}, {
-	    name: 'DigitalGlitch',
-	    assets: [
-	        'assets/js/shaders/DigitalGlitch.js'
-	    ]
-	}, {
-	    name: 'HalftoneShader',
-	    assets: [
-	        'assets/js/shaders/HalftoneShader.js'
-	    ]
-	}, {
-	    name: 'DepthLimitedBlurShader',
-	    assets: [
-	        'assets/js/shaders/DepthLimitedBlurShader.js'
-	    ]
-	}, {
-	    name: 'UnpackDepthRGBAShader',
-	    assets: [
-	        'assets/js/shaders/UnpackDepthRGBAShader.js'
-	    ]
-	}, {
-	    name: 'PixelShader',
-	    assets: [
-	        'assets/js/shaders/PixelShader.js'
-	    ]
-	}, {
-	    name: 'SAOShader',
-	    assets: [
-	        'assets/js/shaders/SAOShader.js'
-	    ]
-	}, {
-	    name: 'SMAAShader',
-	    assets: [
-	        'assets/js/shaders/SMAAShader.js'
-	    ]
-	}, {
-	    name: 'SSAOShader',
-	    assets: [
-	        'assets/js/shaders/SSAOShader.js'
-	    ]
-	}, {
-	    name: 'MaskPass',
-	    assets: [
-	        'assets/js/postprocessing/MaskPass.js'
-	    ]
-	}, {
-	    name: 'AfterimagePass',
-	    assets: [
-	        'assets/js/postprocessing/AfterimagePass.js'
-	    ]
-	}, {
-	    name: 'BokehPass',
-	    assets: [
-	        'assets/js/postprocessing/BokehPass.js'
-	    ]
-	}, {
-	    name: 'GlitchPass',
-	    assets: [
-	        'assets/js/postprocessing/GlitchPass.js'
-	    ]
-	}, {
-	    name: 'HalftonePass',
-	    assets: [
-	        'assets/js/postprocessing/HalftonePass.js'
-	    ]
-	}, {
-	    name: 'SSAARenderPass',
-	    assets: [
-	        'assets/js/postprocessing/SSAARenderPass.js'
-	    ]
-	}, {
-	    name: 'SAOPass',
-	    assets: [
-	        'assets/js/postprocessing/SAOPass.js'
-	    ]
-	}, {
-	    name: 'SMAAPass',
-	    assets: [
-	        'assets/js/postprocessing/SMAAPass.js'
-	    ]
-	}, {
-	    name: 'SSAOPass',
-	    assets: [
-	        'assets/js/postprocessing/SSAOPass.js'
-	    ]
-	}, {
-	    name: 'TAARenderPass',
-	    assets: [
-	        'assets/js/postprocessing/TAARenderPass.js'
-	    ]
-	}, {
-	    name: 'CopyShader',
-	    assets: [
-	        'assets/js/shaders/CopyShader.js'
-	    ]
-	}, {
-	    name: 'EffectComposer',
-	    assets: [
-	        'assets/js/postprocessing/EffectComposer.js'
-	    ]
-	}, {
-	    name: 'RenderPass',
-	    assets: [
-	        'assets/js/postprocessing/RenderPass.js'
-	    ]
-	}, {
-	    name: 'ShaderPass',
-	    assets: [
-	        'assets/js/postprocessing/ShaderPass.js'
-	    ]
-	}, {
-	    name: 'OutlinePass',
-	    assets: [
-	        'assets/js/postprocessing/OutlinePass.js'
-	    ]
-	}, {
-	    name: 'SAOPass',
-	    assets: [
-	        'assets/js/postprocessing/SAOPass.js'
-	    ]
-	}, {
-	    name: 'SSAOPass',
-	    assets: [
-	        'assets/js/postprocessing/SSAOPass.js'
-	    ]
-	}, {
-	    name: 'FirstPersonControls',
-	    assets: [
-	        'assets/js/controls/FirstPersonControls.js'
-	    ]
-	}, {
-	    name: 'FlyControls',
-	    assets: [
-	        'assets/js/controls/FlyControls.js'
-	    ]
-	}, {
-	    name: 'EditorControls',
-	    assets: [
-	        'assets/js/controls/EditorControls.js'
-	    ]
-	}, {
-	    name: 'OrbitControls',
-	    assets: [
-	        'assets/js/controls/OrbitControls.js'
-	    ]
-	}, {
-	    name: 'PointerLockControls',
-	    assets: [
-	        'assets/js/controls/PointerLockControls.js'
-	    ]
-	}, {
-	    name: 'TrackballControls',
-	    assets: [
-	        'assets/js/controls/TrackballControls.js'
-	    ]
-	}, {
-	    name: 'TransformControls',
-	    assets: [
-	        'assets/js/controls/TransformControls.js'
-	    ]
-	}, {
-	    name: 'SPE',
-	    assets: [
-	        'assets/js/SPE.js'
-	    ]
-	}, {
-	    name: 'VolumetricFire',
-	    assets: [
-	        'assets/js/VolumetricFire.js'
-	    ]
-	}];
-
-	/**
-	 * CSS下载器
-	 * @author tengge / https://github.com/tengge1
-	 */
-	function CssLoader() {
-
-	}
-	CssLoader.prototype.load = function (url) {
-	    var head = document.getElementsByTagName('head')[0];
-	    var link = document.createElement('link');
-	    link.type = 'text/css';
-	    link.rel = 'stylesheet';
-	    link.href = url;
-	    head.appendChild(link);
-
-	    return new Promise(resolve => {
-	        link.onload = event => {
-	            link.onload = link.onerror = null;
-	            resolve(link);
-	        };
-	        link.onerror = event => {
-	            link.onload = link.onerror = null;
-	            console.warn(`CssLoader: ${url} loaded failed.`);
-	            resolve(null);
-	        };
-	    });
-	};
-
-	/**
-	 * JS下载器
-	 * @author tengge / https://github.com/tengge1
-	 */
-	function JsLoader() {
-	    this.assets = [];
-	}
-	JsLoader.prototype.load = function (url) {
-	    var data = {
-	        url,
-	        script: null
-	    };
-	    this.assets.push(data);
-	    return new Promise(resolve => {
-	        fetch(url).then(response => {
-	            if (response.ok) {
-	                response.text().then(text => {
-	                    data.script = text;
-	                    resolve(data);
-	                });
-	            } else {
-	                console.warn(`JsLoader: ${url} loaded failed.`);
-	                resolve(null);
-	            }
-	        }).catch(() => {
-	            console.warn(`JsLoader: ${url} loaded failed.`);
-	            resolve(null);
-	        });
-	    });
-	};
-
-	JsLoader.prototype.eval = function () {
-	    var eval2 = eval;
-
-	    var script = '';
-
-	    this.assets.forEach(n => {
-	        if (n.script) {
-	            script += n.script + '\n';
-	        }
-	    });
-
-	    if (script) {
-	        eval2.call(window, script);
-	    }
-	};
-
-	const loaded = new Map();
-
-	/**
-	 * 包管理器
-	 * @author tengge / https://github.com/tengge1
-	 */
-	function PackageManager() {
-
-	}
-	/**
-	 * 加载包
-	 * @param {*} names 包名或包名列表
-	 */
-	PackageManager.prototype.require = function (names) {
-	    names = Array.isArray(names) ? names : [names];
-
-	    var promises = [];
-
-	    names.forEach(n => {
-	        if (loaded.has(n) && loaded.get(n).loading === true) {
-	            promises.push(loaded.get(n).promise);
-	        } else if (!loaded.has(n)) {
-	            var promise = Promise.all(promises).then(() => {
-	                var packages = PackageList.filter(m => m.name === n);
-	                if (packages.length === 0) {
-	                    console.warn(`PackageManager: ${n} does not exist.`);
-	                    return;
-	                } else if (packages.length > 1) {
-	                    console.warn(`PackageManager: Package name ${n} duplicated.`);
-	                }
-
-	                var assets = [];
-
-	                packages.forEach(m => {
-	                    assets.push.apply(assets, m.assets);
-	                });
-
-	                return this._load(assets).then(() => {
-	                    loaded.set(n, {
-	                        loading: false,
-	                        loaded: true,
-	                        promise: null,
-	                    });
-	                    return new Promise(resolve => {
-	                        resolve();
-	                    });
-	                });
-	            });
-	            loaded.set(n, {
-	                loading: true,
-	                loaded: false,
-	                promise: promise,
-	            });
-	            promises.push(promise);
-	        }
-	    });
-
-	    return Promise.all(promises);
-	};
-
-	PackageManager.prototype._load = function (assets = []) {
-	    var cssLoader = new CssLoader();
-	    var jsLoader = new JsLoader();
-
-	    var promises = assets.map(n => {
-	        if (n.toLowerCase().endsWith('.css')) {
-	            return cssLoader.load(n);
-	        } else if (n.toLowerCase().endsWith('.js')) {
-	            return jsLoader.load(n);
-	        } else {
-	            console.warn(`PackageManager: unknown assets ${n}.`);
-	            return new Promise(resolve => {
-	                resolve();
-	            });
-	        }
-	    });
-
-	    return Promise.all(promises).then(() => {
-	        jsLoader.eval();
-	        return new Promise(resolve => {
-	            resolve();
-	        });
-	    });
 	};
 
 	var ID$2 = -1;
@@ -12859,6 +13007,27 @@
 	};
 
 	/**
+	 * VisualSerializer
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function VisualSerializer() {
+	    BaseSerializer.call(this);
+	}
+
+	VisualSerializer.prototype = Object.create(BaseSerializer.prototype);
+	VisualSerializer.prototype.constructor = VisualSerializer;
+
+	VisualSerializer.prototype.toJSON = function (obj) {
+	    var json = BaseSerializer.prototype.toJSON.call(this, obj);
+	    json.data = obj.toJSON();
+	    return json;
+	};
+
+	VisualSerializer.prototype.fromJSON = function (json) {
+	    return json.data ? json.data : null;
+	};
+
+	/**
 	 * 场景序列化/反序列化类
 	 * @author tengge / https://github.com/tengge1
 	 */
@@ -12871,8 +13040,15 @@
 
 	/**
 	 * 将应用转为json
-	 * @param {*} obj 格式：{ options: options, camera: camera, renderer: renderer, scripts: scripts, scene: scene }
-	 * @param {*} obj.server 服务端地址
+	 * @param {Object} obj 需要序列化的对象
+	 * @param {Object} obj.options 配置信息
+	 * @param {THREE.Camera} obj.camera 相机
+	 * @param {THREE.WebGLRenderer} obj.renderer 渲染器 
+	 * @param {Array} obj.scripts 脚本列表
+	 * @param {Array} obj.animations 动画列表
+	 * @param {Object} obj.visual 可视化数据
+	 * @param {THREE.Scene} obj.scene 场景
+	 * @param {String} obj.server 服务端地址
 	 */
 	Converter.prototype.toJSON = function (obj) {
 	    var options = obj.options;
@@ -12880,6 +13056,7 @@
 	    var renderer = obj.renderer;
 	    var scripts = obj.scripts;
 	    var animations = obj.animations;
+	    var visual = obj.visual;
 	    var scene = obj.scene;
 
 	    var list = [];
@@ -12913,6 +13090,12 @@
 	    if (audioListener) {
 	        var audioListenerJson = (new AudioListenerSerializer()).toJSON(audioListener);
 	        list.push(audioListenerJson);
+	    }
+
+	    // 可视化
+	    if (visual) {
+	        var visualJson = (new VisualSerializer()).toJSON(visual);
+	        list.push(visualJson);
 	    }
 
 	    // 场景
@@ -13014,7 +13197,8 @@
 	        renderer: null,
 	        scripts: null,
 	        animations: [],
-	        scene: null
+	        svg: { html: '' },
+	        scene: null,
 	    };
 
 	    // 选项
@@ -13059,6 +13243,12 @@
 	    var animationJsons = jsons.filter(n => n.metadata && n.metadata.generator === 'AnimationSerializer');
 	    if (animationJsons) {
 	        obj.animations = (new AnimationSerializer()).fromJSON(animationJsons);
+	    }
+
+	    // Visual
+	    var visualJson = jsons.filter(n => n.metadata && n.metadata.generator === 'VisualSerializer')[0];
+	    if (visualJson) {
+	        obj.visual = (new VisualSerializer()).fromJSON(visualJson);
 	    }
 
 	    // 音频监听器
@@ -13194,6 +13384,10 @@
 	                    break;
 	                case 'EllipseCurveSerializer':
 	                    obj = (new EllipseCurveSerializer()).fromJSON(objJson);
+	                    break;
+	                case 'GlobeSerializer':
+	                    //obj = (new GlobeSerializer()).fromJSON(objJson);
+	                    return true;
 	                    break;
 	            }
 
@@ -14879,29 +15073,29 @@
 	    return body;
 	};
 
-	const shape = {
-	    btBoxShape: Ammo.btBoxShape, // 正方体
-	    btBvhTriangleMeshShape: Ammo.btBvhTriangleMeshShape, // 三角形
-	    btCapsuleShape: Ammo.btCapsuleShape, // 胶囊
-	    btCapsuleShapeX: Ammo.btCapsuleShapeX, // x轴胶囊
-	    btCapsuleShapeZ: Ammo.btCapsuleShapeZ, // z轴胶囊
-	    btCollisionShape: Ammo.btCollisionShape, // 碰撞体
-	    btCompoundShape: Ammo.btCompoundShape, // 复合形状
-	    btConcaveShape: Ammo.btConcaveShape, // 
-	    btConeShape: Ammo.btConeShape, // 圆锥体
-	    btConeShapeX: Ammo.btConeShapeX, // x轴圆椎体
-	    btConeShapeZ: Ammo.btConeShapeZ, // z轴圆椎体
-	    btConvexHullShape: Ammo.btConvexHullShape, // 凸包
-	    btConvexShape: Ammo.btConvexShape, // 
-	    btConvexTriangleMeshShape: Ammo.btConvexTriangleMeshShape, // 凸三角形
-	    btCylinderShape: Ammo.btCylinderShape, // 圆柱体
-	    btCylinderShapeX: Ammo.btCylinderShapeX, // x轴圆柱体
-	    btCylinderShapeZ: Ammo.btCylinderShapeZ, // z轴圆柱体
-	    btHeightfieldTerrainShape: Ammo.btHeightfieldTerrainShape, // 灰阶高程地形
-	    btSphereShape: Ammo.btSphereShape, // 球体
-	    btStaticPlaneShape: Ammo.btStaticPlaneShape, // 静态平板
-	    btTriangleMeshShape: Ammo.btTriangleMeshShape, // 三角网格
-	};
+	// const shape = {
+	//     btBoxShape: Ammo.btBoxShape, // 正方体
+	//     btBvhTriangleMeshShape: Ammo.btBvhTriangleMeshShape, // 三角形
+	//     btCapsuleShape: Ammo.btCapsuleShape, // 胶囊
+	//     btCapsuleShapeX: Ammo.btCapsuleShapeX, // x轴胶囊
+	//     btCapsuleShapeZ: Ammo.btCapsuleShapeZ, // z轴胶囊
+	//     btCollisionShape: Ammo.btCollisionShape, // 碰撞体
+	//     btCompoundShape: Ammo.btCompoundShape, // 复合形状
+	//     btConcaveShape: Ammo.btConcaveShape, // 
+	//     btConeShape: Ammo.btConeShape, // 圆锥体
+	//     btConeShapeX: Ammo.btConeShapeX, // x轴圆椎体
+	//     btConeShapeZ: Ammo.btConeShapeZ, // z轴圆椎体
+	//     btConvexHullShape: Ammo.btConvexHullShape, // 凸包
+	//     btConvexShape: Ammo.btConvexShape, // 
+	//     btConvexTriangleMeshShape: Ammo.btConvexTriangleMeshShape, // 凸三角形
+	//     btCylinderShape: Ammo.btCylinderShape, // 圆柱体
+	//     btCylinderShapeX: Ammo.btCylinderShapeX, // x轴圆柱体
+	//     btCylinderShapeZ: Ammo.btCylinderShapeZ, // z轴圆柱体
+	//     btHeightfieldTerrainShape: Ammo.btHeightfieldTerrainShape, // 灰阶高程地形
+	//     btSphereShape: Ammo.btSphereShape, // 球体
+	//     btStaticPlaneShape: Ammo.btStaticPlaneShape, // 静态平板
+	//     btTriangleMeshShape: Ammo.btTriangleMeshShape, // 三角网格
+	// };
 
 	/**
 	 * 播放器物理
@@ -14909,7 +15103,43 @@
 	 */
 	function PlayerPhysics(app) {
 	    PlayerComponent.call(this, app);
+	}
 
+	PlayerPhysics.prototype = Object.create(PlayerComponent.prototype);
+	PlayerPhysics.prototype.constructor = PlayerPhysics;
+
+	PlayerPhysics.prototype.create = function (scene, camera, renderer) {
+	    var usePhysics = false;
+
+	    this.scene = scene;
+
+	    this.scene.traverse(n => {
+	        if (n.userData &&
+	            n.userData.physics &&
+	            n.userData.physics.enabled
+	        ) {
+	            usePhysics = true;
+	        }
+	    });
+
+	    // 未使用物理
+	    if (!usePhysics) {
+	        return new Promise(resolve => {
+	            resolve();
+	        });
+	    }
+
+	    // 使用物理
+	    return new Promise(resolve => {
+	        this.app.require('ammo').then(() => {
+	            this.initPhysicsWorld();
+	            this.initScene(scene, camera, renderer);
+	            resolve();
+	        });
+	    });
+	};
+
+	PlayerPhysics.prototype.initPhysicsWorld = function () {
 	    // 各种参数
 	    var gravityConstant = -9.8; // 重力常数
 	    this.margin = 0.05; // 两个物体之间最小间距
@@ -14945,17 +15175,12 @@
 
 	    // api函数
 	    // TODO: 很难受的实现
-	    Object.assign(app, {
+	    Object.assign(this.app, {
 	        addPhysicsObject: this.addPhysicsObject.bind(this)
 	    });
-	}
+	};
 
-	PlayerPhysics.prototype = Object.create(PlayerComponent.prototype);
-	PlayerPhysics.prototype.constructor = PlayerPhysics;
-
-	PlayerPhysics.prototype.create = function (scene, camera, renderer) {
-	    this.scene = scene;
-
+	PlayerPhysics.prototype.initScene = function (scene, camera, renderer) {
 	    this.scene.traverse(n => {
 	        if (n.userData &&
 	            n.userData.physics &&
@@ -14993,13 +15218,13 @@
 	    this.events.forEach(n => {
 	        n.create(scene, camera, renderer);
 	    });
-
-	    return new Promise(resolve => {
-	        resolve();
-	    });
 	};
 
 	PlayerPhysics.prototype.update = function (clock, deltaTime) {
+	    if (!this.world) {
+	        return;
+	    }
+
 	    this.world.stepSimulation(deltaTime, 10);
 
 	    // 更新柔软体
@@ -15073,23 +15298,27 @@
 	};
 
 	PlayerPhysics.prototype.dispose = function () {
-	    this.events.forEach(n => {
+	    this.events && this.events.forEach(n => {
 	        n.dispose();
 	    });
 
-	    this.rigidBodies.forEach(n => {
-	        var body = n.userData.physics.body;
-	        this.world.removeRigidBody(body);
-	    });
+	    if (this.rigidBodies) {
+	        this.rigidBodies.forEach(n => {
+	            var body = n.userData.physics.body;
+	            this.world.removeRigidBody(body);
+	        });
 
-	    this.rigidBodies.length = 0;
+	        this.rigidBodies.length = 0;
+	    }
 
-	    this.softBodies.forEach(n => {
-	        var body = n.userData.physics.body;
-	        this.world.removeRigidBody(body);
-	    });
+	    if (this.softBodies) {
+	        this.softBodies.forEach(n => {
+	            var body = n.userData.physics.body;
+	            this.world.removeRigidBody(body);
+	        });
 
-	    this.softBodies.length = 0;
+	        this.softBodies.length = 0;
+	    }
 
 	    this.scene.traverse(n => {
 	        if (n.userData && n.userData.physics) {
@@ -15887,6 +16116,7 @@
 	        xyz = new THREE.Vector3();
 	    }
 
+	    // 可用THREE.Vector3.prototype.setFromSphericalCoords实现？
 	    return xyz.set(
 	        r * Math.cos(lat) * Math.cos(lon),
 	        r * Math.sin(lat),
@@ -15956,7 +16186,7 @@
 	 * @param {Number} zoom 层级
 	 */
 	function zoomToAlt(zoom) {
-	    return 7820683 / 2 ** zoom;
+	    return 7820683 / 2 ** (zoom - 3);
 	}
 
 	/**
@@ -15964,7 +16194,7 @@
 	 * @param {Number} alt 海拔
 	 */
 	function altToZoom(alt) {
-	    return Math.log2(7820683 / alt);
+	    return Math.log2(7820683 / alt) + 3;
 	}
 
 	/**
@@ -16133,7 +16363,7 @@
 	SphereTileCreator.prototype.get = function (tiles) {
 	    tiles.length = 0;
 
-	    this._centerZoom = ~~GeoUtils.altToZoom(this.camera.position.length() - WGS84.a) + 3;
+	    this._centerZoom = ~~GeoUtils.altToZoom(this.camera.position.length() - WGS84.a);
 
 	    this.fork(0, 0, 1, tiles);
 	    this.fork(1, 0, 1, tiles);
@@ -16174,6 +16404,10 @@
 	 */
 	SphereTileCreator.prototype.fork = function (x, y, z, tiles) {
 	    var tile = this.getTile(x, y, z);
+
+	    // if (z > 20) { // 最大20层级
+	    //     return;
+	    // }
 
 	    if (!this.isVisible(tile)) {
 	        return;
@@ -16670,22 +16904,28 @@
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} camera 相机
 	 * @param {*} domElement 文档
+	 * @description 鼠标的旋转和缩放操作，都应该转换为对相机的操作
 	 */
 	function OrbitViewer(camera, domElement) {
 	    Viewer.call(this, camera, domElement);
 
-	    this.sphere = new THREE.Sphere(undefined, WGS84.a);
-	    this.ray = new THREE.Ray();
-
+	    // 碰撞判断
 	    this.isDown = false;
 	    this.isPan = false;
 
-	    this.intersectPoint = new THREE.Vector3();
+	    this.sphere = new THREE.Sphere(undefined, WGS84.a);
+	    this.intersectPoint = new THREE.Vector3(); // 碰撞点
+
+	    // 视场
 	    this.aabb = new THREE.Box2(
 	        new THREE.Vector2(-Math.PI, -Math.PI / 2),
 	        new THREE.Vector2(Math.PI, Math.PI / 2),
 	    );
 
+	    // 动画参数
+	    this.rotationSpeed = new THREE.Vector3();
+
+	    // 事件绑定
 	    this.onMouseDown = this.onMouseDown.bind(this);
 	    this.onMouseMove = this.onMouseMove.bind(this);
 	    this.onMouseUp = this.onMouseUp.bind(this);
@@ -16695,6 +16935,9 @@
 	    this.domElement.addEventListener('mousemove', this.onMouseMove);
 	    document.body.addEventListener('mouseup', this.onMouseUp);
 	    this.domElement.addEventListener('mousewheel', this.onMouseWheel);
+
+	    // 初始化
+	    this._updateAABB();
 	}
 	OrbitViewer.prototype = Object.create(Viewer.prototype);
 	OrbitViewer.prototype.constructor = OrbitViewer;
@@ -16705,24 +16948,32 @@
 	};
 
 	OrbitViewer.prototype.onMouseMove = function () {
+	    // 计算碰撞
 	    var lastIntersectPoint = new THREE.Vector3();
 
+	    // 计算旋转
 	    var unit1 = new THREE.Vector3();
 	    var unit2 = new THREE.Vector3();
 
+	    // 旋转校正
 	    var yAxis = new THREE.Vector3(0, 1, 0);
-	    var minAngle = 45 * Math.PI / 180;
-	    var maxAngle = 135 * Math.PI / 180;
+	    var minAngle = 30 * Math.PI / 180;
+	    var maxAngle = 150 * Math.PI / 180;
 	    var axis = new THREE.Vector3();
 
+	    var startTime = 0;
+	    var endTime = 0;
+
 	    var quat = new THREE.Quaternion();
-	    var dir = new THREE.Vector3();
+	    var dir1 = new THREE.Vector3();
+	    var dir2 = new THREE.Vector3();
 
 	    return function (event) {
 	        if (!this.isDown) {
 	            return;
 	        }
 
+	        // 1. 按下鼠标，第一次拖动
 	        if (!this.isPan) {
 	            if (!this.intersectSphere(event.offsetX, event.offsetY, this.intersectPoint)) { // 鼠标在地球外
 	                return;
@@ -16730,48 +16981,63 @@
 
 	            this.isPan = true;
 	            lastIntersectPoint.copy(this.intersectPoint);
+
+	            startTime = new Date().getTime();
 	            return;
 	        }
 
+	        // 2. 后续的拖动
 	        if (!this.intersectSphere(event.offsetX, event.offsetY, this.intersectPoint)) { // 鼠标在地球外
 	            return;
 	        }
 
+	        // 3. 计算碰撞点相对于地心旋转
 	        unit1.copy(lastIntersectPoint).normalize();
 	        unit2.copy(this.intersectPoint).normalize();
+	        quat.setFromUnitVectors(unit2, unit1);
 
-	        // unit2与y轴夹角不能太小和太大
-	        var angle = unit2.angleTo(yAxis);
+	        // 4. 计算相机相对于地心旋转
+	        var distance = this.camera.position.length();
+	        dir1.copy(this.camera.position).normalize();
+	        dir2.copy(dir1);
+	        dir2.applyQuaternion(quat).normalize();
+
+	        // 5. 限制dir与y轴的夹角
+	        var angle = dir2.angleTo(yAxis);
 
 	        if (angle && Math.abs(angle) < minAngle) {
-	            axis.crossVectors(unit2, yAxis);
+	            axis.crossVectors(dir2, yAxis);
 	            axis.normalize();
-	            unit2.copy(yAxis);
-	            unit2.applyAxisAngle(axis, -angle);
+	            dir2.copy(yAxis);
+	            dir2.applyAxisAngle(axis, -minAngle);
 	        }
 
 	        if (angle && Math.abs(angle) > maxAngle) {
-	            axis.crossVectors(unit2, yAxis);
+	            axis.crossVectors(dir2, yAxis);
 	            axis.normalize();
-	            unit2.copy(yAxis);
-	            unit2.applyAxisAngle(axis, -angle);
+	            dir2.copy(yAxis);
+	            dir2.applyAxisAngle(axis, -maxAngle);
 	        }
 
-	        // 计算相机新位置
-	        quat.setFromUnitVectors(unit2, unit1);
+	        // 6. 校正碰撞点
+	        quat.setFromUnitVectors(dir2, dir1);
+	        unit2.copy(unit1);
+	        unit2.applyQuaternion(quat);
+	        this.intersectPoint.copy(unit2).multiplyScalar(WGS84.a);
 
-	        var distance = this.camera.position.length();
-	        dir.copy(this.camera.position).normalize();
-	        dir.applyQuaternion(quat).normalize();
-
-	        this.camera.position.set(
-	            distance * dir.x,
-	            distance * dir.y,
-	            distance * dir.z,
-	        );
-
+	        // 7. 计算相机位置和旋转
+	        this.camera.position.copy(dir2).multiplyScalar(distance);
 	        this.camera.lookAt(this.sphere.center);
 
+	        // 8. 计算旋转速度
+	        endTime = new Date().getTime();
+
+	        // if (endTime > startTime) {
+	        //     this.rotationSpeed.subVectors(endLonLat, startLonLat)
+	        //         .multiplyScalar(endTime - startTime);
+	        // }
+
+	        // 9. 更新旧碰撞点
 	        lastIntersectPoint.copy(this.intersectPoint);
 	    };
 	}();
@@ -16797,9 +17063,15 @@
 
 	        var d = delta * (distance - WGS84.a) / 1000;
 
-	        var d_1 = GeoUtils.zoomToAlt(-1) + WGS84.a;
+	        var d_1 = GeoUtils.zoomToAlt(2) + WGS84.a;
 
-	        if (distance + d >= d_1) { // 最远0层级距离
+	        if (distance + d >= d_1) { // 最远2层级距离
+	            d = 0;
+	        }
+
+	        var d_2 = GeoUtils.zoomToAlt(18) + WGS84.a;
+
+	        if (distance + d <= d_2) { // 最近18层级
 	            d = 0;
 	        }
 
@@ -16822,24 +17094,27 @@
 	OrbitViewer.prototype.intersectSphere = function () {
 	    var projectionMatrixInverse = new THREE.Matrix4();
 	    var matrixWorld = new THREE.Matrix4();
+	    var ray = new THREE.Ray();
 
 	    return function (x, y, intersectPoint) {
 	        if (!this.isPan) {
+	            // 只在鼠标按下时，计算一次矩阵的原因是：1、提高性能 2、避免由于浮点数问题抖动。
 	            projectionMatrixInverse.getInverse(this.camera.projectionMatrix);
 	            matrixWorld.copy(this.camera.matrixWorld);
 	        }
 
-	        this.ray.origin.set(
+	        ray.origin.set(
 	            x / this.domElement.clientWidth * 2 - 1, -y / this.domElement.clientHeight * 2 + 1,
 	            0.1,
 	        );
-	        this.ray.direction.copy(this.ray.origin);
-	        this.ray.direction.z = 1;
 
-	        this.ray.origin.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld);
-	        this.ray.direction.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld).sub(this.ray.origin).normalize();
+	        ray.direction.copy(ray.origin);
+	        ray.direction.z = 1;
 
-	        return this.ray.intersectSphere(this.sphere, intersectPoint);
+	        ray.origin.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld);
+	        ray.direction.applyMatrix4(projectionMatrixInverse).applyMatrix4(matrixWorld).sub(ray.origin).normalize();
+
+	        return ray.intersectSphere(this.sphere, intersectPoint);
 	    };
 	}();
 
@@ -16878,8 +17153,50 @@
 	};
 
 	OrbitViewer.prototype.update = function () {
+	    var lonlat = new THREE.Vector3();
 
-	};
+	    return function () {
+	        // if (this.isPan) {
+	        //     return;
+	        // }
+
+	        // if (this.rotationSpeed.x === 0 && this.rotationSpeed.y === 0) {
+	        //     return;
+	        // }
+
+	        // GeoUtils.xyzToLonlat(this.camera.position, lonlat);
+
+	        // lonlat.add(this.rotationSpeed);
+
+	        // if (this.rotationSpeed.x > 0) {
+	        //     this.rotationSpeed.x -= 1;
+	        //     if (this.rotationSpeed.x < 1) {
+	        //         this.rotationSpeed.x = 0;
+	        //     }
+	        // } else if (this.rotationSpeed.x < 0) {
+	        //     this.rotationSpeed.x += 0.01;
+	        //     if (this.rotationSpeed.x > -0.01) {
+	        //         this.rotationSpeed.x = 0;
+	        //     }
+	        // }
+
+	        // if (this.rotationSpeed.y > 0) {
+	        //     this.rotationSpeed.y -= 0.01;
+	        //     if (this.rotationSpeed.y < 0.01) {
+	        //         this.rotationSpeed.y = 0;
+	        //     }
+	        // } else if (this.rotationSpeed.y < 0) {
+	        //     this.rotationSpeed.y += 0.01;
+	        //     if (this.rotationSpeed.y > -0.01) {
+	        //         this.rotationSpeed.y = 0;
+	        //     }
+	        // }
+
+	        // GeoUtils.lonlatToXYZ(lonlat, this.camera.position);
+
+	        // this.camera.lookAt(this.sphere.center);
+	    };
+	}();
 
 	OrbitViewer.prototype.dispose = function () {
 	    this.domElement.removeEventListener('mousedown', this.onMouseDown);
@@ -17158,17 +17475,22 @@
 	 * @param {THREE.WebGLRenderer} renderer 渲染器
 	 * @param {Object} options 配置
 	 * @param {String} options.server 服务端配置
+	 * @param {Boolean} options.useCameraPosition 是否使用相机位置
 	 * @param {Number} options.maxThread 最大工作线程数，避免任务创建过多，导致地图卡顿
 	 */
 	function Globe(camera, renderer, options = {}) {
 	    THREE.Object3D.call(this);
 
 	    options.server = options.server || location.origin;
+	    options.useCameraPosition = options.useCameraPosition || false;
 	    options.maxThread = options.maxThread || 10;
 
 	    this.name = L_GLOBE;
 
-	    this.userData.type = 'Globe';
+	    Object.assign(this.userData, {
+	        type: 'Globe',
+	        background: 'google',
+	    });
 
 	    this.camera = camera;
 	    this.renderer = renderer;
@@ -17191,11 +17513,10 @@
 	    this.renderers = new Renderers(this);
 	    this.viewer = new OrbitViewer(this.camera, this.renderer.domElement);
 
-	    // 默认位置
-	    var lon = 0;
-	    var lat = 0;
-	    var alt = GeoUtils.zoomToAlt(-1);
-	    this.viewer.setPosition(lon, lat, alt);
+	    // 如果不使用相机位置，则设置默认中心点
+	    if (!this.options.useCameraPosition) {
+	        this.viewer.setPosition(0, 0, GeoUtils.zoomToAlt(2));
+	    }
 	}
 
 	Globe.prototype = Object.create(THREE.Object3D.prototype);
@@ -17225,6 +17546,8 @@
 	    if (newLayerName === layer.name) {
 	        return;
 	    }
+
+	    this.userData.background = newLayerName;
 
 	    var newLayer = null;
 
@@ -17301,6 +17624,3640 @@
 	    delete this.renderer;
 	};
 
+	var ID$8 = -1;
+
+	/**
+	 * 所有可视化组件基类
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function BaseComponent() {
+	    this.id = `VisualComponent${ID$8--}`;
+	    this.type = 'VisualComponent'; // 根据此字段判断类型，进行反序列化
+	}
+
+	/**
+	 * 实现该函数，可以在编辑器中拖动该控件。
+	 * 原型:setTranslate(dx, dy)
+	 */
+	BaseComponent.prototype.setTranslate = null;
+
+	/**
+	 * 渲染组件
+	 * @param {SVGElement} parent 父组件
+	 */
+	BaseComponent.prototype.render = function (parent) {
+
+	};
+
+	/**
+	 * 组件转json
+	 */
+	BaseComponent.prototype.toJSON = function () {
+
+	};
+
+	/**
+	 * json转组件
+	 * @param {Object} json JSON字符串反序列化后的对象
+	 */
+	BaseComponent.prototype.fromJSON = function (json) {
+
+	};
+
+	/**
+	 * 清空组件
+	 */
+	BaseComponent.prototype.clear = function () {
+
+	};
+
+	/**
+	 * 按钮
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Button$1() {
+	    BaseComponent.call(this);
+	    this.type = 'Button';
+	    this.text = 'Button';
+	    this.transform = null;
+	}
+
+	Button$1.prototype = Object.create(BaseComponent.prototype);
+	Button$1.prototype.constructor = Button$1;
+
+	Button$1.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Button$1.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var paddingLeft = 8;
+	    var paddingTop = 4;
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Button', true)
+	        .style('pointer-events', 'all')
+	        .style('cursor', 'pointer');
+
+	    var rect = g.append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('stroke', '#3399ff')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'rgba(51,153,255,0.5)');
+
+	    var text = g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.text)
+	        .attr('fill', '#fff');
+
+	    var box = text.node().getBBox();
+
+	    var boxWidth = box.width + paddingLeft * 2;
+	    var boxHeight = box.height + paddingTop * 2;
+
+	    rect.attr('width', boxWidth)
+	        .attr('height', boxHeight);
+
+	    text.attr('x', paddingLeft)
+	        .attr('y', paddingTop - box.y);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - boxWidth) / 2;
+	        var top = (parent.clientHeight - boxHeight) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    g.on(`mouseenter.${this.id}`, this.onMouseEnter.bind(this));
+	    g.on(`mouseleave.${this.id}`, this.onMouseLeave.bind(this));
+
+	    this.dom = g;
+	};
+
+	Button$1.prototype.onMouseEnter = function () {
+	    if (this.dom) {
+	        this.dom.select('rect')
+	            .attr('fill', 'rgba(51,153,255,0.8)');
+	    }
+	};
+
+	Button$1.prototype.onMouseLeave = function () {
+	    if (this.dom) {
+	        this.dom.select('rect')
+	            .attr('fill', 'rgba(51,153,255,0.5)');
+	    }
+	};
+
+	Button$1.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        text: this.text,
+	        transform,
+	    };
+	};
+
+	Button$1.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.text = json.text;
+	    this.transform = json.transform || null;
+	};
+
+	Button$1.prototype.clear = function () {
+	    this.text = 'Button';
+	    this.transform = null;
+
+	    this.dom.on(`mouseover.${this.id}`, null);
+	    this.dom.on(`mouseleave.${this.id}`, null);
+	    delete this.dom;
+	};
+
+	/**
+	 * 标签
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Label$1() {
+	    BaseComponent.call(this);
+	    this.type = 'Label';
+	    this.text = 'Label';
+	    this.transform = null;
+	}
+
+	Label$1.prototype = Object.create(BaseComponent.prototype);
+	Label$1.prototype.constructor = Label$1;
+
+	Label$1.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Label$1.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var padding = 2;
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Label', true)
+	        .style('pointer-events', 'all');
+
+	    var text = g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.text)
+	        .attr('fill', '#fff');
+
+	    var box = text.node().getBBox();
+
+	    var boxWidth = box.width + padding * 2;
+	    var boxHeight = box.height + padding * 2;
+
+	    text.attr('x', padding)
+	        .attr('y', padding - box.y);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - boxWidth) / 2;
+	        var top = (parent.clientHeight - boxHeight) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	Label$1.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        text: this.text,
+	        transform,
+	    };
+	};
+
+	Label$1.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.text = json.text;
+	    this.transform = json.transform || null;
+	};
+
+	Label$1.prototype.clear = function () {
+	    this.text = 'Label';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 面板
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Panel() {
+	    BaseComponent.call(this);
+	    this.type = 'Panel';
+
+	    this.width = 302;
+	    this.height = 358;
+	    this.title = 'Panel';
+	    this.transform = null;
+	}
+
+	Panel.prototype = Object.create(BaseComponent.prototype);
+	Panel.prototype.constructor = Panel;
+
+	Panel.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Panel.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Panel', true)
+	        .style('pointer-events', 'all');
+
+	    // 背景
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M0,0L256,0L302,41L302,358L16,358L0,350Z')
+	        .attr('fill', 'rgba(45,48,60,0.95)');
+
+	    // 左边界线
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M26,22L5,22L5,220L10,225L10,248L5,254L5,345L26,354L48,354')
+	        .attr('stroke', '#2d758f')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 右边界线
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M220,22L264,22L295,56L295,354L104,354')
+	        .attr('stroke', '#2d758f')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 标题
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('x', 38)
+	        .attr('y', 30)
+	        .attr('font-size', 22)
+	        .attr('font-weight', 'bold')
+	        .attr('fill', '#498e7b');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	Panel.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	Panel.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	Panel.prototype.clear = function () {
+	    this.title = 'Panel';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 水平线
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function HorizontalLine() {
+	    BaseComponent.call(this);
+
+	    this.type = 'HorizontalLine';
+
+	    this.width = 240;
+	    this.height = 0;
+	    this.transform = null;
+	}
+
+	HorizontalLine.prototype = Object.create(BaseComponent.prototype);
+	HorizontalLine.prototype.constructor = HorizontalLine;
+
+	HorizontalLine.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	HorizontalLine.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('HorizontalLine', true)
+	        .style('pointer-events', 'all');
+
+	    // 可拖拽区域
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M-4,-4L244,-4L244,4L-4,4Z')
+	        .attr('stroke', '0')
+	        .attr('fill', 'none');
+
+	    g.append('line')
+	        .attr('data-id', this.id)
+	        .attr('x1', 0)
+	        .attr('y1', 0)
+	        .attr('x2', 240)
+	        .attr('y2', 0)
+	        .attr('stroke', 'rgba(0,0,0,0.4)')
+	        .attr('stroke-width', 2);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	HorizontalLine.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        width: this.width,
+	        transform,
+	    };
+	};
+
+	HorizontalLine.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.width = json.width;
+	    this.height = json.height;
+	    this.transform = json.transform || null;
+	};
+
+	HorizontalLine.prototype.clear = function () {
+	    this.width = 240;
+	    this.height = 0;
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 条形图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function BarChart() {
+	    BaseComponent.call(this);
+	    this.type = 'BarChart';
+
+	    this.width = 180;
+	    this.height = 212;
+	    this.title = 'BarChart';
+
+	    this.data = [{
+	        text: '桌椅松动',
+	        value: 100 / 105,
+	    }, {
+	        text: '启动活门',
+	        value: 100 / 105,
+	    }, {
+	        text: '雷达系统',
+	        value: 73 / 105,
+	    }, {
+	        text: '引气系统',
+	        value: 72 / 105,
+	    }, {
+	        text: '防冰活门',
+	        value: 69 / 105,
+	    }, {
+	        text: '引擎',
+	        value: 46 / 105,
+	    }, {
+	        text: '起落架',
+	        value: 42 / 105,
+	    }];
+
+	    this.transform = null;
+	}
+
+	BarChart.prototype = Object.create(BaseComponent.prototype);
+	BarChart.prototype.constructor = BarChart;
+
+	BarChart.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	BarChart.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('BarChart', true)
+	        .style('pointer-events', 'all');
+
+	    // 面板背景
+	    g.append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('width', 180)
+	        .attr('height', 212)
+	        .attr('fill', 'rgba(0,0,0,0.2)');
+
+	    // 底部标题
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M11,0 L72,0 L85,12 L72,24 L11,24 L0,12 Z')
+	        .attr('transform', 'translate(50,200)')
+	        .attr('fill', '#2d232c');
+
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('transform', 'translate(88,217)')
+	        .attr('fill', '#4ccdfc')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle');
+
+	    // 面板
+	    var bar = g.selectAll('.bar')
+	        .data(this.data);
+
+	    bar.exit()
+	        .remove();
+
+	    // 条
+	    var group = bar.enter()
+	        .append('g')
+	        .attr('data-id', this.id)
+	        .classed('bar', true)
+	        .append('g');
+
+	    group.append('text')
+	        .attr('data-id', this.id)
+	        .text(function (d) {
+	            return d.text;
+	        })
+	        .attr('x', 10)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25;
+	        })
+	        .attr('fill', '#4ccdfc');
+
+	    group.append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', 68)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25 - 10;
+	        })
+	        .attr('width', 105)
+	        .attr('height', 10)
+	        .attr('fill', '#0c6887');
+
+	    group.append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', 68)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25 - 10;
+	        })
+	        .attr('width', function (d) {
+	            return d.value * 105;
+	        })
+	        .attr('height', 10)
+	        .attr('fill', '#4ccdfc');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	BarChart.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	BarChart.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	BarChart.prototype.clear = function () {
+	    this.title = 'BarChart';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 时间标签
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function TimeLabel() {
+	    BaseComponent.call(this);
+	    this.type = 'TimeLabel';
+	    this.text = '14:21';
+	    this.transform = null;
+	}
+
+	TimeLabel.prototype = Object.create(BaseComponent.prototype);
+	TimeLabel.prototype.constructor = TimeLabel;
+
+	TimeLabel.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	TimeLabel.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var padding = 2;
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('TimeLabel', true)
+	        .style('pointer-events', 'all');
+
+	    var text = g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.text)
+	        .attr('fill', '#fff');
+
+	    var box = text.node().getBBox();
+
+	    var boxWidth = box.width + padding * 2;
+	    var boxHeight = box.height + padding * 2;
+
+	    text.attr('x', padding)
+	        .attr('y', padding - box.y);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - boxWidth) / 2;
+	        var top = (parent.clientHeight - boxHeight) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	TimeLabel.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        text: this.text,
+	        transform,
+	    };
+	};
+
+	TimeLabel.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.text = json.text;
+	    this.transform = json.transform || null;
+	};
+
+	TimeLabel.prototype.clear = function () {
+	    this.text = '14:21';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 垂直线
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function VerticalLine() {
+	    BaseComponent.call(this);
+
+	    this.type = 'VerticalLine';
+
+	    this.width = 0;
+	    this.height = 20;
+	    this.transform = null;
+	}
+
+	VerticalLine.prototype = Object.create(BaseComponent.prototype);
+	VerticalLine.prototype.constructor = VerticalLine;
+
+	VerticalLine.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	VerticalLine.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('VerticalLine', true)
+	        .style('pointer-events', 'all');
+
+	    // 可拖拽区域
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M-4,-4L4,-4L4,24L-4,24Z')
+	        .attr('stroke', '0')
+	        .attr('fill', 'none');
+
+	    g.append('line')
+	        .attr('data-id', this.id)
+	        .attr('x1', 0)
+	        .attr('y1', 0)
+	        .attr('x2', 0)
+	        .attr('y2', 20)
+	        .attr('stroke', '#4d88a7')
+	        .attr('stroke-width', 2);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	VerticalLine.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        width: this.width,
+	        height: this.height,
+	        transform,
+	    };
+	};
+
+	VerticalLine.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.width = json.width;
+	    this.height = json.height;
+	    this.transform = json.transform || null;
+	};
+
+	VerticalLine.prototype.clear = function () {
+	    this.width = 0;
+	    this.height = 20;
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 日期、周标签
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function DateWeekLabel() {
+	    BaseComponent.call(this);
+	    this.type = 'DateWeekLabel';
+	    this.text = '14:21';
+	    this.transform = null;
+	}
+
+	DateWeekLabel.prototype = Object.create(BaseComponent.prototype);
+	DateWeekLabel.prototype.constructor = DateWeekLabel;
+
+	DateWeekLabel.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	DateWeekLabel.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var padding = 2;
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('DateWeekLabel', true)
+	        .style('pointer-events', 'all');
+
+	    // 星期
+	    var week = g.append('text')
+	        .attr('data-id', this.id)
+	        .text('星期日')
+	        .attr('x', padding)
+	        .attr('y', padding)
+	        .attr('font-size', 14)
+	        .attr('fill', '#fff');
+
+	    // 日期
+	    var date = g.append('text')
+	        .attr('data-id', this.id)
+	        .text('2019-04-21')
+	        .attr('x', padding)
+	        .attr('y', padding)
+	        .attr('font-size', 14)
+	        .attr('fill', '#fff');
+
+	    var weekBox = week.node().getBBox();
+	    var dateBox = date.node().getBBox();
+
+	    week.attr('y', padding - weekBox.y);
+	    date.attr('y', weekBox.height + padding * 2 - dateBox.y);
+
+	    if (!this.transform) {
+	        var boxWidth = Math.max(weekBox.width, dateBox.width) + padding * 2;
+	        var boxHeight = weekBox.height + dateBox.height + padding * 3;
+	        var left = (parent.clientWidth - boxWidth) / 2;
+	        var top = (parent.clientHeight - boxHeight) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	DateWeekLabel.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        text: this.text,
+	        transform,
+	    };
+	};
+
+	DateWeekLabel.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.text = json.text;
+	    this.transform = json.transform || null;
+	};
+
+	DateWeekLabel.prototype.clear = function () {
+	    this.text = '14:21';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 时间圆盘
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function TimeDisk() {
+	    BaseComponent.call(this);
+	    this.type = 'TimeDisk';
+
+	    this.width = 136;
+	    this.height = 136;
+	    this.title = 'Time';
+	    this.transform = null;
+	}
+
+	TimeDisk.prototype = Object.create(BaseComponent.prototype);
+	TimeDisk.prototype.constructor = TimeDisk;
+
+	TimeDisk.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	TimeDisk.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('TimeDisk', true)
+	        .style('pointer-events', 'all');
+
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 68)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 48)
+	        .attr('stroke', '#517496')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 48)
+	        .attr('cy', 0)
+	        .attr('r', 14)
+	        .attr('fill', '#376899');
+
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 48)
+	        .attr('cy', 0)
+	        .attr('r', 14)
+	        .attr('stroke', '#3399ff')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    g.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 0)
+	        .attr('y', -48)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sunrise.svg');
+
+	    g.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 48)
+	        .attr('y', 0)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sun.svg');
+
+	    g.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 0)
+	        .attr('y', 48)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sunset.svg');
+
+	    g.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', -48)
+	        .attr('y', 0)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/moon.svg');
+
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 10)
+	        .attr('font-size', 20)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	TimeDisk.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	TimeDisk.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	TimeDisk.prototype.clear = function () {
+	    this.title = 'Time';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 键值标签
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function KeyValueLabel() {
+	    BaseComponent.call(this);
+	    this.type = 'KeyValueLabel';
+	    this.width = 142;
+	    this.height = 24;
+	    this.key = '标签';
+	    this.value = '值';
+	    this.transform = null;
+	}
+
+	KeyValueLabel.prototype = Object.create(BaseComponent.prototype);
+	KeyValueLabel.prototype.constructor = KeyValueLabel;
+
+	KeyValueLabel.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	KeyValueLabel.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('TimeLabel', true)
+	        .style('pointer-events', 'all');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M0,0 L135,0 L142,8 L142,24 L12,24 L0,17 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.key)
+	        .attr('x', 18)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.value)
+	        .attr('x', 90)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	KeyValueLabel.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        key: this.key,
+	        value: this.value,
+	        transform,
+	    };
+	};
+
+	KeyValueLabel.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.key = json.key;
+	    this.value = json.value;
+	    this.transform = json.transform || null;
+	};
+
+	KeyValueLabel.prototype.clear = function () {
+	    this.key = '键';
+	    this.value = '值';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 表单面板
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function FormPanel() {
+	    BaseComponent.call(this);
+	    this.type = 'FormPanel';
+	    this.width = 166;
+	    this.height = 130;
+	    this.data = [{
+	        key: '键1',
+	        value: '值1',
+	    }, {
+	        key: '键2',
+	        value: '值2',
+	    }, {
+	        key: '键3',
+	        value: '值3',
+	    }, {
+	        key: '键4',
+	        value: '值4',
+	    }];
+	    this.transform = null;
+	}
+
+	FormPanel.prototype = Object.create(BaseComponent.prototype);
+	FormPanel.prototype.constructor = FormPanel;
+
+	FormPanel.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	FormPanel.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('FormPanel', true)
+	        .style('pointer-events', 'all');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M5,0 L160,0 L166,6 L166,33 L158,38 L158,91 L166,96 L166,125 L158,130 L5,130 L0,125 L0,96 L5,91 L5,36 L0,33 L0,6 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    var update = g.selectAll('.item')
+	        .data(this.data);
+
+	    update.exit()
+	        .remove();
+
+	    var item = update.enter()
+	        .append('g')
+	        .attr('data-id', this.id)
+	        .classed('item', true);
+
+	    item.append('text')
+	        .attr('data-id', this.id)
+	        .text(function (d) {
+	            return d.key;
+	        })
+	        .attr('x', 17)
+	        .attr('y', function (d, i) {
+	            return 26 + 26 * i;
+	        })
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    item.append('text')
+	        .attr('data-id', this.id)
+	        .text(function (d) {
+	            return d.value;
+	        })
+	        .attr('x', 140)
+	        .attr('y', function (d, i) {
+	            return 26 + 26 * i;
+	        })
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'end');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	FormPanel.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	FormPanel.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.data = json.data;
+	    this.transform = json.transform || null;
+	};
+
+	FormPanel.prototype.clear = function () {
+	    this.data = [];
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 键值标签
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Gauge() {
+	    BaseComponent.call(this);
+	    this.type = 'Gauge';
+	    this.width = 74;
+	    this.height = 74;
+	    this.label = '标签';
+	    this.value = '值';
+	    this.unit = '单位';
+	    this.transform = null;
+	}
+
+	Gauge.prototype = Object.create(BaseComponent.prototype);
+	Gauge.prototype.constructor = Gauge;
+
+	Gauge.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Gauge.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Gauge', true)
+	        .style('pointer-events', 'all');
+
+	    // 背景
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 18.5)
+	        .attr('cy', 18.5)
+	        .attr('r', 37)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 圆圈
+	    g.append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', 18.5)
+	        .attr('cy', 18.5)
+	        .attr('r', 32)
+	        .attr('stroke', '#6da2ee')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 值
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.value)
+	        .attr('x', 18.5)
+	        .attr('y', 8.5)
+	        .attr('font-size', 22)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#4bc8f5');
+
+	    // 标签
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.label)
+	        .attr('x', 18.5)
+	        .attr('y', 28.5)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    // 单位
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.unit)
+	        .attr('x', 18.5)
+	        .attr('y', 44.5)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	Gauge.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        key: this.key,
+	        value: this.value,
+	        transform,
+	    };
+	};
+
+	Gauge.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.key = json.key;
+	    this.value = json.value;
+	    this.transform = json.transform || null;
+	};
+
+	Gauge.prototype.clear = function () {
+	    this.key = '键';
+	    this.value = '值';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 柱状图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Histogram() {
+	    BaseComponent.call(this);
+	    this.type = 'Histogram';
+
+	    this.width = 132.9;
+	    this.height = 123.38;
+	    this.title = 'Histogram';
+	    this.data = [27, 68, 44, 117, 60, 83, 101];
+
+	    this.transform = null;
+	}
+
+	Histogram.prototype = Object.create(BaseComponent.prototype);
+	Histogram.prototype.constructor = Histogram;
+
+	Histogram.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Histogram.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Histogram', true)
+	        .style('pointer-events', 'all');
+
+	    // 背景
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M16.5,0 L16.5,123.38 L0,132.9 L0,8.5 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M23.5,0 L238,0 L238,124 L23.5,124 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M22,127 L238,127 L225,139 L0,139 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 数据
+	    g.selectAll('.column')
+	        .data(this.data)
+	        .enter()
+	        .append('rect')
+	        .attr('data-id', this.id)
+	        .classed('column', true)
+	        .attr('x', function (d, i) {
+	            return 30 * (i + 1) - 5;
+	        })
+	        .attr('y', function (d) {
+	            return 133.6 - d;
+	        })
+	        .attr('width', function (d) {
+	            return 10;
+	        })
+	        .attr('height', function (d) {
+	            return d;
+	        })
+	        .attr('fill', '#4ccdfc');
+
+	    // 标题
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M11,0 L72,0 L85,12 L72,24 L11,24 L0,12 Z')
+	        .attr('fill', 'rgba(23,29,48,0.5)')
+	        .attr('transform', 'translate(75,128)');
+
+	    g.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 4)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff')
+	        .attr('transform', 'translate(117,140)');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	Histogram.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	Histogram.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	Histogram.prototype.clear = function () {
+	    this.title = 'Histogram';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 折线图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function LineChart() {
+	    BaseComponent.call(this);
+	    this.type = 'LineChart';
+
+	    this.width = 132.9;
+	    this.height = 123.38;
+	    this.title = 'LineChart';
+
+	    var data1 = [];
+	    var data2 = [];
+
+	    var ran1 = d3.randomNormal(29, 8);
+	    var ran2 = d3.randomNormal(72, 20);
+
+	    for (var i = 0; i <= 210; i += 10) {
+	        data1.push([8 + i, ran1()]);
+	        data2.push([8 + i, ran2()]);
+	    }
+
+	    this.data = [data1, data2];
+
+	    this.transform = null;
+	}
+
+	LineChart.prototype = Object.create(BaseComponent.prototype);
+	LineChart.prototype.constructor = LineChart;
+
+	LineChart.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	LineChart.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('LineChart', true)
+	        .style('pointer-events', 'all');
+
+	    // 背景
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M16.5,0 L16.5,123.38 L0,132.9 L0,8.5 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M23.5,0 L238,0 L238,124 L23.5,124 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M22,127 L238,127 L225,139 L0,139 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 数据
+	    var line = d3.line();
+
+	    var lineData1 = line(this.data[0]);
+	    var lineData2 = line(this.data[1]);
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', lineData1 + 'L218,133.6L8,133.6Z')
+	        .attr('stroke', '#458dab')
+	        .attr('fill', 'rgba(76,205,252,0.2)');
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', lineData1)
+	        .attr('stroke', '#458dab')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', lineData2 + 'L218,133.6L8,133.6Z')
+	        .attr('fill', 'rgba(182,152,132,0.2)')
+	        .attr('stroke-width', 2);
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', lineData2)
+	        .attr('stroke', '#b59784')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 标签
+	    var label = g.append('g')
+	        .attr('transform', 'translate(117,135)');
+
+	    label.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M11,0 L72,0 L85,12 L72,24 L11,24 L0,12 Z')
+	        .attr('fill', 'rgba(23,29,48,0.8)')
+	        .attr('transform', 'translate(-42,-12)');
+
+	    label.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 4)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	LineChart.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	LineChart.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	LineChart.prototype.clear = function () {
+	    this.title = 'LineChart';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 侧边栏
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function SideBar() {
+	    BaseComponent.call(this);
+	    this.type = 'SideBar';
+
+	    this.width = 270;
+	    this.height = 969;
+	    this.title = 'SideBar';
+	    this.transform = null;
+	}
+
+	SideBar.prototype = Object.create(BaseComponent.prototype);
+	SideBar.prototype.constructor = SideBar;
+
+	SideBar.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	SideBar.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Panel', true)
+	        .style('pointer-events', 'all');
+
+	    // 背景
+	    g.append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('width', 270)
+	        .attr('height', 969)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 边框
+	    g.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'm180,11 l0,35 l-10,10 L9,56 l0,183 l40,30 l0,193 M32,472 l0,18 l-23,20 l0,310')
+	        .attr('stroke', '#3a6a84')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 选项卡
+	    var defs = d3.select('defs');
+
+	    defs.append('path')
+	        .attr('id', 'tabDef')
+	        .attr('d', 'M0,0 L32,22 L32,60 L0,38 Z')
+	        .attr('fill', '#6c6f6e');
+
+	    defs.append('path')
+	        .attr('id', 'tabSelectDef')
+	        .attr('d', 'M0,0 L32,22 L32,60 L0,38 Z')
+	        .attr('fill', '#356899');
+
+	    var tab1 = g.append('g')
+	        .attr('data-id', this.id)
+	        .attr('transform', 'translate(14,58)');
+
+	    tab1.append('use')
+	        .attr('data-id', this.id)
+	        .attr('href', '#tabSelectDef');
+
+	    tab1.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/home.svg');
+
+	    var tab2 = g.append('g')
+	        .attr('data-id', this.id)
+	        .attr('transform', 'translate(14,104)');
+
+	    tab2.append('use')
+	        .attr('data-id', this.id)
+	        .attr('href', '#tabDef');
+
+	    tab2.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/plane.svg');
+
+	    var tab3 = g.append('g')
+	        .attr('data-id', this.id)
+	        .attr('transform', 'translate(14,150)');
+
+	    tab3.append('use')
+	        .attr('data-id', this.id)
+	        .attr('href', '#tabDef');
+
+	    tab3.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/water.svg');
+
+	    var tab4 = g.append('g')
+	        .attr('data-id', this.id)
+	        .attr('transform', 'translate(14,196)');
+
+	    tab4.append('use')
+	        .attr('data-id', this.id)
+	        .attr('href', '#tabDef');
+
+	    tab4.append('image')
+	        .attr('data-id', this.id)
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/guard.svg');
+
+	    var header = g.append('g')
+	        .attr('data-id', this.id)
+	        .attr('transform', 'translate(15,276)');
+
+	    header.append('path')
+	        .attr('data-id', this.id)
+	        .attr('d', 'M0,0 L12,0 L25,10 L25,185 L12,195 L0,195 Z')
+	        .attr('fill', '#185185');
+
+	    header.append('text')
+	        .attr('data-id', this.id)
+	        .text(this.title)
+	        .attr('x', 12)
+	        .attr('y', 85)
+	        .attr('text-anchor', 'middle')
+	        .attr('writing-mode', 'tb')
+	        .attr('textlength', '90px')
+	        .attr('lengthAdjust', 'spacing') // spacing, spacingAndGlyphs; see: https://blog.csdn.net/huanhuanq1209/article/details/71438629
+	        .attr('fill', '#fff');
+
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	SideBar.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	SideBar.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	SideBar.prototype.clear = function () {
+	    this.title = 'SideBar';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 柱状图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Histogram2() {
+	    BaseComponent.call(this);
+	    this.type = 'Histogram2';
+
+	    this.width = 132.9;
+	    this.height = 123.38;
+	    this.title = 'Histogram2';
+	    this.data = [27, 68, 44, 117, 60, 83, 101];
+
+	    this.transform = null;
+	}
+
+	Histogram2.prototype = Object.create(BaseComponent.prototype);
+	Histogram2.prototype.constructor = Histogram2;
+
+	Histogram2.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	Histogram2.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('Histogram2', true)
+	        .style('pointer-events', 'all');
+
+	    var dataset = [
+	        50, 43, 120, 87, 99, 167, 142
+	    ];
+
+	    var xAxisWidth = 300;
+	    var yAxisWidth = 300;
+
+	    var padding = {
+	        top: 20,
+	        right: 20,
+	        bottom: 20,
+	        left: 30,
+	    };
+
+	    var xScale = d3.scaleBand()
+	        .domain(d3.range(dataset.length))
+	        .range([0, xAxisWidth]);
+
+	    var yScale = d3.scaleLinear()
+	        .domain([0, d3.max(dataset)])
+	        .range([0, yAxisWidth]);
+
+	    var rect = g.selectAll('rect')
+	        .data(dataset)
+	        .enter()
+	        .append('rect')
+	        .attr('data-id', this.id)
+	        .attr('fill', 'steelblue')
+	        .attr('x', function (d, i) {
+	            return padding.left + xScale(i);
+	        })
+	        .attr('y', function (d) {
+	            return padding.top + yAxisWidth - yScale(d);
+	        })
+	        .attr('width', xScale.bandwidth() - 2)
+	        .attr('height', function (d) {
+	            return yScale(d);
+	        });
+
+	    var text = g.selectAll('text')
+	        .data(dataset)
+	        .enter()
+	        .append('text')
+	        .attr('data-id', this.id)
+	        .attr('fill', 'white')
+	        .attr('font-size', '14px')
+	        .attr('text-anchor', 'middle')
+	        .attr('x', function (d, i) {
+	            return padding.left + xScale(i);
+	        })
+	        .attr('y', function (d) {
+	            return padding.top + yAxisWidth - yScale(d);
+	        })
+	        .attr('dx', xScale.bandwidth() / 2)
+	        .attr('dy', '1em')
+	        .text(function (d) {
+	            return d;
+	        });
+
+	    var xAxis = d3.axisBottom()
+	        .scale(xScale)
+	        .tickFormat(function (d) {
+	            return d + 1;
+	        });
+
+	    g.append('g')
+	        .attr('transform',
+	            `translate(${padding.left}, ${padding.top + yAxisWidth})`)
+	        .call(xAxis);
+
+	    yScale.range([yAxisWidth, 0]);
+
+	    var yAxis = d3.axisLeft()
+	        .scale(yScale);
+
+	    g.append('g')
+	        .attr('transform',
+	            `translate(${padding.left},${padding.top})`)
+	        .call(yAxis);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	Histogram2.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	Histogram2.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	Histogram2.prototype.clear = function () {
+	    this.title = 'Histogram2';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 散点图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function ScatterPlot() {
+	    BaseComponent.call(this);
+	    this.type = 'ScatterPlot';
+
+	    this.width = 400;
+	    this.height = 400;
+	    this.title = 'ScatterPlot';
+
+	    var data1 = [];
+	    var data2 = [];
+
+	    var ran1 = d3.randomNormal(29, 8);
+	    var ran2 = d3.randomNormal(72, 20);
+
+	    for (var i = 0; i <= 210; i += 10) {
+	        data1.push([8 + i, ran1()]);
+	        data2.push([8 + i, ran2()]);
+	    }
+
+	    this.data = [data1, data2];
+
+	    this.transform = null;
+	}
+
+	ScatterPlot.prototype = Object.create(BaseComponent.prototype);
+	ScatterPlot.prototype.constructor = ScatterPlot;
+
+	ScatterPlot.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	ScatterPlot.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var center = [
+	        [0.5, 0.5],
+	        [0.7, 0.8],
+	        [0.4, 0.9],
+	        [0.11, 0.32],
+	        [0.88, 0.25],
+	        [0.75, 0.12],
+	        [0.5, 0.1],
+	        [0.2, 0.3],
+	        [0.4, 0.1],
+	        [0.6, 0.7]
+	    ];
+
+	    var xAxisWidth = 400;
+	    var yAxisWidth = 400;
+
+	    var xScale = d3.scaleLinear()
+	        .domain([0, 1.2 * d3.max(center, function (d) {
+	            return d[0];
+	        })])
+	        .range([0, xAxisWidth]);
+
+	    var yScale = d3.scaleLinear()
+	        .domain([0, 1.2 * d3.max(center, function (d) {
+	            return d[1];
+	        })])
+	        .range([0, yAxisWidth]);
+
+	    var padding = {
+	        top: 30,
+	        right: 30,
+	        bottom: 30,
+	        left: 40
+	    };
+	    var height = yAxisWidth + padding.top + padding.bottom;
+
+	    var circle = g.selectAll('circle')
+	        .data(center)
+	        .enter()
+	        .append('circle')
+	        .attr('data-id', this.id)
+	        .attr('fill', 'black')
+	        .attr('cx', function (d) {
+	            return padding.left + xScale(d[0]);
+	        })
+	        .attr('cy', function (d) {
+	            return height - padding.bottom - yScale(d[1]);
+	        })
+	        .attr('r', 5);
+
+	    var xAxis = d3.axisBottom()
+	        .scale(xScale);
+
+	    g.append('g')
+	        .attr('transform',
+	            `translate(${padding.left}, ${padding.top + yAxisWidth})`)
+	        .call(xAxis);
+
+	    yScale.range([yAxisWidth, 0]);
+
+	    var yAxis = d3.axisLeft()
+	        .scale(yScale);
+
+	    g.append('g')
+	        .attr('transform',
+	            `translate(${padding.left},${padding.top})`)
+	        .call(yAxis);
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	ScatterPlot.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	ScatterPlot.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	ScatterPlot.prototype.clear = function () {
+	    this.title = 'ScatterPlot';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 饼状图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function PieChart() {
+	    BaseComponent.call(this);
+	    this.type = 'PieChart';
+
+	    this.width = 500;
+	    this.height = 500;
+	    this.title = 'PieChart';
+
+	    this.transform = null;
+	}
+
+	PieChart.prototype = Object.create(BaseComponent.prototype);
+	PieChart.prototype.constructor = PieChart;
+
+	PieChart.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	PieChart.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var dataset = [
+	        ['小米', 60.8],
+	        ['三星', 58.4],
+	        ['联想', 47.3],
+	        ['苹果', 46.6],
+	        ['华为', 41.3],
+	        ['酷派', 40.1],
+	        ['其他', 111.5]
+	    ];
+
+	    var pie = d3.pie()
+	        .value(function (d) {
+	            return d[1];
+	        });
+
+	    var width = 500;
+	    var height = 500;
+
+	    var piedata = pie(dataset);
+
+	    var outerRadius = width / 3;
+	    var innerRadius = 0;
+
+	    var arc = d3.arc()
+	        .innerRadius(innerRadius)
+	        .outerRadius(outerRadius);
+
+	    var color = d3.schemeCategory10;
+
+	    var arcs = g.selectAll('g')
+	        .data(piedata)
+	        .enter()
+	        .append('g')
+	        .attr('transform',
+	            'translate(' + (width / 2) + ',' + (height / 2) + ')');
+
+	    arcs.append('path')
+	        .attr('data-id', this.id)
+	        .attr('fill', function (d, i) {
+	            return color[i];
+	        })
+	        .attr('d', function (d) {
+	            return arc(d);
+	        });
+
+	    arcs.append('text')
+	        .attr('data-id', this.id)
+	        .attr('transform', function (d) {
+	            var x = arc.centroid(d)[0] * 1.4;
+	            var y = arc.centroid(d)[1] * 1.4;
+	            return 'translate(' + x + ',' + y + ')';
+	        })
+	        .attr('text-anchor', 'middle')
+	        .text(function (d) {
+	            var percent = Number(d.value) /
+	                d3.sum(dataset, function (d) {
+	                    return d[1];
+	                }) * 100;
+	            return percent.toFixed(1) + '%';
+	        });
+
+	    arcs.append('line')
+	        .attr('data-id', this.id)
+	        .attr('stroke', 'black')
+	        .attr('x1', function (d) {
+	            return arc.centroid(d)[0] * 2;
+	        })
+	        .attr('y1', function (d) {
+	            return arc.centroid(d)[1] * 2;
+	        })
+	        .attr('x2', function (d) {
+	            return arc.centroid(d)[0] * 2.2;
+	        })
+	        .attr('y2', function (d) {
+	            return arc.centroid(d)[1] * 2.2;
+	        });
+
+	    arcs.append('text')
+	        .attr('data-id', this.id)
+	        .attr('transform', function (d) {
+	            var x = arc.centroid(d)[0] * 2.5;
+	            var y = arc.centroid(d)[1] * 2.5;
+	            return 'translate(' + x + ',' + y + ')';
+	        })
+	        .attr('text-anchor', 'middle')
+	        .text(function (d) {
+	            return d.data[0];
+	        });
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	PieChart.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	PieChart.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	PieChart.prototype.clear = function () {
+	    this.title = 'PieChart';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 弦图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function ChordGraph() {
+	    BaseComponent.call(this);
+	    this.type = 'ChordGraph';
+
+	    this.width = 400;
+	    this.height = 400;
+	    this.title = 'ChordGraph';
+
+	    var data1 = [];
+	    var data2 = [];
+
+	    var ran1 = d3.randomNormal(29, 8);
+	    var ran2 = d3.randomNormal(72, 20);
+
+	    for (var i = 0; i <= 210; i += 10) {
+	        data1.push([8 + i, ran1()]);
+	        data2.push([8 + i, ran2()]);
+	    }
+
+	    this.data = [data1, data2];
+
+	    this.transform = null;
+	}
+
+	ChordGraph.prototype = Object.create(BaseComponent.prototype);
+	ChordGraph.prototype.constructor = ChordGraph;
+
+	ChordGraph.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	ChordGraph.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var continent = [
+	        '亚洲', '欧洲', '非洲', '美洲', '大洋洲',
+	    ];
+	    var population = [
+	        [9000, 870, 3000, 1000, 5200],
+	        [3400, 8000, 2300, 4922, 374],
+	        [2000, 2000, 7700, 4881, 1050],
+	        [3000, 8012, 5531, 500, 400],
+	        [3540, 4310, 1500, 1900, 300],
+	    ];
+
+	    var chord = d3.chord()
+	        .padAngle(0.03)
+	        .sortSubgroups(d3.ascending);
+
+	    var chordData = chord(population);
+
+	    var width = 500;
+	    var height = 500;
+
+	    // 弦图的<g>元素
+	    var gChord = g.append('g')
+	        .attr('transform', 'translate(' + (width / 2) +
+	            ',' + (height / 2) + ')');
+
+	    // 节点的<g>元素
+	    var gOuter = gChord.append('g');
+
+	    // 弦的<g>元素
+	    var gInner = gChord.append('g');
+
+	    // 颜色比例器
+	    var color = d3.schemeCategory10;
+
+	    var innerRadius = width / 2 * 0.7;
+	    var outerRadius = innerRadius * 1.1;
+
+	    // 弦生成器
+	    var arcOuter = d3.arc()
+	        .innerRadius(innerRadius)
+	        .outerRadius(outerRadius);
+
+	    gOuter.selectAll('.outerPath')
+	        .data(chordData.groups)
+	        .enter()
+	        .append('path')
+	        .attr('data-id', this.id)
+	        .attr('class', 'outerPath')
+	        .style('fill', function (d, i) {
+	            return color[i];
+	        })
+	        .attr('d', arcOuter);
+
+	    gOuter.selectAll('.outerText')
+	        .data(chordData.groups)
+	        .enter()
+	        .append('text')
+	        .attr('data-id', this.id)
+	        .each(function (d, i) {
+	            d.angle = (d.startAngle + d.endAngle) / 2;
+	            d.name = continent[i];
+	        })
+	        .attr('class', 'outerText')
+	        .attr('dy', '.35em')
+	        .attr('transform', function (d) {
+	            var result = 'rotate(' +
+	                (d.angle * 180 / Math.PI) + ')';
+
+	            result += ' translate(0,'
+	                + (- 1.0 * (outerRadius + 10)) + ')';
+
+	            if (d.angle > Math.PI * 3 / 4 &&
+	                d.angle < Math.PI * 5 / 4) {
+	                result += ' rotate(180)';
+	            }
+
+	            return result;
+	        })
+	        .text(function (d) {
+	            return d.name;
+	        });
+
+	    var ribbon = d3.ribbon()
+	        .radius(innerRadius);
+
+	    gInner.selectAll('.innerPath')
+	        .data(chordData)
+	        .enter()
+	        .append('path')
+	        .attr('data-id', this.id)
+	        .attr('class', 'innerPath')
+	        .attr('d', ribbon)
+	        .style('fill', function (d) {
+	            return color[d.source.index];
+	        });
+
+	    gOuter.selectAll('.outerPath')
+	        .on('mouseover', fade(0.0))
+	        .on('mouseout', fade(1.0));
+
+	    function fade(opacity) {
+	        return function (g, i) {
+	            gInner.selectAll('.innerPath')
+	                .filter(function (d) {
+	                    return d.source.index != i &&
+	                        d.target.index != i;
+	                })
+	                .transition()
+	                .style('opacity', opacity);
+	        };
+	    }
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	ChordGraph.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        data: this.data,
+	        transform,
+	    };
+	};
+
+	ChordGraph.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	ChordGraph.prototype.clear = function () {
+	    this.title = 'ChordGraph';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 饼状图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function ForceDirectedGraph() {
+	    BaseComponent.call(this);
+	    this.type = 'ForceDirectedGraph';
+
+	    this.width = 500;
+	    this.height = 500;
+	    this.title = 'ForceDirectedGraph';
+
+	    this.transform = null;
+	}
+
+	ForceDirectedGraph.prototype = Object.create(BaseComponent.prototype);
+	ForceDirectedGraph.prototype.constructor = ForceDirectedGraph;
+
+	ForceDirectedGraph.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	ForceDirectedGraph.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var dataset = {
+	        nodes: [
+	            { name: "Adam" },
+	            { name: "Bob" },
+	            { name: "Carrie" },
+	            { name: "Donovan" },
+	            { name: "Edward" },
+	            { name: "Felicity" },
+	            { name: "George" },
+	            { name: "Hannah" },
+	            { name: "Iris" },
+	            { name: "Jerry" }
+	        ],
+	        links: [
+	            { source: 0, target: 1 },
+	            { source: 0, target: 2 },
+	            { source: 0, target: 3 },
+	            { source: 0, target: 4 },
+	            { source: 1, target: 5 },
+	            { source: 2, target: 5 },
+	            { source: 2, target: 5 },
+	            { source: 3, target: 4 },
+	            { source: 5, target: 8 },
+	            { source: 5, target: 9 },
+	            { source: 6, target: 7 },
+	            { source: 7, target: 8 },
+	            { source: 8, target: 9 }
+	        ]
+	    };
+
+	    var width = 500;
+	    var height = 500;
+
+	    var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+	    var simulation = d3.forceSimulation(dataset.nodes)
+	        .force('charge', d3.forceManyBody())
+	        .force('link', d3.forceLink(dataset.links))
+	        .force('center', d3.forceCenter(width / 2, height / 2));
+
+	    var link = g.append('g')
+	        .attr('class', 'links')
+	        .selectAll('line')
+	        .data(dataset.links)
+	        .enter().append('line')
+	        .attr('stroke', '#ccc')
+	        .attr('stroke-width', 1);
+
+	    var node = g.append('g')
+	        .attr('class', 'nodes')
+	        .selectAll('circle')
+	        .data(dataset.nodes)
+	        .enter().append('circle')
+	        .attr('r', 10)
+	        .attr('fill', function (d, i) {
+	            return colors(i);
+	        })
+	        .call(d3.drag()
+	            .on('start', dragstarted)
+	            .on('drag', dragged)
+	            .on('end', dragended));
+
+	    node.append('title')
+	        .text(function (d) { return d.name; });
+
+	    simulation
+	        .nodes(dataset.nodes)
+	        .on('tick', ticked);
+
+	    simulation.force('link')
+	        .links(dataset.links);
+
+	    function ticked() {
+	        link
+	            .attr('x1', function (d) { return d.source.x; })
+	            .attr('y1', function (d) { return d.source.y; })
+	            .attr('x2', function (d) { return d.target.x; })
+	            .attr('y2', function (d) { return d.target.y; });
+
+	        node
+	            .attr('cx', function (d) { return d.x; })
+	            .attr('cy', function (d) { return d.y; });
+	    }
+
+	    function dragstarted(d) {
+	        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+	        d.fx = d.x;
+	        d.fy = d.y;
+	    }
+
+	    function dragged(d) {
+	        d.fx = d3.event.x;
+	        d.fy = d3.event.y;
+	    }
+
+	    function dragended(d) {
+	        if (!d3.event.active) simulation.alphaTarget(0);
+	        d.fx = null;
+	        d.fy = null;
+	    }
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	ForceDirectedGraph.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	ForceDirectedGraph.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	ForceDirectedGraph.prototype.clear = function () {
+	    this.title = 'ForceDirectedGraph';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 树状图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function TreeDiagram() {
+	    BaseComponent.call(this);
+	    this.type = 'TreeDiagram';
+
+	    this.width = 500;
+	    this.height = 500;
+	    this.title = 'TreeDiagram';
+
+	    this.transform = null;
+	}
+
+	TreeDiagram.prototype = Object.create(BaseComponent.prototype);
+	TreeDiagram.prototype.constructor = TreeDiagram;
+
+	TreeDiagram.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	TreeDiagram.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var root = {
+	        name: '中国',
+	        children: [{
+	            name: '浙江',
+	            children: [{
+	                name: '杭州'
+	            }, {
+	                name: '宁波'
+	            }, {
+	                name: '温州'
+	            }, {
+	                name: '绍兴'
+	            }]
+	        }, {
+	            name: '广西',
+	            children: [{
+	                name: '桂林',
+	                children: [{
+	                    name: '秀峰区'
+	                }, {
+	                    name: '叠彩区'
+	                }, {
+	                    name: '象山区'
+	                }, {
+	                    name: '七星区'
+	                }]
+	            }, {
+	                name: '南宁'
+	            }, {
+	                name: '柳州'
+	            }, {
+	                name: '防城港'
+	            }]
+	        }],
+	    };
+
+	    var width = 500;
+	    var height = 500;
+
+	    var tree = d3.tree()
+	        .size([width, height - 200])
+	        .separation(function (a, b) {
+	            return (a.parent === b.parent ? 1 : 2);
+	        });
+
+	    var hierachyData = d3.hierarchy(root)
+	        .sum(function (d) {
+	            return d.value;
+	        });
+
+	    var g1 = g.append('g')
+	        .attr('transform', 'translate(40, 40)');
+
+	    tree(hierachyData);
+
+	    var nodes = hierachyData.descendants();
+	    var links = hierachyData.links();
+
+	    g1.selectAll('.link')
+	        .data(links)
+	        .enter()
+	        .append('path')
+	        .attr('data-id', this.id)
+	        .attr('class', 'link')
+	        .attr('fill', 'none')
+	        .attr('stroke', '#000')
+	        .attr('d', function (d) {
+	            return `M${d.source.y},${d.source.x} L${d.target.y},${d.target.x}`;
+	        });
+
+	    g1.selectAll('.node')
+	        .data(nodes)
+	        .enter()
+	        .append('g')
+	        .attr('class', 'node')
+	        .attr('transform', function (d) {              // 这样写是为了 让数据横向显示
+	            return `translate(${d.y}, ${d.x})`
+	        });
+	    g1.selectAll('.node')
+	        .append('circle')
+	        .attr('data-id', this.id)
+	        .attr('r', 5)
+	        .attr('fill', 'green');
+
+	    // 绘制文字
+	    g1.selectAll('.node')
+	        .append('text')
+	        .attr('data-id', this.id)
+	        .attr('dy', 3)
+	        .attr('x', function (d) {
+	            return d.children ? -8 : 8;
+	        })
+	        .attr('text-anchor', function (d) {
+	            return d.children ? 'end' : 'start'
+	        })
+	        .text(function (d) {
+	            return d.data.name
+	        })
+	        .style('font-size', '18px');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	TreeDiagram.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	TreeDiagram.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	TreeDiagram.prototype.clear = function () {
+	    this.title = 'TreeDiagram';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 集群图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function ClusterDiagram() {
+	    BaseComponent.call(this);
+	    this.type = 'ClusterDiagram';
+
+	    this.width = 500;
+	    this.height = 500;
+	    this.title = 'ClusterDiagram';
+
+	    this.transform = null;
+	}
+
+	ClusterDiagram.prototype = Object.create(BaseComponent.prototype);
+	ClusterDiagram.prototype.constructor = ClusterDiagram;
+
+	ClusterDiagram.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	ClusterDiagram.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('ScatterPlot', true)
+	        .style('pointer-events', 'all');
+
+	    var root = {
+	        name: '中国',
+	        children: [{
+	            name: '浙江',
+	            children: [{
+	                name: '杭州'
+	            }, {
+	                name: '宁波'
+	            }, {
+	                name: '温州'
+	            }, {
+	                name: '绍兴'
+	            }]
+	        }, {
+	            name: '广西',
+	            children: [{
+	                name: '桂林',
+	                children: [{
+	                    name: '秀峰区'
+	                }, {
+	                    name: '叠彩区'
+	                }, {
+	                    name: '象山区'
+	                }, {
+	                    name: '七星区'
+	                }]
+	            }, {
+	                name: '南宁'
+	            }, {
+	                name: '柳州'
+	            }, {
+	                name: '防城港'
+	            }]
+	        }],
+	    };
+
+	    var width = 500;
+	    var height = 500;
+
+	    var tree = d3.cluster()
+	        .size([width, height - 200])
+	        .separation(function (a, b) {
+	            return (a.parent === b.parent ? 1 : 2);
+	        });
+
+	    var hierachyData = d3.hierarchy(root)
+	        .sum(function (d) {
+	            return d.value;
+	        });
+
+	    var g1 = g.append('g')
+	        .attr('transform', 'translate(40, 40)');
+
+	    tree(hierachyData);
+
+	    var nodes = hierachyData.descendants();
+	    var links = hierachyData.links();
+
+	    g1.selectAll('.link')
+	        .data(links)
+	        .enter()
+	        .append('path')
+	        .attr('data-id', this.id)
+	        .attr('class', 'link')
+	        .attr('fill', 'none')
+	        .attr('stroke', '#000')
+	        .attr('d', function (d) {
+	            return `M${d.source.y},${d.source.x} L${d.target.y},${d.target.x}`;
+	        });
+
+	    g1.selectAll('.node')
+	        .data(nodes)
+	        .enter()
+	        .append('g')
+	        .attr('class', 'node')
+	        .attr('transform', function (d) {              // 这样写是为了 让数据横向显示
+	            return `translate(${d.y}, ${d.x})`
+	        });
+	    g1.selectAll('.node')
+	        .append('circle')
+	        .attr('data-id', this.id)
+	        .attr('r', 5)
+	        .attr('fill', 'green');
+
+	    // 绘制文字
+	    g1.selectAll('.node')
+	        .append('text')
+	        .attr('data-id', this.id)
+	        .attr('dy', 3)
+	        .attr('x', function (d) {
+	            return d.children ? -8 : 8;
+	        })
+	        .attr('text-anchor', function (d) {
+	            return d.children ? 'end' : 'start'
+	        })
+	        .text(function (d) {
+	            return d.data.name
+	        })
+	        .style('font-size', '18px');
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	ClusterDiagram.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	ClusterDiagram.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.transform = json.transform || null;
+	};
+
+	ClusterDiagram.prototype.clear = function () {
+	    this.title = 'ClusterDiagram';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 包图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function PackDiagram() {
+	    BaseComponent.call(this);
+	    this.type = 'PackDiagram';
+
+	    this.width = 500;
+	    this.height = 500;
+	    this.title = 'PackDiagram';
+
+	    this.transform = null;
+	}
+
+	PackDiagram.prototype = Object.create(BaseComponent.prototype);
+	PackDiagram.prototype.constructor = PackDiagram;
+
+	PackDiagram.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	PackDiagram.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('PackDiagram', true)
+	        .style('pointer-events', 'all');
+
+	    var city = {
+	        name: '中国',
+	        children: [{
+	            name: '浙江',
+	            children: [{
+	                name: '杭州'
+	            }, {
+	                name: '宁波'
+	            }, {
+	                name: '温州'
+	            }, {
+	                name: '绍兴'
+	            }]
+	        }, {
+	            name: '广西',
+	            children: [{
+	                name: '桂林',
+	                children: [{
+	                    name: '秀峰区'
+	                }, {
+	                    name: '叠彩区'
+	                }, {
+	                    name: '象山区'
+	                }, {
+	                    name: '七星区'
+	                }]
+	            }, {
+	                name: '南宁'
+	            }, {
+	                name: '柳州'
+	            }, {
+	                name: '防城港'
+	            }]
+	        }],
+	    };
+
+	    var width = 500;
+	    var height = 500;
+
+	    var pack = d3.pack()
+	        .size([width, height])
+	        .radius(function (d) {
+	            return 30;
+	        })
+	        .padding(5);
+
+	    var hierachy = d3.hierarchy(city);
+	    var packData = pack(hierachy);
+
+	    var colors = d3.schemeCategory10;
+
+	    g.selectAll('circle')
+	        .data(packData.descendants())
+	        .enter()
+	        .append('circle')
+	        .attr('data-id', this.id)
+	        .attr('cx', function (d) {
+	            return d.x;
+	        })
+	        .attr('cy', function (d) {
+	            return d.y;
+	        })
+	        .attr('r', function (d) {
+	            return d.r;
+	        })
+	        .attr('class', function (d) {
+	            return d.children ? 'node' : 'leafnode';
+	        })
+	        .attr('fill', function (d, i) {
+	            return colors[i];
+	        });
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	PackDiagram.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	PackDiagram.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	PackDiagram.prototype.clear = function () {
+	    this.title = 'PackDiagram';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	/**
+	 * 分区图
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function PartitionDiagram() {
+	    BaseComponent.call(this);
+	    this.type = 'PartitionDiagram';
+
+	    this.width = 800;
+	    this.height = 500;
+	    this.title = 'PartitionDiagram';
+
+	    this.transform = null;
+	}
+
+	PartitionDiagram.prototype = Object.create(BaseComponent.prototype);
+	PartitionDiagram.prototype.constructor = PartitionDiagram;
+
+	PartitionDiagram.prototype.setTranslate = function (dx, dy) {
+	    var xy = this.transform.split(',');
+
+	    this.transform = `${parseFloat(xy[0]) + dx},${parseFloat(xy[1]) + dy}`;
+
+	    this.dom.attr('transform', `translate(${this.transform})`);
+	};
+
+	PartitionDiagram.prototype.render = function (parent) {
+	    if (d3.select(`#${this.id}`).size() > 0) {
+	        return;
+	    }
+
+	    var g = d3.select(parent)
+	        .append('g')
+	        .attr('id', this.id)
+	        .classed('Visual', true)
+	        .classed('PartitionDiagram', true)
+	        .style('pointer-events', 'all');
+
+	    var city = {
+	        name: '中国',
+	        value: 1,
+	        children: [{
+	            name: '浙江',
+	            value: 1,
+	            children: [{
+	                name: '杭州',
+	                value: 1,
+	            }, {
+	                name: '宁波',
+	                value: 1,
+	            }, {
+	                name: '温州',
+	                value: 1,
+	            }, {
+	                name: '绍兴',
+	                value: 1,
+	            }]
+	        }, {
+	            name: '广西',
+	            value: 1,
+	            children: [{
+	                name: '桂林',
+	                value: 1,
+	                children: [{
+	                    name: '秀峰区',
+	                    value: 1,
+	                }, {
+	                    name: '叠彩区',
+	                    value: 1,
+	                }, {
+	                    name: '象山区',
+	                    value: 1,
+	                }, {
+	                    name: '七星区',
+	                    value: 1,
+	                }]
+	            }, {
+	                name: '南宁',
+	                value: 1,
+	            }, {
+	                name: '柳州',
+	                value: 1,
+	            }, {
+	                name: '防城港',
+	                value: 1,
+	            }]
+	        }],
+	    };
+
+	    var hierarchy = d3.hierarchy(city);
+
+	    var partition = d3.partition();
+	    var partitionData = partition(hierarchy)
+	        .descendants();
+
+	    var colors = d3.schemeCategory10;
+
+	    g.selectAll('rect')
+	        .data(partitionData)
+	        .enter()
+	        .append('rect')
+	        .attr('data-id', this.id)
+	        .attr('x', function (d) {
+	            return d.x0 * 100;
+	        })
+	        .attr('y', function (d) {
+	            return d.y0 * 100;
+	        })
+	        .attr('width', function (d) {
+	            return d.x1 * 100 - d.x0 * 100;
+	        })
+	        .attr('height', function (d) {
+	            return d.y1 * 100 - d.y0 * 100;
+	        })
+	        .attr('fill', function (d, i) {
+	            return colors[i % 10];
+	        });
+
+	    if (!this.transform) {
+	        var left = (parent.clientWidth - this.width) / 2;
+	        var top = (parent.clientHeight - this.height) / 2;
+	        this.transform = `${left},${top}`;
+	    }
+
+	    g.attr('transform', `translate(${this.transform})`);
+
+	    this.dom = g;
+	};
+
+	PartitionDiagram.prototype.toJSON = function () {
+	    var transform;
+	    if (this.transform) {
+	        transform = this.transform
+	            .replace('translate(', '')
+	            .replace(')', '');
+	    }
+
+	    return {
+	        id: this.id,
+	        type: this.type,
+	        title: this.title,
+	        transform,
+	    };
+	};
+
+	PartitionDiagram.prototype.fromJSON = function (json) {
+	    this.id = json.id;
+	    this.type = json.type;
+	    this.title = json.title;
+	    this.data = data;
+	    this.transform = json.transform || null;
+	};
+
+	PartitionDiagram.prototype.clear = function () {
+	    this.title = 'PartitionDiagram';
+	    this.transform = null;
+
+	    delete this.dom;
+	};
+
+	const ComponentTypes = {
+	    Button: Button$1,
+	    Label: Label$1,
+	    Panel,
+	    HorizontalLine,
+	    BarChart,
+	    TimeLabel,
+	    DateWeekLabel,
+	    TimeDisk,
+	    KeyValueLabel,
+	    FormPanel,
+	    Gauge,
+	    Histogram,
+	    LineChart,
+	    SideBar,
+	    Histogram2,
+	    ScatterPlot,
+	    PieChart,
+	    ChordGraph,
+	    ForceDirectedGraph,
+	    TreeDiagram,
+	    ClusterDiagram,
+	    PackDiagram,
+	    PartitionDiagram,
+	};
+
+	/**
+	 * 数据可视化
+	 * @author tengge / https://github.com/tengge1
+	 */
+	function Visualization() {
+	    BaseComponent.call(this);
+	    this.components = [];
+	}
+
+	Visualization.prototype = Object.create(BaseComponent.prototype);
+	Visualization.prototype.constructor = Visualization;
+
+	/**
+	 * 添加一个组件
+	 * @param {BaseComponent} component 可视化组件
+	 */
+	Visualization.prototype.add = function (component) {
+	    if (!(component instanceof BaseComponent)) {
+	        console.warn(`Visualization: component is not an instance of BaseComponent.`);
+	        return;
+	    }
+	    if (this.components.indexOf(component) > -1) {
+	        console.warn(`Visualization: component has already added to the list.`);
+	        return;
+	    }
+
+	    this.components.push(component);
+	};
+
+	/**
+	 * 移除一个组件
+	 * @param {BaseComponent} component 可视化组件
+	 */
+	Visualization.prototype.remove = function (component) {
+	    if (!(component instanceof BaseComponent)) {
+	        console.warn(`Visualization: component is not an instance of BaseComponent.`);
+	        return;
+	    }
+
+	    var index = this.components.indexOf(component);
+
+	    if (index === -1) {
+	        console.warn(`Visualization: component does not exist in the list.`);
+	        return;
+	    }
+
+	    this.components.splice(index, 1);
+	};
+
+	Visualization.prototype.get = function (id) {
+	    var component = this.components.filter(n => {
+	        return n.id === id;
+	    })[0];
+
+	    if (!component) {
+	        console.warn(`Visualization: component#${id} is not defined.`);
+	        return null;
+	    }
+
+	    return component;
+	};
+
+	/**
+	 * 将所有控件渲染到svgDom里面
+	 * @param {SVGSVGElement} svgDom SVG元素
+	 */
+	Visualization.prototype.render = function (svgDom) {
+	    if (!(svgDom instanceof SVGSVGElement)) {
+	        console.warn(`Visualization: svgDom is not an instance of SVGSVGElement.`);
+	        return;
+	    }
+
+	    this.components.forEach(n => {
+	        n.render(svgDom);
+	    });
+	};
+
+	/**
+	 * svg控件转json
+	 */
+	Visualization.prototype.toJSON = function () {
+	    var list = [];
+
+	    this.components.forEach(n => {
+	        var jsons = n.toJSON();
+
+	        if (Array.isArray(jsons)) {
+	            list.push.apply(list, jsons);
+	        } else if (jsons) {
+	            list.push(jsons);
+	        } else {
+	            console.warn(`Visualization: ${n.id}.toJSON() result in null.`);
+	        }
+	    });
+
+	    return list;
+	};
+
+	/**
+	 * json转svg控件
+	 * @param {Object} jsons JSON字符串序列后的对象
+	 */
+	Visualization.prototype.fromJSON = function (jsons) {
+	    if (!Array.isArray(jsons)) {
+	        console.warn(`Visualization: jsons is not an Array.`);
+	        return;
+	    }
+
+	    this.clear();
+
+	    jsons.forEach(n => {
+	        var ctype = ComponentTypes[n.type];
+	        if (ctype) {
+	            var component = new ctype();
+	            component.fromJSON(n);
+	            this.add(component);
+	        } else {
+	            console.warn(`Visualization: there is no ComponentType named ${n.type}.`);
+	        }
+	    });
+	};
+
+	/**
+	 * 清空组件
+	 */
+	Visualization.prototype.clear = function () {
+	    this.components.forEach(n => {
+	        n.clear();
+	    });
+	    this.components.length = 0;
+	};
+
 	/**
 	 * 播放器
 	 * @author mrdoob / http://mrdoob.com/
@@ -17331,6 +21288,9 @@
 
 	    this.gis = null;
 
+	    this.package = new PackageManager();
+	    this.require = this.package.require.bind(this.package);
+
 	    this.loader = new PlayerLoader(this);
 	    this.event = new PlayerEvent(this);
 	    this.control = new PlayerControl(this);
@@ -17354,10 +21314,27 @@
 	        cls: 'Panel player',
 	        style: {
 	            display: 'none'
-	        }
+	        },
+	        children: [{
+	            xtype: 'svg',
+	            id: 'svg',
+	            scope: this.id,
+	            style: {
+	                position: 'absolute',
+	                left: 0,
+	                top: 0,
+	                width: '100%',
+	                height: '100%',
+	                pointerEvents: 'none',
+	                zIndex: 10,
+	            },
+	        }]
 	    });
 
 	    control.render();
+
+	    this.svg = UI$1.get('svg', this.id).dom;
+	    this.visual = new Visualization();
 
 	    // 性能控件
 	    if (this.options.showStats) {
@@ -17502,8 +21479,18 @@
 	    this.scene = obj.scene || new THREE.Scene();
 
 	    if (obj.options.sceneType === 'GIS') {
-	        this.gis = new Globe(this.camera, this.renderer, obj.options);
+	        this.gis = new Globe(this.camera, this.renderer, Object.assign({}, obj.options, {
+	            useCameraPosition: true,
+	        }));
 	    }
+
+	    // 可视化
+	    if (obj.visual) {
+	        this.visual.fromJSON(obj.visual);
+	    } else {
+	        this.visual.clear();
+	    }
+	    this.visual.render(this.svg);
 	};
 
 	Player.prototype.animate = function () {
@@ -17719,7 +21706,7 @@
 	    'enableThrowBall', // 是否允许扔小球
 	];
 
-	var ID$8 = -1;
+	var ID$9 = -1;
 
 	/**
 	 * 事件基类
@@ -17727,7 +21714,7 @@
 	 */
 	function BaseEvent(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$8--}`;
+	    this.id = `${this.constructor.name}${ID$9--}`;
 	}
 
 	BaseEvent.prototype.start = function () {
@@ -18771,6 +22758,55 @@
 	};
 
 	/**
+	 * 拖动事件
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} app 
+	 */
+	function DraggableEvent(app) {
+	    BaseEvent.call(this, app);
+	}
+
+	DraggableEvent.prototype = Object.create(BaseEvent.prototype);
+	DraggableEvent.prototype.constructor = DraggableEvent;
+
+	DraggableEvent.prototype.start = function () {
+	    var visual = this.app.editor.visual;
+	    var component = null;
+
+	    var drag = d3.drag()
+	        .on('start', function () {
+	            var target = d3.event.sourceEvent.target;
+
+	            var id = d3.select(target).attr('data-id');
+
+	            if (!id) {
+	                return;
+	            }
+
+	            component = visual.get(id);
+	        })
+	        .on('drag', function () {
+	            if (!component) {
+	                return;
+	            }
+
+	            if (component.setTranslate) {
+	                component.setTranslate(d3.event.dx, d3.event.dy);
+	            }
+	        })
+	        .on('end', function () {
+	            component = null;
+	        });
+
+	    d3.select(this.app.editor.svg)
+	        .call(drag);
+	};
+
+	DraggableEvent.prototype.stop = function () {
+
+	};
+
+	/**
 	 * 事件执行器
 	 * @author tengge / https://github.com/tengge1
 	 */
@@ -18792,7 +22828,10 @@
 	        new ObjectEvent(this.app),
 	        new RaycastEvent(this.app),
 	        new PickEvent(this.app),
-	        new EditorControlsEvent(this.app)
+	        new EditorControlsEvent(this.app),
+
+	        // 可视化
+	        new DraggableEvent(this.app),
 	    ];
 	}
 
@@ -19075,10 +23114,14 @@
 	/**
 	 * GIS场景
 	 * @author tengge / https://github.com/tengge1
-	 * @param {*} app 
+	 * @param {*} app 应用程序
+	 * @param {Object} options 配置
+	 * @param {Boolean} options.useCameraPosition 是否使用相机位置
 	 */
-	function Scene(app) {
+	function Scene(app, options = {}) {
 	    this.app = app;
+	    this.options = options;
+	    this.options.useCameraPosition = this.options.useCameraPosition || false;
 	}
 
 	Scene.prototype.start = function () {
@@ -19096,6 +23139,7 @@
 
 	    this.globe = new Globe(editor.camera, editor.renderer, {
 	        server: this.app.options.server,
+	        useCameraPosition: this.options.useCameraPosition,
 	    });
 	    editor.scene.add(this.globe);
 	    this.oldSceneBeforeRender = editor.scene.onBeforeRender;
@@ -19282,7 +23326,8 @@
 	        renderer: editor.renderer,
 	        scripts: editor.scripts,
 	        animations: editor.animations,
-	        scene: editor.scene
+	        scene: editor.scene,
+	        visual: editor.visual,
 	    });
 
 	    var params = {
@@ -19334,7 +23379,8 @@
 	        renderer: editor.renderer,
 	        scripts: editor.scripts,
 	        animations: editor.animations,
-	        scene: editor.scene
+	        scene: editor.scene,
+	        visual: editor.visual,
 	    });
 
 	    Ajax.post(`${this.app.options.server}/api/Scene/Save`, {
@@ -19617,6 +23663,398 @@
 	        clone.dom.classList.add('inactive');
 	        deleteBtn.dom.classList.add('inactive');
 	    }
+	};
+
+	/**
+	 * 二维菜单
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function TwoDMenu(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	TwoDMenu.prototype = Object.create(UI$1.Control.prototype);
+	TwoDMenu.prototype.constructor = TwoDMenu;
+
+	TwoDMenu.prototype.render = function () {
+	    var container = UI$1.create({
+	        xtype: 'div',
+	        parent: this.parent,
+	        cls: 'menu',
+	        children: [{
+	            xtype: 'div',
+	            cls: 'title',
+	            html: L_TWO_D
+	        }, {
+	            xtype: 'div',
+	            cls: 'options',
+	            children: [{
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_BUTTON,
+	                onClick: this.addButton.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_LABEL,
+	                onClick: this.addLabel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_PANEL,
+	                onClick: this.addPanel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_HORIZONTAL_LINE,
+	                onClick: this.addHorizontalLine.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_BAR_CHART,
+	                onClick: this.addBarChart.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_TIME,
+	                onClick: this.addTimeLabel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_VERTICAL_LINE,
+	                onClick: this.addVerticalLine.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_DATE_WEEK,
+	                onClick: this.addDateWeek.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_TIME_DISK,
+	                onClick: this.addTimeDisk.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_KEY_VALUE_LABEL,
+	                onClick: this.addKeyValueLabel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_FORM_PANEL,
+	                onClick: this.addFormPanel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_GAUGE,
+	                onClick: this.addGauge.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_HISTOGRAM,
+	                onClick: this.addHistogram.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_LINECHART,
+	                onClick: this.addLineChart.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_SIDEBAR,
+	                onClick: this.addSideBar.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_HISTOGRAM + '2',
+	                onClick: this.addHistogram2.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_SCATTER_PLOT,
+	                onClick: this.addScatterPlot.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_PIE_CHART,
+	                onClick: this.addPieChart.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_CHORD_GRAPH,
+	                onClick: this.addChordGraph.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_FORCE_DIRECTED_GRAPH,
+	                onClick: this.addForceDirectedGraph.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_TREE_DIAGRAM,
+	                onClick: this.addTreeDiagram.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_CLUSTER_DIAGRAM,
+	                onClick: this.addClusterDiagram.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_PACK_DIAGRAM,
+	                onClick: this.addPackDiagram.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_PARTITION_DIAGRAM,
+	                onClick: this.addPartitionDiagram.bind(this),
+	            }]
+	        }]
+	    });
+
+	    container.render();
+	};
+
+	// ------------------------------ 按钮 --------------------------------
+
+	TwoDMenu.prototype.addButton = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Button$1());
+	    visual.render(svg);
+	};
+
+	// ---------------------------- 标签 -----------------------------------
+
+	TwoDMenu.prototype.addLabel = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Label$1());
+	    visual.render(svg);
+	};
+
+	// ---------------------------- 面板 ------------------------------------
+
+	TwoDMenu.prototype.addPanel = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Panel());
+	    visual.render(svg);
+	};
+
+	// --------------------------- 水平线 -------------------------------------
+
+	TwoDMenu.prototype.addHorizontalLine = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new HorizontalLine());
+	    visual.render(svg);
+	};
+
+	// ---------------------------- 条形图 -------------------------------------
+
+	TwoDMenu.prototype.addBarChart = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new BarChart());
+	    visual.render(svg);
+	};
+
+	// --------------------------- 时间标签 --------------------------------------
+
+	TwoDMenu.prototype.addTimeLabel = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new TimeLabel());
+	    visual.render(svg);
+	};
+
+	// --------------------------- 垂直线 ------------------------------------------
+
+	TwoDMenu.prototype.addVerticalLine = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new VerticalLine());
+	    visual.render(svg);
+	};
+
+	// -------------------------- 日期时间 -------------------------------------------
+
+	TwoDMenu.prototype.addDateWeek = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new DateWeekLabel());
+	    visual.render(svg);
+	};
+
+	// ------------------------- 时间圆盘 -----------------------------------------------
+
+	TwoDMenu.prototype.addTimeDisk = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new TimeDisk());
+	    visual.render(svg);
+	};
+
+	// -------------------------- 键值标签 -------------------------------------------------
+
+	TwoDMenu.prototype.addKeyValueLabel = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new KeyValueLabel());
+	    visual.render(svg);
+	};
+
+	// --------------------------- 表单 ------------------------------------------------------
+
+	TwoDMenu.prototype.addFormPanel = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new FormPanel());
+	    visual.render(svg);
+	};
+
+	// ---------------------------- 仪表 --------------------------------------------
+
+	TwoDMenu.prototype.addGauge = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Gauge());
+	    visual.render(svg);
+	};
+
+	// --------------------------- 柱状图 ----------------------------------------------
+
+	TwoDMenu.prototype.addHistogram = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Histogram());
+	    visual.render(svg);
+	};
+
+	// ------------------------------- 折线图 ----------------------------------------------
+
+	TwoDMenu.prototype.addLineChart = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new LineChart());
+	    visual.render(svg);
+	};
+
+	// -------------------------------- 侧边栏 ---------------------------------------------
+
+	TwoDMenu.prototype.addSideBar = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new SideBar());
+	    visual.render(svg);
+	};
+
+	// ------------------------------- 柱状图2 ------------------------------------------------
+
+	TwoDMenu.prototype.addHistogram2 = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new Histogram2());
+	    visual.render(svg);
+	};
+
+	// -------------------------------- 散点图 ---------------------------------------------------
+
+	TwoDMenu.prototype.addScatterPlot = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new ScatterPlot());
+	    visual.render(svg);
+	};
+
+	// --------------------------------- 饼状图 --------------------------------------------------
+
+	TwoDMenu.prototype.addPieChart = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new PieChart());
+	    visual.render(svg);
+	};
+
+	// --------------------------------- 弦图 --------------------------------------------------
+
+	TwoDMenu.prototype.addChordGraph = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new ChordGraph());
+	    visual.render(svg);
+	};
+
+	// ----------------------------------- 力导向图 ---------------------------------------------
+
+	TwoDMenu.prototype.addForceDirectedGraph = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new ForceDirectedGraph());
+	    visual.render(svg);
+	};
+
+	// ----------------------------------- 树状图 -----------------------------------------------
+
+	TwoDMenu.prototype.addTreeDiagram = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new TreeDiagram());
+	    visual.render(svg);
+	};
+
+	// ---------------------------------- 集群图 -----------------------------------------------------
+
+	TwoDMenu.prototype.addClusterDiagram = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new ClusterDiagram());
+	    visual.render(svg);
+	};
+
+	// ------------------------------- 包图 -----------------------------------------
+
+	TwoDMenu.prototype.addPackDiagram = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new PackDiagram());
+	    visual.render(svg);
+	};
+
+	// --------------------------------- 分区图 --------------------------------------------
+
+	TwoDMenu.prototype.addPartitionDiagram = function () {
+	    var visual = this.app.editor.visual;
+	    var svg = this.app.editor.svg;
+
+	    visual.add(new PartitionDiagram());
+	    visual.render(svg);
 	};
 
 	/**
@@ -20057,7 +24495,7 @@
 	    this.material.map.needsUpdate = true;
 	};
 
-	var ID$9 = -1;
+	var ID$a = -1;
 
 	/**
 	 * 帮助器基类
@@ -20066,7 +24504,7 @@
 	 */
 	function BaseHelper(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$9--}`;
+	    this.id = `${this.constructor.name}${ID$a--}`;
 	}
 
 	/**
@@ -20917,449 +25355,6 @@
 	    });
 	};
 
-	var HeightVertexShader = "varying vec2 vUv;\r\nuniform vec2 scale;\r\nuniform vec2 offset;\r\n\r\nvoid main( void ) {\r\n    vUv = uv * scale + offset;\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n}";
-
-	var HeightFragmentShader = "//\r\n// Description : Array and textureless GLSL 3D simplex noise function.\r\n//      Author : Ian McEwan, Ashima Arts.\r\n//  Maintainer : ijm\r\n//     Lastmod : 20110409 (stegu)\r\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\r\n//               Distributed under the MIT License. See LICENSE file.\r\n//\r\nuniform float time;\r\nvarying vec2 vUv;\r\n\r\nvec4 permute( vec4 x ) {\r\n\treturn mod( ( ( x * 34.0 ) + 1.0 ) * x, 289.0 );\r\n}\r\n\r\nvec4 taylorInvSqrt( vec4 r ) {\r\n\treturn 1.79284291400159 - 0.85373472095314 * r;\r\n}\r\n\r\nfloat snoise( vec3 v ) {\r\n\tconst vec2 C = vec2( 1.0 / 6.0, 1.0 / 3.0 );\r\n\tconst vec4 D = vec4( 0.0, 0.5, 1.0, 2.0 );\r\n\t// First corner\r\n\tvec3 i  = floor( v + dot( v, C.yyy ) );\r\n\tvec3 x0 = v - i + dot( i, C.xxx );\r\n\t// Other corners\r\n\tvec3 g = step( x0.yzx, x0.xyz );\r\n\tvec3 l = 1.0 - g;\r\n\tvec3 i1 = min( g.xyz, l.zxy );\r\n\tvec3 i2 = max( g.xyz, l.zxy );\r\n\tvec3 x1 = x0 - i1 + 1.0 * C.xxx;\r\n\tvec3 x2 = x0 - i2 + 2.0 * C.xxx;\r\n\tvec3 x3 = x0 - 1. + 3.0 * C.xxx;\r\n\t// Permutations\r\n\ti = mod( i, 289.0 );\r\n\tvec4 p = permute( permute( permute(\r\n\t\t\t i.z + vec4( 0.0, i1.z, i2.z, 1.0 ) )\r\n\t\t   + i.y + vec4( 0.0, i1.y, i2.y, 1.0 ) )\r\n\t\t   + i.x + vec4( 0.0, i1.x, i2.x, 1.0 ) );\r\n\t// Gradients\r\n\t// ( N*N points uniformly over a square, mapped onto an octahedron.)\r\n\tfloat n_ = 1.0 / 7.0; // N=7\r\n\tvec3 ns = n_ * D.wyz - D.xzx;\r\n\tvec4 j = p - 49.0 * floor( p * ns.z *ns.z );  //  mod(p,N*N)\r\n\tvec4 x_ = floor( j * ns.z );\r\n\tvec4 y_ = floor( j - 7.0 * x_ );    // mod(j,N)\r\n\tvec4 x = x_ *ns.x + ns.yyyy;\r\n\tvec4 y = y_ *ns.x + ns.yyyy;\r\n\tvec4 h = 1.0 - abs( x ) - abs( y );\r\n\tvec4 b0 = vec4( x.xy, y.xy );\r\n\tvec4 b1 = vec4( x.zw, y.zw );\r\n\tvec4 s0 = floor( b0 ) * 2.0 + 1.0;\r\n\tvec4 s1 = floor( b1 ) * 2.0 + 1.0;\r\n\tvec4 sh = -step( h, vec4( 0.0 ) );\r\n\tvec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;\r\n\tvec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;\r\n\tvec3 p0 = vec3( a0.xy, h.x );\r\n\tvec3 p1 = vec3( a0.zw, h.y );\r\n\tvec3 p2 = vec3( a1.xy, h.z );\r\n\tvec3 p3 = vec3( a1.zw, h.w );\r\n\t// Normalise gradients\r\n\tvec4 norm = taylorInvSqrt( vec4( dot( p0, p0 ), dot( p1, p1 ), dot( p2, p2 ), dot( p3, p3 ) ) );\r\n\tp0 *= norm.x;\r\n\tp1 *= norm.y;\r\n\tp2 *= norm.z;\r\n\tp3 *= norm.w;\r\n\t// Mix final noise value\r\n\tvec4 m = max( 0.6 - vec4( dot( x0, x0 ), dot( x1, x1 ), dot( x2, x2 ), dot( x3, x3 ) ), 0.0 );\r\n\tm = m * m;\r\n\treturn 42.0 * dot( m*m, vec4( dot( p0, x0 ), dot( p1, x1 ),\r\n\t\t\t\t\t\t\t\t  dot( p2, x2 ), dot( p3, x3 ) ) );\r\n}\r\n\r\nfloat surface3( vec3 coord ) {\r\n\tfloat n = 0.0;\r\n\tn += 1.0 * abs( snoise( coord ) );\r\n\tn += 0.5 * abs( snoise( coord * 2.0 ) );\r\n\tn += 0.25 * abs( snoise( coord * 4.0 ) );\r\n\tn += 0.125 * abs( snoise( coord * 8.0 ) );\r\n\treturn n;\r\n}\r\n\r\nvoid main( void ) {\r\n\tvec3 coord = vec3( vUv, -time );\r\n\tfloat n = surface3( coord );\r\n\tgl_FragColor = vec4( vec3( n, n, n ), 1.0 );\r\n}";
-
-	/**
-	 * 着色器地形
-	 * @param {*} renderer 渲染器
-	 * @param {*} options 参数
-	 */
-	function ShaderTerrain(renderer, options) {
-	    var width = options.width || window.innerWidth; // 画布宽度
-	    var height = options.height || window.innerHeight; // 画布高度
-
-	    // 地形参数
-	    var rx = 256, ry = 256, // 分辨率
-	        animDelta = 0, // 动画间隔
-	        animDeltaDir = -1, // 动画方向
-	        lightDir = 1; // 光源方向
-
-	    // 场景
-	    var scene = new THREE.Scene();
-
-	    // 相机
-	    var camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
-	    camera.position.z = 100;
-	    scene.add(camera);
-
-	    // 高程贴图
-	    var heightMap = new THREE.WebGLRenderTarget(rx, ry, {
-	        minFilter: THREE.LinearFilter,
-	        magFilter: THREE.LinearFilter,
-	        format: THREE.RGBFormat
-	    });
-	    heightMap.texture.generateMipmaps = false;
-
-	    // 法线贴图
-	    var normalMap = new THREE.WebGLRenderTarget(rx, ry, {
-	        minFilter: THREE.LinearFilter,
-	        magFilter: THREE.LinearFilter,
-	        format: THREE.RGBFormat
-	    });
-	    normalMap.texture.generateMipmaps = false;
-
-	    // 高光贴图
-	    var specularMap = new THREE.WebGLRenderTarget(2048, 2048, {
-	        minFilter: THREE.LinearFilter,
-	        magFilter: THREE.LinearFilter,
-	        format: THREE.RGBFormat
-	    });
-	    specularMap.texture.generateMipmaps = false;
-
-	    // 下载纹理
-	    var loadingManager = new THREE.LoadingManager(() => {
-	        this.visible = true;
-	    });
-
-	    var textureLoader = new THREE.TextureLoader(loadingManager);
-
-	    var diffuseTexture1 = textureLoader.load("assets/textures/terrain/grasslight-big.jpg"); // 漫反射纹理1
-	    var diffuseTexture2 = textureLoader.load("assets/textures/terrain/backgrounddetailed6.jpg"); // 漫反射纹理2
-	    var detailTexture = textureLoader.load("assets/textures/terrain/grasslight-big-nm.jpg"); // 细节纹理
-
-	    diffuseTexture1.wrapS = diffuseTexture1.wrapT = THREE.RepeatWrapping;
-	    diffuseTexture2.wrapS = diffuseTexture2.wrapT = THREE.RepeatWrapping;
-	    detailTexture.wrapS = detailTexture.wrapT = THREE.RepeatWrapping;
-
-	    // 创建高程材质
-	    var heightUniforms = {
-	        time: { value: 1.0 },
-	        scale: { value: new THREE.Vector2(1.5, 1.5) },
-	        offset: { value: new THREE.Vector2(0, 0) }
-	    };
-
-	    var hightMaterial = this.createShaderMaterial(HeightVertexShader, HeightFragmentShader, heightUniforms, false);
-
-	    // 创建法线材质
-	    var normalUniforms = THREE.UniformsUtils.clone(THREE.NormalMapShader.uniforms);
-	    normalUniforms.height.value = 0.05;
-	    normalUniforms.resolution.value.set(rx, ry);
-	    normalUniforms.heightMap.value = heightMap.texture;
-
-	    var normalMaterial = this.createShaderMaterial(THREE.NormalMapShader.vertexShader, THREE.NormalMapShader.fragmentShader, normalUniforms, false);
-
-	    // 创建地形材质
-	    var terrainShader = THREE.ShaderTerrain["terrain"];
-
-	    var terrainUniforms = THREE.UniformsUtils.clone(terrainShader.uniforms);
-
-	    terrainUniforms['tDisplacement'].value = heightMap.texture; // 位移贴图
-	    terrainUniforms['uDisplacementScale'].value = 375; // 位移贴图缩放
-
-	    terrainUniforms['tNormal'].value = normalMap.texture; // 法线贴图
-	    terrainUniforms['uNormalScale'].value = 3.5; // 法线贴图缩放
-
-	    terrainUniforms['specular'].value.setHex(0xffffff); // 高光颜色
-	    terrainUniforms['diffuse'].value.setHex(0xffffff); // 漫反射颜色
-	    terrainUniforms['shininess'].value = 30; // 光泽
-
-	    terrainUniforms['tSpecular'].value = specularMap.texture; // 高光贴图
-	    terrainUniforms['enableSpecular'].value = true; // 是否启用高光贴图
-
-	    terrainUniforms['tDiffuse1'].value = diffuseTexture1; // 漫反射纹理1
-	    terrainUniforms['enableDiffuse1'].value = true; // 是否启用漫反射纹理1
-
-	    terrainUniforms['tDiffuse2'].value = diffuseTexture2; // 漫反射纹理2
-	    terrainUniforms['enableDiffuse2'].value = true; // 是否启用漫反射纹理2
-
-	    terrainUniforms['tDetail'].value = detailTexture; // 细节纹理
-	    terrainUniforms['uRepeatOverlay'].value.set(6, 6); // 重复叠加次数
-
-	    var terrainMaterial = this.createShaderMaterial(terrainShader.vertexShader, terrainShader.fragmentShader, terrainUniforms, true);
-
-	    // 贴图生成渲染目标
-	    var quadTarget = new THREE.Mesh(new THREE.PlaneBufferGeometry(width, height), new THREE.MeshBasicMaterial({ color: 0x000000 }));
-	    quadTarget.position.z = -500;
-	    scene.add(quadTarget);
-
-	    // 创建网格
-	    var geometry = new THREE.PlaneBufferGeometry(6000, 6000, 256, 256);
-	    THREE.BufferGeometryUtils.computeTangents(geometry);
-
-	    THREE.Mesh.call(this, geometry, terrainMaterial);
-
-	    this.name = L_TERRAIN;
-	    this.position.set(0, -30, 0);
-	    this.rotation.x = -Math.PI / 2;
-	    this.scale.set(0.1, 0.1, 0.1);
-
-	    // 动画函数
-	    function update(deltaTime) {
-	        if (!this.visible) {
-	            return;
-	        }
-
-	        var fLow = 0.1,
-	            fHigh = 0.8;
-
-	        var lightVal = THREE.Math.clamp(lightVal + 0.5 * deltaTime * lightDir, fLow, fHigh);
-	        var valNorm = (lightVal - fLow) / (fHigh - fLow);
-
-	        terrainUniforms['uNormalScale'].value = THREE.Math.mapLinear(valNorm, 0, 1, 0.6, 3.5);
-
-	        animDelta = THREE.Math.clamp(animDelta + 0.00075 * animDeltaDir, 0, 0.05);
-	        heightUniforms['time'].value += deltaTime * animDelta;
-	        heightUniforms['offset'].value.x += deltaTime * 0.05;
-
-	        // 生成高程贴图
-	        quadTarget.material = hightMaterial;
-	        renderer.render(scene, camera, heightMap, true);
-
-	        // 生成法线贴图
-	        quadTarget.material = normalMaterial;
-	        renderer.render(scene, camera, normalMap, true);
-	    }
-	    this.update = update.bind(this);
-	}
-
-	ShaderTerrain.prototype = Object.create(THREE.Mesh.prototype);
-	ShaderTerrain.prototype.constructor = ShaderTerrain;
-
-	/**
-	 * 创建着色器材质
-	 * @param {*} vertexShader 顶点着色器
-	 * @param {*} fragmentShader 片源着色器
-	 * @param {*} uniforms 变量
-	 * @param {*} lights 是否使用光源
-	 */
-	ShaderTerrain.prototype.createShaderMaterial = function (vertexShader, fragmentShader, uniforms, lights) {
-	    return new THREE.ShaderMaterial({
-	        vertexShader: vertexShader,
-	        fragmentShader: fragmentShader,
-	        uniforms: uniforms,
-	        lights: lights,
-	        fog: true
-	    });
-	};
-
-	/**
-	 * 物理地形
-	 */
-	function PhysicsTerrain() {
-	    // 灰阶高度参数
-	    var terrainWidthExtents = 100; // 地形宽度范围
-	    var terrainDepthExtents = 100; // 地形深度范围
-	    var terrainWidth = 128; // 地形宽度
-	    var terrainDepth = 128; // 地形深度
-	    var terrainMinHeight = -2;
-	    var terrainMaxHeight = 8;
-
-	    // 创建几何体
-	    var geometry = new THREE.PlaneBufferGeometry(terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1);
-	    geometry.rotateX(-Math.PI / 2);
-
-	    var vertices = geometry.attributes.position.array;
-
-	    var heightData = this.generateHeight(terrainWidth, terrainDepth, terrainMinHeight, terrainMaxHeight);
-
-	    for (var i = 0, j = 0, l = vertices.length; i < l; i++ , j += 3) {
-	        // j + 1 because it is the y component that we modify
-	        vertices[j + 1] = heightData[i];
-	    }
-
-	    geometry.computeVertexNormals();
-
-	    // 创建材质
-	    var material = new THREE.MeshPhongMaterial({
-	        color: 0xC7C7C7
-	    });
-
-	    // 创建网格
-	    THREE.Mesh.call(this, geometry, material);
-
-	    this.name = L_TERRAIN;
-	    this.castShadow = true;
-	    this.receiveShadow = true;
-
-	    // 下载贴图
-	    var loader = new THREE.TextureLoader();
-	    loader.load(`assets/textures/grid.png`, texture => {
-	        texture.wrapS = THREE.RepeatWrapping;
-	        texture.wrapT = THREE.RepeatWrapping;
-	        texture.repeat.set(terrainWidth - 1, terrainDepth - 1);
-	        material.map = texture;
-	        material.needsUpdate = true;
-	    });
-
-	    // 物理
-	    var mass = 0;
-	    var position = this.position;
-	    var quaternion = this.quaternion;
-
-	    var transform = new Ammo.btTransform();
-	    transform.setIdentity();
-	    transform.setOrigin(new Ammo.btVector3(position.x, position.y, position.z));
-	    transform.setRotation(new Ammo.btQuaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
-	    var state = new Ammo.btDefaultMotionState(transform);
-
-	    var shape = this.createTerrainShape(terrainWidth, terrainDepth, terrainWidthExtents, terrainDepthExtents, heightData, terrainMinHeight, terrainMaxHeight);
-
-	    var localInertia = new Ammo.btVector3(0, 0, 0);
-
-	    var body = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(mass, state, shape, localInertia));
-
-	    this.userData.physicsBody = body;
-	}
-
-	PhysicsTerrain.prototype = Object.create(THREE.Mesh.prototype);
-	PhysicsTerrain.prototype.constructor = PhysicsTerrain;
-
-	/**
-	 * 生成高程数据（正弦曲线）
-	 * @param {*} width 
-	 * @param {*} depth 
-	 * @param {*} minHeight 
-	 * @param {*} maxHeight 
-	 */
-	PhysicsTerrain.prototype.generateHeight = function (width, depth, minHeight, maxHeight) {
-	    var size = width * depth;
-	    var data = new Float32Array(size);
-	    var hRange = maxHeight - minHeight;
-	    var w2 = width / 2;
-	    var d2 = depth / 2;
-	    var phaseMult = 12;
-	    var p = 0;
-	    for (var j = 0; j < depth; j++) {
-	        for (var i = 0; i < width; i++) {
-	            var radius = Math.sqrt(Math.pow((i - w2) / w2, 2.0) + Math.pow((j - d2) / d2, 2.0));
-	            var height = (Math.sin(radius * phaseMult) + 1) * 0.5 * hRange + minHeight;
-	            data[p] = height;
-	            p++;
-	        }
-	    }
-	    return data;
-	};
-
-	/**
-	 * 创建物理地形形状
-	 * @param {*} terrainWidth 
-	 * @param {*} terrainDepth 
-	 * @param {*} terrainWidthExtents 
-	 * @param {*} terrainDepthExtents 
-	 * @param {*} heightData 
-	 * @param {*} terrainMinHeight 
-	 * @param {*} terrainMaxHeight 
-	 */
-	PhysicsTerrain.prototype.createTerrainShape = function (terrainWidth, terrainDepth, terrainWidthExtents, terrainDepthExtents, heightData, terrainMinHeight, terrainMaxHeight) {
-	    // 此参数并未真正使用，因为我们使用的是PHY_FLOAT高度数据类型，因此会被忽略。
-	    var heightScale = 1;
-	    // 向上轴 0表示X，1表示Y，2表示Z。通常使用1=Y。
-	    var upAxis = 1;
-	    // hdt，高度数据类型。 使用“PHY_FLOAT”。 可能的值为“PHY_FLOAT”，“PHY_UCHAR”，“PHY_SHORT”。
-	    var hdt = "PHY_FLOAT";
-	    // 根据您的需要设置（反转三角形）。
-	    var flipQuadEdges = false;
-	    // 在Ammo堆中创建高度数据缓冲区。
-	    var ammoHeightData = Ammo._malloc(4 * terrainWidth * terrainDepth);
-	    // 将javascript高度数据数组复制到Ammo。
-	    var p = 0;
-	    var p2 = 0;
-	    var dh = (terrainMinHeight + terrainMaxHeight) / 2;
-	    for (var j = 0; j < terrainDepth; j++) {
-	        for (var i = 0; i < terrainWidth; i++) {
-	            // 将32位浮点数写入内存。
-	            Ammo.HEAPF32[ammoHeightData + p2 >> 2] = heightData[p] + dh;
-	            p++;
-	            // 4个字节/浮点数
-	            p2 += 4;
-	        }
-	    }
-	    // 创建高度场物理形状
-	    var heightFieldShape = new Ammo.btHeightfieldTerrainShape(
-	        terrainWidth,
-	        terrainDepth,
-	        ammoHeightData,
-	        heightScale,
-	        terrainMinHeight,
-	        terrainMaxHeight,
-	        upAxis,
-	        hdt,
-	        flipQuadEdges
-	    );
-	    // 设置水平缩放
-	    var scaleX = terrainWidthExtents / (terrainWidth - 1);
-	    var scaleZ = terrainDepthExtents / (terrainDepth - 1);
-	    heightFieldShape.setLocalScaling(new Ammo.btVector3(scaleX, 1, scaleZ));
-	    heightFieldShape.setMargin(0.05);
-	    return heightFieldShape;
-	};
-
-	PhysicsTerrain.prototype.update = function (deltaTime, physicsWorld) {
-	    physicsWorld.stepSimulation(deltaTime, 10);
-
-	    var body = this.userData.physics.body;
-	    var state = body.getMotionState();
-
-	    if (state) {
-	        var transformAux1 = new Ammo.btTransform();
-
-	        state.getWorldTransform(transformAux1);
-	        var p = transformAux1.getOrigin();
-	        var q = transformAux1.getRotation();
-	        this.position.set(p.x(), p.y(), p.z());
-	        this.quaternion.set(q.x(), q.y(), q.z(), q.w());
-	    }
-	};
-
-	/**
-	 * 地形菜单
-	 * @author tengge / https://github.com/tengge1
-	 * @param {*} options 
-	 */
-	function TerrainMenu(options) {
-	    UI$1.Control.call(this, options);
-	    this.app = options.app;
-	}
-
-	TerrainMenu.prototype = Object.create(UI$1.Control.prototype);
-	TerrainMenu.prototype.constructor = TerrainMenu;
-
-	TerrainMenu.prototype.render = function () {
-	    var container = UI$1.create({
-	        xtype: 'div',
-	        parent: this.parent,
-	        cls: 'menu',
-	        children: [{
-	            xtype: 'div',
-	            cls: 'title',
-	            html: L_TERRAIN
-	        }, {
-	            xtype: 'div',
-	            cls: 'options',
-	            children: [{
-	                xtype: 'div',
-	                cls: 'option',
-	                html: L_PERLIN_TERRAIN,
-	                onClick: this.createPerlinTerrain.bind(this)
-	            }, {
-	                xtype: 'div',
-	                cls: 'option inactive',
-	                html: L_SHADER_TERRAIN,
-	                onClick: this.createShaderTerrain.bind(this)
-	            }, {
-	                xtype: 'div',
-	                cls: 'option inactive',
-	                html: L_RAISE_TERRAIN,
-	                onClick: this.raiseTerrain.bind(this)
-	            }, {
-	                xtype: 'div',
-	                cls: 'option inactive',
-	                html: L_REDUCE_TERRAIN,
-	                onClick: this.reduceTerrain.bind(this)
-	            }, {
-	                xtype: 'div',
-	                cls: 'option inactive',
-	                html: L_PLANT_TREES,
-	                onClick: this.plantTrees.bind(this)
-	            }]
-	        }]
-	    });
-
-	    container.render();
-	};
-
-	// ---------------------------- 创建地形 -----------------------------------
-
-	TerrainMenu.prototype.createPerlinTerrain = function () {
-	    this.app.editor.execute(new AddObjectCommand(new PerlinTerrain()));
-	};
-
-	// ---------------------------- 创建着色器地形 ----------------------------------------
-
-	TerrainMenu.prototype.createShaderTerrain = function () {
-	    var dom = this.app.viewport.container.dom;
-
-	    var terrain = new ShaderTerrain(this.app.editor.renderer, dom.clientWidth, dom.clientHeight);
-
-	    this.app.editor.execute(new AddObjectCommand(terrain));
-
-	    terrain.update(0);
-
-	    // this.app.on(`animate.Terrain2`, (clock, deltaTime) => {
-	    //     terrain.update(deltaTime);
-	    // });
-	};
-
-	// ---------------------------- 升高地形 -----------------------------------
-
-	TerrainMenu.prototype.raiseTerrain = function () {
-
-	};
-
-	// ---------------------------- 降低地形 ------------------------------------
-
-	TerrainMenu.prototype.reduceTerrain = function () {
-
-	};
-
-	// ----------------------------- 批量种树 --------------------------------------
-
-	TerrainMenu.prototype.plantTrees = function () {
-
-	};
-
 	/**
 	 * 组件菜单
 	 * @author tengge / https://github.com/tengge1
@@ -21513,6 +25508,946 @@
 	    editor.execute(new AddObjectCommand(cloth));
 	};
 
+	var ID$b = -1;
+
+	const svgNS$3 = 'http://www.w3.org/2000/svg';
+
+	/**
+	 * 可视化组件
+	 * @param {*} options 配置
+	 * @param {SVGElement} options.parent SVG要素
+	 */
+	function Component(options = {}) {
+	    this.options = options;
+	    this.parent = options.parent;
+
+	    if (!this.parent) {
+	        console.warn(`Component: options.parent is undefined.`);
+	        this.parent = document.createElementNS(svgNS$3, 'svg');
+	    }
+
+	    this.id = `${this.constructor.name}${ID$b--}`;
+	}
+
+	Component.prototype.render = function () {
+
+	};
+
+	/**
+	 * 侧边栏
+	 * @param {*} options 
+	 */
+	function Sidebar(options) {
+	    Component.call(this, options);
+
+	    this.margin = 2;
+	    this.padding = 4;
+	}
+
+	Sidebar.prototype = Object.create(Component.prototype);
+	Sidebar.prototype.constructor = Sidebar;
+
+	Sidebar.prototype.render = function () {
+	    var svg = d3.select(this.parent);
+	    var defs = svg.select('defs');
+
+	    var group = svg.append('g');
+
+	    // 背景
+	    group.append('rect')
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('width', 270)
+	        .attr('height', 969)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 时间
+	    group.append('text')
+	        .text('14:21')
+	        .attr('x', 25)
+	        .attr('y', 38)
+	        .attr('font-size', 22)
+	        .attr('text-anchor', 'start') // start, middle, end; see: https://segmentfault.com/a/1190000009293590?utm_source=tag-newest
+	        .attr('fill', '#fff');
+
+	    // 时间、日期分割竖线
+	    group.append('line')
+	        .attr('x1', 87)
+	        .attr('y1', 21)
+	        .attr('x2', 87)
+	        .attr('y2', 42)
+	        .attr('stroke', '#4d88a7')
+	        .attr('stroke-width', 2);
+
+	    // 星期
+	    group.append('text')
+	        .text('星期日')
+	        .attr('x', 95)
+	        .attr('y', 28)
+	        .attr('font-size', 14)
+	        .attr('fill', '#fff');
+
+	    // 日期
+	    group.append('text')
+	        .text('2019-04-21')
+	        .attr('x', 95)
+	        .attr('y', 45)
+	        .attr('font-size', 14)
+	        .attr('fill', '#fff');
+
+	    // 边框
+	    group.append('path')
+	        .attr('d', 'm180,11 l0,35 l-10,10 L9,56 l0,183 l40,30 l0,193 M32,472 l0,18 l-23,20 l0,310')
+	        .attr('stroke', '#3a6a84')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 选项卡
+	    var tabDef = defs.append('path')
+	        .attr('id', 'tabDef')
+	        .attr('d', 'M0,0 L32,22 L32,60 L0,38 Z')
+	        .attr('fill', '#6c6f6e');
+
+	    var tabSelectDef = defs.append('path')
+	        .attr('id', 'tabSelectDef')
+	        .attr('d', 'M0,0 L32,22 L32,60 L0,38 Z')
+	        .attr('fill', '#356899');
+
+	    var tab1 = group.append('g')
+	        .attr('transform', 'translate(14,58)');
+
+	    tab1.append('use')
+	        .attr('href', '#tabSelectDef');
+
+	    tab1.append('image')
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/home.svg');
+
+	    var tab2 = group.append('g')
+	        .attr('transform', 'translate(14,104)');
+
+	    tab2.append('use')
+	        .attr('href', '#tabDef');
+
+	    tab2.append('image')
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/plane.svg');
+
+	    var tab3 = group.append('g')
+	        .attr('transform', 'translate(14,150)');
+
+	    tab3.append('use')
+	        .attr('href', '#tabDef');
+
+	    tab3.append('image')
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/water.svg');
+
+	    var tab4 = group.append('g')
+	        .attr('transform', 'translate(14,196)');
+
+	    tab4.append('use')
+	        .attr('href', '#tabDef');
+
+	    tab4.append('image')
+	        .attr('x', 5)
+	        .attr('y', 20)
+	        .attr('width', 24)
+	        .attr('height', 24)
+	        .attr('href', 'assets/svg/guard.svg');
+
+	    var header = group.append('g')
+	        .attr('transform', 'translate(15,276)');
+
+	    header.append('path')
+	        .attr('d', 'M0,0 L12,0 L25,10 L25,185 L12,195 L0,195 Z')
+	        .attr('fill', '#185185');
+
+	    header.append('text')
+	        .text('首都机场')
+	        .attr('x', 12)
+	        .attr('y', 85)
+	        .attr('text-anchor', 'middle')
+	        .attr('writing-mode', 'tb')
+	        .attr('textlength', '90px')
+	        .attr('lengthAdjust', 'spacing') // spacing, spacingAndGlyphs; see: https://blog.csdn.net/huanhuanq1209/article/details/71438629
+	        .attr('fill', '#fff');
+
+	    // 圆圈
+	    var circle = group.append('g')
+	        .attr('transform', 'translate(125,140)');
+
+	    circle.append('circle')
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 68)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    circle.append('circle')
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 48)
+	        .attr('stroke', '#517496')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    circle.append('circle')
+	        .attr('cx', 48)
+	        .attr('cy', 0)
+	        .attr('r', 14)
+	        .attr('fill', '#376899');
+
+	    circle.append('circle')
+	        .attr('cx', 48)
+	        .attr('cy', 0)
+	        .attr('r', 14)
+	        .attr('stroke', '#3399ff')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    circle.append('image')
+	        .attr('x', 0)
+	        .attr('y', -48)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sunrise.svg');
+
+	    circle.append('image')
+	        .attr('x', 48)
+	        .attr('y', 0)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sun.svg');
+
+	    circle.append('image')
+	        .attr('x', 0)
+	        .attr('y', 48)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/sunset.svg');
+
+	    circle.append('image')
+	        .attr('x', -48)
+	        .attr('y', 0)
+	        .attr('transform', 'translate(-12,-12)')
+	        .attr('href', 'assets/svg/moon.svg');
+
+	    circle.append('text')
+	        .text('Time')
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 10)
+	        .attr('font-size', 20)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    // 横线
+	    group.append('path')
+	        .attr('d', 'M90,222 L160,222')
+	        .attr('stroke', '#3e7390')
+	        .attr('stroke-width', 2);
+
+	    // 小面板
+	    defs.append('path')
+	        .attr('id', 'smallPanel')
+	        .attr('d', 'M0,0 L135,0 L142,8 L142,24 L12,24 L0,17 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    var smallPanel1 = group.append('g')
+	        .attr('transform', 'translate(60,240)');
+
+	    smallPanel1.append('use')
+	        .attr('href', '#smallPanel');
+	    smallPanel1.append('text')
+	        .text('正常停泊')
+	        .attr('x', 18)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+	    smallPanel1.append('text')
+	        .text('22')
+	        .attr('x', 90)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    var smallPanel2 = group.append('g')
+	        .attr('transform', 'translate(60,268)');
+
+	    smallPanel2.append('use')
+	        .attr('href', '#smallPanel');
+	    smallPanel2.append('text')
+	        .text('晚点起飞')
+	        .attr('x', 18)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+	    smallPanel2.append('text')
+	        .text('02')
+	        .attr('x', 90)
+	        .attr('y', 17)
+	        .attr('fill', '#e4a74a')
+	        .attr('font-size', 14);
+
+	    var smallPanel3 = group.append('g')
+	        .attr('transform', 'translate(60,301)');
+
+	    smallPanel3.append('use')
+	        .attr('href', '#smallPanel');
+	    smallPanel3.append('text')
+	        .text('计划停泊')
+	        .attr('x', 18)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+	    smallPanel3.append('text')
+	        .text('46')
+	        .attr('x', 90)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    var smallPanel4 = group.append('g')
+	        .attr('transform', 'translate(60,333)');
+
+	    smallPanel4.append('use')
+	        .attr('href', '#smallPanel');
+	    smallPanel4.append('text')
+	        .text('晚点到达')
+	        .attr('x', 18)
+	        .attr('y', 17)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+	    smallPanel4.append('text')
+	        .text('02')
+	        .attr('x', 90)
+	        .attr('y', 17)
+	        .attr('fill', '#d60c0c')
+	        .attr('font-size', 14);
+
+	    // 中等面板
+	    var mediumPanelDef = defs.append('path')
+	        .attr('id', 'mediumPanelDef')
+	        .attr('d', 'M5,0 L160,0 L166,6 L166,33 L158,38 L158,91 L166,96 L166,125 L158,130 L5,130 L0,125 L0,96 L5,91 L5,36 L0,33 L0,6 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    var mediumPanel = group.append('g')
+	        .attr('transform', 'translate(54,363)');
+
+	    mediumPanel.append('use')
+	        .attr('href', '#mediumPanelDef');
+
+	    mediumPanel.append('text')
+	        .text('长途停车场')
+	        .attr('x', 17)
+	        .attr('y', 26)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    mediumPanel.append('text')
+	        .text('56/90')
+	        .attr('x', 140)
+	        .attr('y', 26)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'end');
+
+	    mediumPanel.append('line')
+	        .attr('x1', 15)
+	        .attr('y1', 36)
+	        .attr('x2', 150)
+	        .attr('y2', 36)
+	        .attr('stroke', 'rgba(0,0,0,0.7)')
+	        .attr('stroke-width', 2);
+
+	    mediumPanel.append('text')
+	        .text('公交停车场')
+	        .attr('x', 17)
+	        .attr('y', 58)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    mediumPanel.append('text')
+	        .text('34/126')
+	        .attr('x', 140)
+	        .attr('y', 58)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'end');
+
+	    mediumPanel.append('line')
+	        .attr('x1', 15)
+	        .attr('y1', 67)
+	        .attr('x2', 150)
+	        .attr('y2', 67)
+	        .attr('stroke', 'rgba(0,0,0,0.7)')
+	        .attr('stroke-width', 2);
+
+	    mediumPanel.append('text')
+	        .text('地上停车场')
+	        .attr('x', 17)
+	        .attr('y', 90)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    mediumPanel.append('text')
+	        .text('256/560')
+	        .attr('x', 140)
+	        .attr('y', 90)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'end');
+
+	    mediumPanel.append('line')
+	        .attr('x1', 15)
+	        .attr('y1', 100)
+	        .attr('x2', 150)
+	        .attr('y2', 100)
+	        .attr('stroke', 'rgba(0,0,0,0.7)')
+	        .attr('stroke-width', 2);
+
+	    mediumPanel.append('text')
+	        .text('地下停车场')
+	        .attr('x', 17)
+	        .attr('y', 122)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14);
+
+	    mediumPanel.append('text')
+	        .text('389/560')
+	        .attr('x', 140)
+	        .attr('y', 122)
+	        .attr('fill', '#fff')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'end');
+
+	    // 仪表盘
+	    var gaugeDef = defs.append('g')
+	        .attr('id', 'gaugeDef');
+
+	    gaugeDef.append('circle')
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 37)
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    gaugeDef.append('circle')
+	        .attr('cx', 0)
+	        .attr('cy', 0)
+	        .attr('r', 32)
+	        .attr('stroke', '#6da2ee')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    var gauge1 = group.append('g')
+	        .attr('transform', 'translate(50,550)');
+
+	    gauge1.append('use')
+	        .attr('href', '#gaugeDef');
+
+	    gauge1.append('text')
+	        .text('66%')
+	        .attr('y', -10)
+	        .attr('font-size', 22)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#4bc8f5');
+
+	    gauge1.append('text')
+	        .text('设备')
+	        .attr('y', 10)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    gauge1.append('text')
+	        .text('在线率')
+	        .attr('y', 26)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    var gauge2 = group.append('g')
+	        .attr('transform', 'translate(131,550)');
+
+	    gauge2.append('use')
+	        .attr('href', '#gaugeDef');
+
+	    gauge2.append('text')
+	        .text('67')
+	        .attr('y', -10)
+	        .attr('font-size', 22)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#4bc8f5');
+
+	    gauge2.append('text')
+	        .text('修复')
+	        .attr('y', 10)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    gauge2.append('text')
+	        .text('故障数')
+	        .attr('y', 26)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    var gauge3 = group.append('g')
+	        .attr('transform', 'translate(220,550)');
+
+	    gauge3.append('use')
+	        .attr('href', '#gaugeDef');
+
+	    gauge3.append('text')
+	        .text('23')
+	        .attr('y', -10)
+	        .attr('font-size', 22)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#4bc8f5');
+
+	    gauge3.append('text')
+	        .text('剩余')
+	        .attr('y', 10)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    gauge3.append('text')
+	        .text('故障数')
+	        .attr('y', 26)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    // 图表背景
+	    var diagramBgDefs = defs.append('g')
+	        .attr('id', 'diagramBg');
+
+	    diagramBgDefs.append('path')
+	        .attr('d', 'M16.5,0 L16.5,123.38 L0,132.9 L0,8.5 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    diagramBgDefs.append('path')
+	        .attr('d', 'M23.5,0 L238,0 L238,124 L23.5,124 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    diagramBgDefs.append('path')
+	        .attr('d', 'M22,127 L238,127 L225,139 L0,139 Z')
+	        .attr('fill', 'rgba(0,0,0,0.5)');
+
+	    // 标签
+	    var labelDef = defs.append('path')
+	        .attr('id', 'labelDef')
+	        .attr('d', 'M11,0 L72,0 L85,12 L72,24 L11,24 L0,12 Z')
+	        .attr('fill', 'rgba(23,29,48,0.5)');
+
+	    // 柱状图
+	    var histogram = group.append('g')
+	        .attr('transform', 'translate(14,610)');
+
+	    histogram.append('use')
+	        .attr('href', '#diagramBg');
+
+	    var data = [27, 68, 44, 117, 60, 83, 101];
+
+	    histogram.selectAll('.column')
+	        .data(data)
+	        .enter()
+	        .append('rect')
+	        .classed('column', true)
+	        .attr('x', function (d, i) {
+	            return 30 * (i + 1) - 5;
+	        })
+	        .attr('y', function (d) {
+	            return 133.6 - d;
+	        })
+	        .attr('width', function (d) {
+	            return 10;
+	        })
+	        .attr('height', function (d) {
+	            return d;
+	        })
+	        .attr('fill', '#4ccdfc');
+
+	    var label = histogram.append('g')
+	        .attr('transform', 'translate(117,140)');
+
+	    label.append('use')
+	        .attr('href', '#labelDef')
+	        .attr('transform', 'translate(-42,-12)');
+
+	    label.append('text')
+	        .text('时段航班')
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 4)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+
+	    // 折线图
+	    var linechart = group.append('g')
+	        .attr('transform', 'translate(14,769)');
+
+	    linechart.append('use')
+	        .attr('href', '#diagramBg');
+
+	    var data1 = [];
+	    var data2 = [];
+
+	    var ran1 = d3.randomNormal(29, 8);
+	    var ran2 = d3.randomNormal(72, 20);
+
+	    for (var i = 0; i <= 210; i += 10) {
+	        data1.push([8 + i, ran1()]);
+	        data2.push([8 + i, ran2()]);
+	    }
+
+	    var line = d3.line();
+	    var lineData1 = line(data1);
+	    var lineData2 = line(data2);
+
+	    linechart.append('path')
+	        .attr('d', lineData1 + 'L218,133.6L8,133.6Z')
+	        .attr('stroke', '#458dab')
+	        .attr('fill', 'rgba(76,205,252,0.2)');
+	    linechart.append('path')
+	        .attr('d', lineData1)
+	        .attr('stroke', '#458dab')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    linechart.append('path')
+	        .attr('d', lineData2 + 'L218,133.6L8,133.6Z')
+	        .attr('fill', 'rgba(182,152,132,0.2)')
+	        .attr('stroke-width', 2);
+	    linechart.append('path')
+	        .attr('d', lineData2)
+	        .attr('stroke', '#b59784')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    var label = linechart.append('g')
+	        .attr('transform', 'translate(117,140)');
+
+	    label.append('use')
+	        .attr('href', '#labelDef')
+	        .attr('transform', 'translate(-42,-12)');
+
+	    label.append('text')
+	        .text('客流量')
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('dy', 4)
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle')
+	        .attr('fill', '#fff');
+	};
+
+	/**
+	 * 面板
+	 * @param {*} options 
+	 */
+	function Panel$1(options) {
+	    Component.call(this, options);
+	}
+
+	Panel$1.prototype = Object.create(Component.prototype);
+	Panel$1.prototype.constructor = Panel$1;
+
+	Panel$1.prototype.render = function () {
+	    var svg = d3.select(this.parent);
+	    var defs = svg.select('defs');
+
+	    // svg文本垂直居中：dominant-baseline, see: https://cloud.tencent.com/developer/section/1423913
+
+	    // 面板背景
+	    var panelDef = defs.append('g')
+	        .attr('id', 'panelDef');
+
+	    panelDef.append('path')
+	        .attr('d', 'M0,0L256,0L302,41L302,358L16,358L0,350Z')
+	        .attr('fill', 'rgba(45,48,60,0.95)');
+
+	    panelDef.append('path')
+	        .attr('d', 'M26,22L5,22L5,220L10,225L10,248L5,254L5,345L26,354L48,354')
+	        .attr('stroke', '#2d758f')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    panelDef.append('path')
+	        .attr('d', 'M220,22L264,22L295,56L295,354L104,354')
+	        .attr('stroke', '#2d758f')
+	        .attr('stroke-width', 2)
+	        .attr('fill', 'none');
+
+	    // 面板
+	    var panel = svg.append('g')
+	        .attr('transform', 'translate(500,200)');
+
+	    panel.append('use')
+	        .attr('href', '#panelDef');
+
+	    panel.append('text')
+	        .text('春秋航空9C8804')
+	        .attr('x', 38)
+	        .attr('y', 30)
+	        .attr('font-size', 22)
+	        .attr('font-weight', 'bold')
+	        .attr('fill', '#498e7b');
+
+	    panel.append('text')
+	        .text('空客A320')
+	        .attr('x', 31)
+	        .attr('y', 68)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('text')
+	        .text('首都机场 ———— 厦门高琦')
+	        .attr('x', 31)
+	        .attr('y', 107)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('line')
+	        .attr('x1', 30)
+	        .attr('y1', 132)
+	        .attr('x2', 270)
+	        .attr('y2', 132)
+	        .attr('stroke', 'rgba(0,0,0,0.4)')
+	        .attr('stroke-width', 2);
+
+	    panel.append('text')
+	        .text('到达时间：0907 - 17:50')
+	        .attr('x', 31)
+	        .attr('y', 178)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('text')
+	        .text('计划出发：0907 - 15:50')
+	        .attr('x', 31)
+	        .attr('y', 215)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('text')
+	        .text('实际出发：0907 - 16:00')
+	        .attr('x', 31)
+	        .attr('y', 254)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('line')
+	        .attr('x1', 30)
+	        .attr('y1', 273)
+	        .attr('x2', 270)
+	        .attr('y2', 273)
+	        .attr('stroke', 'rgba(0,0,0,0.4)')
+	        .attr('stroke-width', 2);
+
+	    panel.append('text')
+	        .text('落座率：88%')
+	        .attr('x', 31)
+	        .attr('y', 304)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+
+	    panel.append('text')
+	        .text('旅客人数：287')
+	        .attr('x', 31)
+	        .attr('y', 338)
+	        .attr('font-size', 18)
+	        .attr('fill', '#4087a2');
+	};
+
+	/**
+	 * 条形图
+	 * @param {*} options 
+	 */
+	function BarChart$1(options) {
+	    Component.call(this, options);
+	}
+
+	BarChart$1.prototype = Object.create(Component.prototype);
+	BarChart$1.prototype.constructor = BarChart$1;
+
+	BarChart$1.prototype.render = function () {
+	    var svg = d3.select(this.parent);
+	    var defs = svg.select('defs');
+
+	    // 面板背景
+	    var barChartDef = defs.append('g')
+	        .attr('id', 'barChartDef');
+
+	    barChartDef.append('rect')
+	        .attr('x', 0)
+	        .attr('y', 0)
+	        .attr('width', 180)
+	        .attr('height', 212)
+	        .attr('fill', 'rgba(0,0,0,0.2)');
+
+	    barChartDef.append('path')
+	        .attr('d', 'M11,0 L72,0 L85,12 L72,24 L11,24 L0,12 Z')
+	        .attr('transform', 'translate(50,200)')
+	        .attr('fill', '#2d232c');
+
+	    // 面板
+	    var chart = svg.append('g')
+	        .attr('transform', 'translate(850,200)');
+
+	    chart.append('use')
+	        .attr('href', '#barChartDef');
+
+	    var data = [{
+	        text: '桌椅松动',
+	        value: 100 / 105,
+	    }, {
+	        text: '启动活门',
+	        value: 100 / 105,
+	    }, {
+	        text: '雷达系统',
+	        value: 73 / 105,
+	    }, {
+	        text: '引气系统',
+	        value: 72 / 105,
+	    }, {
+	        text: '防冰活门',
+	        value: 69 / 105,
+	    }, {
+	        text: '引擎',
+	        value: 46 / 105,
+	    }, {
+	        text: '起落架',
+	        value: 42 / 105,
+	    }];
+
+	    var group = chart.selectAll('.bar')
+	        .data(data)
+	        .enter()
+	        .append('g')
+	        .classed('bar', true);
+
+	    group.append('text')
+	        .text(function (d) {
+	            return d.text;
+	        })
+	        .attr('x', 10)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25;
+	        })
+	        .attr('fill', '#4ccdfc');
+
+	    group.append('rect')
+	        .attr('x', 68)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25 - 10;
+	        })
+	        .attr('width', 105)
+	        .attr('height', 10)
+	        .attr('fill', '#0c6887');
+
+	    group.append('rect')
+	        .attr('x', 68)
+	        .attr('y', function (d, i) {
+	            return (i + 1) * 25 - 10;
+	        })
+	        .attr('width', function (d) {
+	            return d.value * 105;
+	        })
+	        .attr('height', 10)
+	        .attr('fill', '#4ccdfc');
+
+	    group.append('text')
+	        .text('检修耗时')
+	        .attr('transform', 'translate(88,217)')
+	        .attr('fill', '#4ccdfc')
+	        .attr('font-size', 14)
+	        .attr('text-anchor', 'middle');
+	};
+
+	/**
+	 * 数据可视化菜单
+	 * @author tengge / https://github.com/tengge1
+	 * @param {*} options 
+	 */
+	function VisualMenu(options) {
+	    UI$1.Control.call(this, options);
+	    this.app = options.app;
+	}
+
+	VisualMenu.prototype = Object.create(UI$1.Control.prototype);
+	VisualMenu.prototype.constructor = VisualMenu;
+
+	VisualMenu.prototype.render = function () {
+	    var container = UI$1.create({
+	        xtype: 'div',
+	        parent: this.parent,
+	        cls: 'menu',
+	        children: [{
+	            xtype: 'div',
+	            cls: 'title',
+	            html: L_VISUAL
+	        }, {
+	            xtype: 'div',
+	            cls: 'options',
+	            children: [{
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_SIDEBAR,
+	                onClick: this.addSidebar.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_PANEL,
+	                onClick: this.addPanel.bind(this),
+	            }, {
+	                xtype: 'div',
+	                cls: 'option',
+	                html: L_BAR_CHART,
+	                onClick: this.addBarChart.bind(this),
+	            }]
+	        }]
+	    });
+
+	    container.render();
+	};
+
+	// ------------------------- 侧边栏 ------------------------------------------
+
+	VisualMenu.prototype.addSidebar = function () {
+	    var control = new Sidebar({
+	        parent: this.app.editor.svg,
+	    });
+	    control.render();
+	};
+
+	// ------------------------------ 面板 ----------------------------------------
+
+	VisualMenu.prototype.addPanel = function () {
+	    var control = new Panel$1({
+	        parent: this.app.editor.svg,
+	    });
+	    control.render();
+	};
+
+	// ---------------------------- 条形图 ------------------------------------------
+
+	VisualMenu.prototype.addBarChart = function () {
+	    var control = new BarChart$1({
+	        parent: this.app.editor.svg,
+	    });
+	    control.render();
+	};
+
 	/**
 	 * 启动菜单
 	 * @author tengge / https://github.com/tengge1
@@ -21589,6 +26524,7 @@
 	        renderer: this.app.editor.renderer,
 	        scripts: this.app.editor.scripts,
 	        animations: this.app.editor.animations,
+	        visual: this.app.editor.visual,
 	    });
 
 	    this.app.player.start(JSON.stringify(jsons));
@@ -22627,102 +27563,6 @@
 	};
 
 	/**
-	 * 测试菜单
-	 * @author tengge / https://github.com/tengge1
-	 * @param {*} options 
-	 */
-	function TestMenu(options) {
-	    UI$1.Control.call(this, options);
-	    this.app = options.app;
-	}
-
-	TestMenu.prototype = Object.create(UI$1.Control.prototype);
-	TestMenu.prototype.constructor = TestMenu;
-
-	TestMenu.prototype.render = function () {
-	    var container = UI$1.create({
-	        xtype: 'div',
-	        parent: this.parent,
-	        cls: 'menu',
-	        children: [{
-	            xtype: 'div',
-	            cls: 'title',
-	            html: 'Test'
-	        }, {
-	            xtype: 'div',
-	            cls: 'options',
-	            children: [{
-	                xtype: 'div',
-	                cls: 'option',
-	                html: 'Hello World',
-	                onClick: this.hello.bind(this),
-	            }]
-	        }]
-	    });
-
-	    container.render();
-	};
-
-	TestMenu.prototype.showWin = function () {
-	    if (this.win === undefined) {
-	        this.win = UI$1.create({
-	            xtype: 'window',
-	            title: 'Data Visualization',
-	            id: 'dataVisualWin',
-	            scope: this.id,
-	            width: '800px',
-	            height: '500px',
-	            shade: false,
-	            containerStyle: {
-	                display: 'flex',
-	                flexDirection: 'column',
-	            },
-	            bodyStyle: {
-	                padding: 0,
-	            },
-	            children: [{
-	                xtype: 'div',
-	                id: 'container',
-	                scope: this.id,
-	                style: {
-	                    width: '100%',
-	                    height: '100%',
-	                },
-	            }]
-	        });
-	        this.win.render();
-	    }
-
-	    this.win.show();
-	};
-
-	TestMenu.prototype.clearContent = function () {
-	    var container = UI$1.get('container', this.id);
-
-	    while (container.dom.children.length) {
-	        container.dom.removeChild(container.dom.children[0]);
-	    }
-	};
-
-	TestMenu.prototype.hello = function () {
-	    this.showWin();
-	    this.clearContent();
-
-	    var container = UI$1.get('container', this.id);
-
-	    var svg = d3.select(container.dom)
-	        .append('svg')
-	        .attr('width', 500)
-	        .attr('height', 500);
-
-	    var circle = svg.append('circle')
-	        .attr('cx', 100)
-	        .attr('cy', 100)
-	        .attr('r', 50)
-	        .attr('fill', '#f00');
-	};
-
-	/**
 	 * 状态菜单（菜单栏右侧）
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} options 
@@ -22838,16 +27678,17 @@
 	            // 左侧
 	            new SceneMenu(params),
 	            new EditMenu(params),
+	            new TwoDMenu(params),
 	            new GeometryMenu(params),
 	            new LightMenu(params),
 	            new AssetMenu(params),
 	            //new TerrainMenu(params),
 	            new ComponentMenu(params),
+	            // new VisualMenu(params),
 	            new PlayMenu(params),
 	            new ToolMenu(params),
 	            new OptionsMenu(params),
 	            new HelpMenu(params),
-	            new TestMenu(params),
 
 	            // 右侧
 	            new StatusMenu(params)
@@ -22862,7 +27703,7 @@
 	 * Port from https://github.com/mapbox/earcut (v2.1.2)
 	 */
 
-	var ID$a = -1;
+	var ID$c = -1;
 
 	/**
 	 * 工具基类
@@ -22870,7 +27711,7 @@
 	 */
 	function BaseTool(app) {
 	    this.app = app;
-	    this.id = `${this.constructor.name}${ID$a--}`;
+	    this.id = `${this.constructor.name}${ID$c--}`;
 
 	    this.dispatch = d3.dispatch('end');
 
@@ -23466,7 +28307,28 @@
 	        xtype: 'div',
 	        id: 'viewport',
 	        parent: this.parent,
-	        cls: 'viewport'
+	        cls: 'viewport',
+	        children: [{
+	            xtype: 'svg',
+	            id: 'SvgContainer',
+	            attr: {
+	                // viewBox: '0 0 1920 969', // see: https://segmentfault.com/a/1190000009226427?utm_source=tag-newest
+	                // preserveAspectRatio: 'xMinYMin', // xMinYMin, xMinYMid, xMinYMax, xMidYMin, xMidYMid, xMidYMax, xMaxYMin, xMaxYMid, xMaxYMax
+	            },
+	            style: {
+	                position: 'absolute',
+	                left: 0,
+	                top: 0,
+	                width: '100%',
+	                height: '100%',
+	                pointerEvents: 'none',
+	                zIndex: 10,
+	            },
+	            children: [{
+	                xtype: 'defs',
+	                id: 'svgDefs',
+	            }]
+	        }]
 	    });
 	    this.container.render();
 	};
@@ -23476,15 +28338,15 @@
 	 * @author tengge / https://github.com/tengge1
 	 * @param {*} options 
 	 */
-	function BaseComponent(options) {
+	function BaseComponent$1(options) {
 	    UI$1.Control.call(this, options);
 	    this.app = options.app;
 	}
 
-	BaseComponent.prototype = Object.create(UI$1.Control.prototype);
-	BaseComponent.prototype.constructor = BaseComponent;
+	BaseComponent$1.prototype = Object.create(UI$1.Control.prototype);
+	BaseComponent$1.prototype.constructor = BaseComponent$1;
 
-	BaseComponent.prototype.render = function () {
+	BaseComponent$1.prototype.render = function () {
 
 	};
 
@@ -23555,11 +28417,11 @@
 	 * @param {*} options 
 	 */
 	function BasicComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	BasicComponent.prototype = Object.create(BaseComponent.prototype);
+	BasicComponent.prototype = Object.create(BaseComponent$1.prototype);
 	BasicComponent.prototype.constructor = BasicComponent;
 
 	BasicComponent.prototype.render = function () {
@@ -23680,11 +28542,11 @@
 	 * @param {*} options 
 	 */
 	function TransformComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TransformComponent.prototype = Object.create(BaseComponent.prototype);
+	TransformComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TransformComponent.prototype.constructor = TransformComponent;
 
 	TransformComponent.prototype.render = function () {
@@ -23908,11 +28770,11 @@
 	 * @param {*} options 
 	 */
 	function CameraComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	CameraComponent.prototype = Object.create(BaseComponent.prototype);
+	CameraComponent.prototype = Object.create(BaseComponent$1.prototype);
 	CameraComponent.prototype.constructor = CameraComponent;
 
 	CameraComponent.prototype.render = function () {
@@ -24028,11 +28890,11 @@
 	 * @param {*} options 
 	 */
 	function LightComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	LightComponent.prototype = Object.create(BaseComponent.prototype);
+	LightComponent.prototype = Object.create(BaseComponent$1.prototype);
 	LightComponent.prototype.constructor = LightComponent;
 
 	LightComponent.prototype.render = function () {
@@ -24366,11 +29228,11 @@
 	 * @param {*} options 
 	 */
 	function ShadowComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	ShadowComponent.prototype = Object.create(BaseComponent.prototype);
+	ShadowComponent.prototype = Object.create(BaseComponent$1.prototype);
 	ShadowComponent.prototype.constructor = ShadowComponent;
 
 	ShadowComponent.prototype.render = function () {
@@ -24797,11 +29659,11 @@
 	 * @param {*} options 
 	 */
 	function PlaneGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PlaneGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	PlaneGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PlaneGeometryComponent.prototype.constructor = PlaneGeometryComponent;
 
 	PlaneGeometryComponent.prototype.render = function () {
@@ -24929,11 +29791,11 @@
 	 * @param {*} options 
 	 */
 	function BoxGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	BoxGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	BoxGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	BoxGeometryComponent.prototype.constructor = BoxGeometryComponent;
 
 	BoxGeometryComponent.prototype.render = function () {
@@ -25094,11 +29956,11 @@
 	 * @param {*} options 
 	 */
 	function CircleGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	CircleGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	CircleGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	CircleGeometryComponent.prototype.constructor = CircleGeometryComponent;
 
 	CircleGeometryComponent.prototype.render = function () {
@@ -25222,11 +30084,11 @@
 	 * @param {*} options 
 	 */
 	function CylinderGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	CylinderGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	CylinderGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	CylinderGeometryComponent.prototype.constructor = CylinderGeometryComponent;
 
 	CylinderGeometryComponent.prototype.render = function () {
@@ -25383,11 +30245,11 @@
 	 * @param {*} options 
 	 */
 	function SphereGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SphereGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	SphereGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SphereGeometryComponent.prototype.constructor = SphereGeometryComponent;
 
 	SphereGeometryComponent.prototype.render = function () {
@@ -25560,11 +30422,11 @@
 	 * @param {*} options 
 	 */
 	function IcosahedronGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	IcosahedronGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	IcosahedronGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	IcosahedronGeometryComponent.prototype.constructor = IcosahedronGeometryComponent;
 
 	IcosahedronGeometryComponent.prototype.render = function () {
@@ -25656,11 +30518,11 @@
 	 * @param {*} options 
 	 */
 	function TorusGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TorusGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	TorusGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TorusGeometryComponent.prototype.constructor = TorusGeometryComponent;
 
 	TorusGeometryComponent.prototype.render = function () {
@@ -25801,11 +30663,11 @@
 	 * @param {*} options 
 	 */
 	function TorusKnotGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TorusKnotGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	TorusKnotGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TorusKnotGeometryComponent.prototype.constructor = TorusKnotGeometryComponent;
 
 	TorusKnotGeometryComponent.prototype.render = function () {
@@ -25962,11 +30824,11 @@
 	 * @param {*} options 
 	 */
 	function LatheGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	LatheGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	LatheGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	LatheGeometryComponent.prototype.constructor = LatheGeometryComponent;
 
 	LatheGeometryComponent.prototype.render = function () {
@@ -26076,11 +30938,11 @@
 	 * @param {*} options 
 	 */
 	function TeapotGeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TeapotGeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	TeapotGeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TeapotGeometryComponent.prototype.constructor = TeapotGeometryComponent;
 
 	TeapotGeometryComponent.prototype.render = function () {
@@ -26269,10 +31131,10 @@
 	 * @param {*} options 
 	 */
 	function GeometryComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	}
 
-	GeometryComponent.prototype = Object.create(BaseComponent.prototype);
+	GeometryComponent.prototype = Object.create(BaseComponent$1.prototype);
 	GeometryComponent.prototype.constructor = GeometryComponent;
 
 	GeometryComponent.prototype.render = function () {
@@ -27455,11 +32317,11 @@
 	 * @param {*} options 
 	 */
 	function MaterialComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	MaterialComponent.prototype = Object.create(BaseComponent.prototype);
+	MaterialComponent.prototype = Object.create(BaseComponent$1.prototype);
 	MaterialComponent.prototype.constructor = MaterialComponent;
 
 	MaterialComponent.prototype.render = function () {
@@ -28951,11 +33813,11 @@
 	 * @param {*} options 
 	 */
 	function PhysicsWorldComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PhysicsWorldComponent.prototype = Object.create(BaseComponent.prototype);
+	PhysicsWorldComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PhysicsWorldComponent.prototype.constructor = PhysicsWorldComponent;
 
 	PhysicsWorldComponent.prototype.render = function () {
@@ -29093,11 +33955,11 @@
 	 * @param {*} options 
 	 */
 	function AudioListenerComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	AudioListenerComponent.prototype = Object.create(BaseComponent.prototype);
+	AudioListenerComponent.prototype = Object.create(BaseComponent$1.prototype);
 	AudioListenerComponent.prototype.constructor = AudioListenerComponent;
 
 	AudioListenerComponent.prototype.render = function () {
@@ -29181,13 +34043,13 @@
 	 * @param {*} options 
 	 */
 	function ParticleEmitterComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	ParticleEmitterComponent.prototype = Object.create(BaseComponent.prototype);
+	ParticleEmitterComponent.prototype = Object.create(BaseComponent$1.prototype);
 	ParticleEmitterComponent.prototype.constructor = ParticleEmitterComponent;
 
 	ParticleEmitterComponent.prototype.render = function () {
@@ -29760,11 +34622,11 @@
 	 * @param {*} options 
 	 */
 	function SceneComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SceneComponent.prototype = Object.create(BaseComponent.prototype);
+	SceneComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SceneComponent.prototype.constructor = SceneComponent;
 
 	SceneComponent.prototype.render = function () {
@@ -30335,11 +35197,11 @@
 	 * @param {*} options 
 	 */
 	function BackgroundMusicComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	BackgroundMusicComponent.prototype = Object.create(BaseComponent.prototype);
+	BackgroundMusicComponent.prototype = Object.create(BaseComponent$1.prototype);
 	BackgroundMusicComponent.prototype.constructor = BackgroundMusicComponent;
 
 	BackgroundMusicComponent.prototype.render = function () {
@@ -30543,13 +35405,13 @@
 	 * @param {*} options 
 	 */
 	function FireComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	FireComponent.prototype = Object.create(BaseComponent.prototype);
+	FireComponent.prototype = Object.create(BaseComponent$1.prototype);
 	FireComponent.prototype.constructor = FireComponent;
 
 	FireComponent.prototype.render = function () {
@@ -30761,13 +35623,13 @@
 	 * @param {*} options 
 	 */
 	function SmokeComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	SmokeComponent.prototype = Object.create(BaseComponent.prototype);
+	SmokeComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SmokeComponent.prototype.constructor = SmokeComponent;
 
 	SmokeComponent.prototype.render = function () {
@@ -30933,11 +35795,11 @@
 	 * @param {*} options 
 	 */
 	function ReflectorComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	ReflectorComponent.prototype = Object.create(BaseComponent.prototype);
+	ReflectorComponent.prototype = Object.create(BaseComponent$1.prototype);
 	ReflectorComponent.prototype.constructor = ReflectorComponent;
 
 	ReflectorComponent.prototype.render = function () {
@@ -31185,13 +36047,13 @@
 	 * @param {*} options 
 	 */
 	function LMeshComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	LMeshComponent.prototype = Object.create(BaseComponent.prototype);
+	LMeshComponent.prototype = Object.create(BaseComponent$1.prototype);
 	LMeshComponent.prototype.constructor = LMeshComponent;
 
 	LMeshComponent.prototype.render = function () {
@@ -31339,11 +36201,11 @@
 	 * @param {*} options 
 	 */
 	function MMDComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	MMDComponent.prototype = Object.create(BaseComponent.prototype);
+	MMDComponent.prototype = Object.create(BaseComponent$1.prototype);
 	MMDComponent.prototype.constructor = MMDComponent;
 
 	MMDComponent.prototype.render = function () {
@@ -31623,11 +36485,11 @@
 	 * @param {*} options 
 	 */
 	function RigidBodyComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	RigidBodyComponent.prototype = Object.create(BaseComponent.prototype);
+	RigidBodyComponent.prototype = Object.create(BaseComponent$1.prototype);
 	RigidBodyComponent.prototype.constructor = RigidBodyComponent;
 
 	RigidBodyComponent.prototype.render = function () {
@@ -31852,11 +36714,11 @@
 	 * @param {*} options 
 	 */
 	function SkyComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SkyComponent.prototype = Object.create(BaseComponent.prototype);
+	SkyComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SkyComponent.prototype.constructor = SkyComponent;
 
 	SkyComponent.prototype.render = function () {
@@ -32022,11 +36884,11 @@
 	 * @param {*} options 
 	 */
 	function PerlinTerrainComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PerlinTerrainComponent.prototype = Object.create(BaseComponent.prototype);
+	PerlinTerrainComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PerlinTerrainComponent.prototype.constructor = PerlinTerrainComponent;
 
 	PerlinTerrainComponent.prototype.render = function () {
@@ -32193,13 +37055,13 @@
 	 * @param {*} options 
 	 */
 	function WaterComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	WaterComponent.prototype = Object.create(BaseComponent.prototype);
+	WaterComponent.prototype = Object.create(BaseComponent$1.prototype);
 	WaterComponent.prototype.constructor = WaterComponent;
 
 	WaterComponent.prototype.render = function () {
@@ -32306,13 +37168,13 @@
 	 * @param {*} options 
 	 */
 	function ClothComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 
 	    this.isPlaying = false;
 	}
 
-	ClothComponent.prototype = Object.create(BaseComponent.prototype);
+	ClothComponent.prototype = Object.create(BaseComponent$1.prototype);
 	ClothComponent.prototype.constructor = ClothComponent;
 
 	ClothComponent.prototype.render = function () {
@@ -32419,11 +37281,11 @@
 	 * @param {*} options 
 	 */
 	function ControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	ControlComponent.prototype = Object.create(BaseComponent.prototype);
+	ControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	ControlComponent.prototype.constructor = ControlComponent;
 
 	ControlComponent.prototype.render = function () {
@@ -32516,11 +37378,11 @@
 	 * @param {*} options 
 	 */
 	function FirstPersonControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	FirstPersonControlComponent.prototype = Object.create(BaseComponent.prototype);
+	FirstPersonControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	FirstPersonControlComponent.prototype.constructor = FirstPersonControlComponent;
 
 	FirstPersonControlComponent.prototype.render = function () {
@@ -32802,11 +37664,11 @@
 	 * @param {*} options 
 	 */
 	function FlyControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	FlyControlComponent.prototype = Object.create(BaseComponent.prototype);
+	FlyControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	FlyControlComponent.prototype.constructor = FlyControlComponent;
 
 	FlyControlComponent.prototype.render = function () {
@@ -32952,11 +37814,11 @@
 	 * @param {*} options 
 	 */
 	function OrbitControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	OrbitControlComponent.prototype = Object.create(BaseComponent.prototype);
+	OrbitControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	OrbitControlComponent.prototype.constructor = OrbitControlComponent;
 
 	OrbitControlComponent.prototype.render = function () {
@@ -33357,11 +38219,11 @@
 	 * @param {*} options 
 	 */
 	function PointerLockControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PointerLockControlComponent.prototype = Object.create(BaseComponent.prototype);
+	PointerLockControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PointerLockControlComponent.prototype.constructor = PointerLockControlComponent;
 
 	PointerLockControlComponent.prototype.render = function () {
@@ -33456,11 +38318,11 @@
 	 * @param {*} options 
 	 */
 	function TrackballControlComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TrackballControlComponent.prototype = Object.create(BaseComponent.prototype);
+	TrackballControlComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TrackballControlComponent.prototype.constructor = TrackballControlComponent;
 
 	TrackballControlComponent.prototype.render = function () {
@@ -33710,11 +38572,11 @@
 	 * @param {*} options 
 	 */
 	function DotScreenComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	DotScreenComponent.prototype = Object.create(BaseComponent.prototype);
+	DotScreenComponent.prototype = Object.create(BaseComponent$1.prototype);
 	DotScreenComponent.prototype.constructor = DotScreenComponent;
 
 	DotScreenComponent.prototype.render = function () {
@@ -33827,11 +38689,11 @@
 	 * @param {*} options 
 	 */
 	function RgbShiftComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	RgbShiftComponent.prototype = Object.create(BaseComponent.prototype);
+	RgbShiftComponent.prototype = Object.create(BaseComponent$1.prototype);
 	RgbShiftComponent.prototype.constructor = RgbShiftComponent;
 
 	RgbShiftComponent.prototype.render = function () {
@@ -33944,11 +38806,11 @@
 	 * @param {*} options 
 	 */
 	function AfterimageComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	AfterimageComponent.prototype = Object.create(BaseComponent.prototype);
+	AfterimageComponent.prototype = Object.create(BaseComponent$1.prototype);
 	AfterimageComponent.prototype.constructor = AfterimageComponent;
 
 	AfterimageComponent.prototype.render = function () {
@@ -34061,11 +38923,11 @@
 	 * @param {*} options 
 	 */
 	function BokehComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	BokehComponent.prototype = Object.create(BaseComponent.prototype);
+	BokehComponent.prototype = Object.create(BaseComponent$1.prototype);
 	BokehComponent.prototype.constructor = BokehComponent;
 
 	BokehComponent.prototype.render = function () {
@@ -34210,11 +39072,11 @@
 	 * @param {*} options 
 	 */
 	function FxaaComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	FxaaComponent.prototype = Object.create(BaseComponent.prototype);
+	FxaaComponent.prototype = Object.create(BaseComponent$1.prototype);
 	FxaaComponent.prototype.constructor = FxaaComponent;
 
 	FxaaComponent.prototype.render = function () {
@@ -34311,11 +39173,11 @@
 	 * @param {*} options 
 	 */
 	function GlitchComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	GlitchComponent.prototype = Object.create(BaseComponent.prototype);
+	GlitchComponent.prototype = Object.create(BaseComponent$1.prototype);
 	GlitchComponent.prototype.constructor = GlitchComponent;
 
 	GlitchComponent.prototype.render = function () {
@@ -34427,11 +39289,11 @@
 	 * @param {*} options 
 	 */
 	function HalftoneComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	HalftoneComponent.prototype = Object.create(BaseComponent.prototype);
+	HalftoneComponent.prototype = Object.create(BaseComponent$1.prototype);
 	HalftoneComponent.prototype.constructor = HalftoneComponent;
 
 	HalftoneComponent.prototype.render = function () {
@@ -34687,11 +39549,11 @@
 	 * @param {*} options 
 	 */
 	function SsaaComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SsaaComponent.prototype = Object.create(BaseComponent.prototype);
+	SsaaComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SsaaComponent.prototype.constructor = SsaaComponent;
 
 	SsaaComponent.prototype.render = function () {
@@ -34828,11 +39690,11 @@
 	 * @param {*} options 
 	 */
 	function PixelComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PixelComponent.prototype = Object.create(BaseComponent.prototype);
+	PixelComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PixelComponent.prototype.constructor = PixelComponent;
 
 	PixelComponent.prototype.render = function () {
@@ -34945,11 +39807,11 @@
 	 * @param {*} options 
 	 */
 	function SaoComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SaoComponent.prototype = Object.create(BaseComponent.prototype);
+	SaoComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SaoComponent.prototype.constructor = SaoComponent;
 
 	SaoComponent.prototype.render = function () {
@@ -35221,11 +40083,11 @@
 	 * @param {*} options 
 	 */
 	function SmaaComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SmaaComponent.prototype = Object.create(BaseComponent.prototype);
+	SmaaComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SmaaComponent.prototype.constructor = SmaaComponent;
 
 	SmaaComponent.prototype.render = function () {
@@ -35322,11 +40184,11 @@
 	 * @param {*} options 
 	 */
 	function SsaoComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SsaoComponent.prototype = Object.create(BaseComponent.prototype);
+	SsaoComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SsaoComponent.prototype.constructor = SsaoComponent;
 
 	SsaoComponent.prototype.render = function () {
@@ -35498,11 +40360,11 @@
 	 * @param {*} options 
 	 */
 	function TaaComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TaaComponent.prototype = Object.create(BaseComponent.prototype);
+	TaaComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TaaComponent.prototype.constructor = TaaComponent;
 
 	TaaComponent.prototype.render = function () {
@@ -35639,11 +40501,11 @@
 	 * @param {*} options 
 	 */
 	function SoftVolumeComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	SoftVolumeComponent.prototype = Object.create(BaseComponent.prototype);
+	SoftVolumeComponent.prototype = Object.create(BaseComponent$1.prototype);
 	SoftVolumeComponent.prototype.constructor = SoftVolumeComponent;
 
 	SoftVolumeComponent.prototype.render = function () {
@@ -35762,11 +40624,11 @@
 	 * @param {*} options 
 	 */
 	function PhysicsTypeComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	PhysicsTypeComponent.prototype = Object.create(BaseComponent.prototype);
+	PhysicsTypeComponent.prototype = Object.create(BaseComponent$1.prototype);
 	PhysicsTypeComponent.prototype.constructor = PhysicsTypeComponent;
 
 	PhysicsTypeComponent.prototype.render = function () {
@@ -35875,11 +40737,11 @@
 	 * @param {*} options 
 	 */
 	function LineCurveComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	LineCurveComponent.prototype = Object.create(BaseComponent.prototype);
+	LineCurveComponent.prototype = Object.create(BaseComponent$1.prototype);
 	LineCurveComponent.prototype.constructor = LineCurveComponent;
 
 	LineCurveComponent.prototype.render = function () {
@@ -36013,11 +40875,11 @@
 	 * @param {*} options 
 	 */
 	function CatmullRomCurveComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	CatmullRomCurveComponent.prototype = Object.create(BaseComponent.prototype);
+	CatmullRomCurveComponent.prototype = Object.create(BaseComponent$1.prototype);
 	CatmullRomCurveComponent.prototype.constructor = CatmullRomCurveComponent;
 
 	CatmullRomCurveComponent.prototype.render = function () {
@@ -36190,11 +41052,11 @@
 	 * @param {*} options 
 	 */
 	function QuadraticBezierCurveComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	QuadraticBezierCurveComponent.prototype = Object.create(BaseComponent.prototype);
+	QuadraticBezierCurveComponent.prototype = Object.create(BaseComponent$1.prototype);
 	QuadraticBezierCurveComponent.prototype.constructor = QuadraticBezierCurveComponent;
 
 	QuadraticBezierCurveComponent.prototype.render = function () {
@@ -36359,11 +41221,11 @@
 	 * @param {*} options 
 	 */
 	function CubicBezierCurveComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	CubicBezierCurveComponent.prototype = Object.create(BaseComponent.prototype);
+	CubicBezierCurveComponent.prototype = Object.create(BaseComponent$1.prototype);
 	CubicBezierCurveComponent.prototype.constructor = CubicBezierCurveComponent;
 
 	CubicBezierCurveComponent.prototype.render = function () {
@@ -36559,11 +41421,11 @@
 	 * @param {*} options 
 	 */
 	function EllipseCurveComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	EllipseCurveComponent.prototype = Object.create(BaseComponent.prototype);
+	EllipseCurveComponent.prototype = Object.create(BaseComponent$1.prototype);
 	EllipseCurveComponent.prototype.constructor = EllipseCurveComponent;
 
 	EllipseCurveComponent.prototype.render = function () {
@@ -36735,11 +41597,11 @@
 	 * @param {*} options 
 	 */
 	function GisBasicComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	GisBasicComponent.prototype = Object.create(BaseComponent.prototype);
+	GisBasicComponent.prototype = Object.create(BaseComponent$1.prototype);
 	GisBasicComponent.prototype.constructor = GisBasicComponent;
 
 	GisBasicComponent.prototype.render = function () {
@@ -36906,11 +41768,11 @@
 	 * @param {*} options 
 	 */
 	function BasicAnimationComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	BasicAnimationComponent.prototype = Object.create(BaseComponent.prototype);
+	BasicAnimationComponent.prototype = Object.create(BaseComponent$1.prototype);
 	BasicAnimationComponent.prototype.constructor = BasicAnimationComponent;
 
 	BasicAnimationComponent.prototype.render = function () {
@@ -37097,11 +41959,11 @@
 	 * @param {*} options 
 	 */
 	function TweenAnimationComponent(options) {
-	    BaseComponent.call(this, options);
+	    BaseComponent$1.call(this, options);
 	    this.selected = null;
 	}
 
-	TweenAnimationComponent.prototype = Object.create(BaseComponent.prototype);
+	TweenAnimationComponent.prototype = Object.create(BaseComponent$1.prototype);
 	TweenAnimationComponent.prototype.constructor = TweenAnimationComponent;
 
 	TweenAnimationComponent.prototype.render = function () {
@@ -37761,14 +42623,14 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author tengge / https://github.com/tengge1
 	 */
-	function Sidebar(options) {
+	function Sidebar$1(options) {
 	    UI$1.Control.call(this, options);
 	    this.app = options.app;
 	}
-	Sidebar.prototype = Object.create(UI$1.Control.prototype);
-	Sidebar.prototype.constructor = Sidebar;
+	Sidebar$1.prototype = Object.create(UI$1.Control.prototype);
+	Sidebar$1.prototype.constructor = Sidebar$1;
 
-	Sidebar.prototype.render = function () {
+	Sidebar$1.prototype.render = function () {
 	    var data = {
 	        xtype: 'div',
 	        parent: this.parent,
@@ -37837,11 +42699,11 @@
 	    this.app.on(`tabSelected.${this.id}`, this.onTabSelected.bind(this));
 	};
 
-	Sidebar.prototype.onAppStarted = function () {
+	Sidebar$1.prototype.onAppStarted = function () {
 	    this.app.call('tabSelected', this, 'property');
 	};
 
-	Sidebar.prototype.onTabSelected = function (tabName) {
+	Sidebar$1.prototype.onTabSelected = function (tabName) {
 	    var tabNames = [
 	        'property',
 	        'animation',
@@ -38607,14 +43469,14 @@ void main()	{
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author tengge / https://github.com/tengge1
 	 */
-	function Sidebar$1(options) {
+	function Sidebar$2(options) {
 	    UI$1.Control.call(this, options);
 	    this.app = options.app;
 	}
-	Sidebar$1.prototype = Object.create(UI$1.Control.prototype);
-	Sidebar$1.prototype.constructor = Sidebar$1;
+	Sidebar$2.prototype = Object.create(UI$1.Control.prototype);
+	Sidebar$2.prototype.constructor = Sidebar$2;
 
-	Sidebar$1.prototype.render = function () {
+	Sidebar$2.prototype.render = function () {
 	    var data = {
 	        xtype: 'div',
 	        cls: 'sidebar lsidebar',
@@ -38646,7 +43508,7 @@ void main()	{
 	    control.render();
 	};
 
-	var ID$b = -1;
+	var ID$d = -1;
 
 	const STOP = 0;
 	const PLAY = 1;
@@ -39013,7 +43875,7 @@ void main()	{
 	        var animation = {
 	            id: null,
 	            uuid: THREE.Math.generateUUID(),
-	            name: `${L_ANIMATION}${ID$b--}`,
+	            name: `${L_ANIMATION}${ID$d--}`,
 	            target: null,
 	            type: 'Tween',
 	            beginTime: event.offsetX / timeline.scale,
@@ -39793,7 +44655,9 @@ void main()	{
 	                    if (this.app.editor.gis) {
 	                        this.app.editor.gis.stop();
 	                    }
-	                    this.app.editor.gis = new Scene(this.app);
+	                    this.app.editor.gis = new Scene(this.app, {
+	                        useCameraPosition: true,
+	                    });
 	                    this.app.editor.gis.start();
 	                }
 	            }
@@ -39883,6 +44747,14 @@ void main()	{
 	            this.app.editor.select(obj);
 	        }
 	    }
+
+	    // 可视化
+	    if (obj.visual) {
+	        this.app.editor.visual.fromJSON(obj.visual);
+	    } else {
+	        this.app.editor.visual.clear();
+	    }
+	    this.app.editor.visual.render(this.app.editor.svg);
 
 	    this.app.call('sceneLoaded', this);
 	    this.app.call('animationChanged', this);
@@ -44619,6 +49491,10 @@ void main()	{
 
 	    this.showViewHelper = true;
 
+	    // 可视化
+	    this.svg = UI$1.get('SvgContainer').dom;
+	    this.visual = new Visualization();
+
 	    // 事件
 	    this.app.on(`appStarted.${this.id}`, this.onAppStarted.bind(this));
 
@@ -44957,8 +49833,8 @@ void main()	{
 	    this.menubar = new Menubar(params); // 菜单栏
 	    this.toolbar = new Toolbar(params); // 工具栏
 	    this.viewport = new Viewport(params); // 场景编辑区
-	    this.sidebar = new Sidebar(params); // 侧边栏
-	    this.sidebar2 = new Sidebar$1(params); // 侧边栏2
+	    this.sidebar = new Sidebar$1(params); // 侧边栏
+	    this.sidebar2 = new Sidebar$2(params); // 侧边栏2
 	    this.bottomPanel = new BottomPanel(params); // 底部面板
 	    this.statusBar = new StatusBar(params); // 状态栏
 	    this.script = new ScriptEditor(params); // 脚本编辑器面板
