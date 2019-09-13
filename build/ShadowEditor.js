@@ -1034,11 +1034,20 @@
 	VideoTextureSerializer.prototype.constructor = VideoTextureSerializer;
 
 	VideoTextureSerializer.prototype.toJSON = function (obj) {
-	  return TextureSerializer.prototype.toJSON.call(this, obj);
+	  var json = TextureSerializer.prototype.toJSON.call(this, obj);
+	  json.image = {
+	    tagName: 'video',
+	    src: obj.image.src
+	  };
+	  return json;
 	};
 
 	VideoTextureSerializer.prototype.fromJSON = function (json, parent, server) {
-	  var obj = parent === undefined ? new THREE.VideoTexture() : parent;
+	  let video = document.createElement('video');
+	  video.setAttribute('src', json.image.src);
+	  video.setAttribute('autoplay', 'autoplay');
+	  video.setAttribute('loop', 'loop');
+	  var obj = parent === undefined ? new THREE.VideoTexture(video) : parent;
 	  TextureSerializer.prototype.fromJSON.call(this, json, obj, server);
 	  return obj;
 	};
@@ -19767,6 +19776,16 @@
 	        texture.sourceFile = name;
 	        onChange && onChange(texture, this.props.name, data);
 	      });
+	    } else if (type === 'video') {
+	      let video = document.createElement('video');
+	      video.setAttribute('src', data.Url);
+	      video.setAttribute('autoplay', 'autoplay');
+	      video.setAttribute('loop', 'loop');
+	      let texture = new THREE.VideoTexture(video);
+	      texture.minFilter = THREE.LinearFilter;
+	      texture.magFilter = THREE.LinearFilter;
+	      texture.format = THREE.RGBFormat;
+	      onChange && onChange(texture, this.props.name, data);
 	    } else {
 	      const loader = new THREE.TextureLoader();
 	      loader.load(url, obj => {
