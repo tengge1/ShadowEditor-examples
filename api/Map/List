@@ -1,1 +1,1 @@
-{"Code":200,"Msg":"获取成功！","Data":[]}
+{"Code":200,"Msg":"Get Successfully!","Data":[{"ID":"5d7afb36c8b49a1a38e7321b","Name":"normal","CategoryID":"","CategoryName":"","TotalPinYin":"normal","FirstPinYin":"normal","Type":"unknown","Url":"/Upload/Texture/20190913101310/normal.jpg","Version":0,"CreateTime":"2019-09-13 02:13:10","UpdateTime":"2019-09-13 02:13:10","Thumbnail":"/Upload/Texture/20190913101310/normal.jpg"}]}
