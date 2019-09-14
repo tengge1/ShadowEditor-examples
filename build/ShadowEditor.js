@@ -10442,7 +10442,11 @@
 	};
 
 	ThrowBallEvent.prototype.dispose = function () {
-	  this.renderer.domElement.removeEventListener('click', this.throwBall);
+	  // TODO: 不判断有时报错，不知道为什么。
+	  if (this.renderer) {
+	    this.renderer.domElement.removeEventListener('click', this.throwBall);
+	  }
+
 	  this.scene = null;
 	  this.camera = null;
 	  this.renderer = null;
@@ -19778,6 +19782,7 @@
 	      video.setAttribute('src', data.Url);
 	      video.setAttribute('autoplay', 'autoplay');
 	      video.setAttribute('loop', 'loop');
+	      video.setAttribute('crossorigin', 'anonymous');
 	      let texture = new THREE.VideoTexture(video);
 	      texture.minFilter = THREE.LinearFilter;
 	      texture.magFilter = THREE.LinearFilter;
