@@ -4,10 +4,40 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Shadow Editor Viewer</title>
-    <link rel="shortcut icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>3D场景查看器 - Shadow Editor - 超腾开源</title>
+    <meta name="description" content="使用 Shadow Editor 3D场景查看器在线浏览交互式三维场景。支持实时查看、动画播放、全屏显示等功能，兼容多种 3D 格式。">
+    <meta name="keywords" content="3D场景查看,3D模型查看器,在线3D浏览,3D展示,3D预览,GLTF查看器,OBJ查看器,Three.js查看器,WebGL查看器,3D场景播放,3D动画查看,VR场景查看">
+    <meta name="author" content="ShadowEditor Team">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="3D场景查看器 - Shadow Editor">
+    <meta property="og:description" content="使用 Shadow Editor 3D场景查看器在线浏览交互式三维场景。支持实时查看、动画播放、全屏显示等功能。">
+    <meta property="og:image" content="https://www.hylab.cn/img/shadow_editor.jpg">
+    <meta property="og:url" content="">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="3D场景查看器 - Shadow Editor">
+    <meta name="twitter:description" content="使用 Shadow Editor 3D场景查看器在线浏览交互式三维场景。支持实时查看、动画播放、全屏显示等功能。">
+    <meta name="twitter:image" content="https://www.hylab.cn/img/shadow_editor.jpg">
+    <meta name="twitter:url" content="">
+
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="application-name" content="Shadow Editor Viewer">
+
+    <!-- Icons -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="favicon.ico">
+
+    <!-- Stylesheets -->
     <link href="build/ShadowEditor.css" rel="stylesheet" />
+
     <style>
         .player {
             position: absolute;
@@ -20,10 +50,41 @@
             background-color: white;
         }
     </style>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "3D场景查看器",
+        "description": "使用 Shadow Editor 3D场景查看器在线浏览交互式三维场景。支持实时查看、动画播放、全屏显示等功能。",
+        "application": {
+            "@type": "SoftwareApplication",
+            "name": "Shadow Editor Viewer",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Windows, Linux, macOS, Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            }
+        }
+    }
+    </script>
 </head>
 
 <body>
-    <div id="container" tabindex="10"></div>
+    <noscript>
+        <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+            <h1>Shadow Editor 场景查看器需要 JavaScript</h1>
+            <p>请在浏览器设置中启用 JavaScript 以查看 3D 场景。</p>
+            <p>Shadow Editor Viewer requires JavaScript to display 3D scenes.</p>
+        </div>
+    </noscript>
+
+    <main role="main">
+        <div id="container" tabindex="10" aria-label="3D场景查看器" title="Shadow Editor 3D场景查看器" class="player"></div>
+    </main>
 
     <!-- three.js -->
     <script src="assets/js/three.js"></script>
@@ -78,6 +139,81 @@
             return null;
         };
 
+        // 动态更新页面元数据的函数
+        const updateMetadata = (sceneData) => {
+            try {
+                const sceneName = sceneData.metadata && sceneData.metadata.name ? sceneData.metadata.name : '3D场景';
+                const sceneDescription = sceneData.metadata && sceneData.metadata.description ? sceneData.metadata.description : '使用 Shadow Editor 创建的交互式3D场景';
+
+                // 更新页面标题
+                document.title = `${sceneName} - Shadow Editor 3D场景查看器`;
+
+                // 更新描述
+                const descriptionMeta = document.querySelector('meta[name="description"]');
+                if (descriptionMeta) {
+                    descriptionMeta.setAttribute('content', `在线查看${sceneName}：${sceneDescription}`);
+                }
+
+                // 更新 Open Graph 标题
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                if (ogTitle) {
+                    ogTitle.setAttribute('content', `${sceneName} - Shadow Editor 3D场景`);
+                }
+
+                // 更新 Open Graph 描述
+                const ogDescription = document.querySelector('meta[property="og:description"]');
+                if (ogDescription) {
+                    ogDescription.setAttribute('content', sceneDescription);
+                }
+
+                // 更新 Twitter 标题
+                const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+                if (twitterTitle) {
+                    twitterTitle.setAttribute('content', `${sceneName} - Shadow Editor 3D场景`);
+                }
+
+                // 更新 Twitter 描述
+                const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+                if (twitterDescription) {
+                    twitterDescription.setAttribute('content', sceneDescription);
+                }
+
+                // 更新 Open Graph URL
+                const currentUrl = window.location.href;
+                const ogUrl = document.querySelector('meta[property="og:url"]');
+                if (ogUrl) {
+                    ogUrl.setAttribute('content', currentUrl);
+                }
+
+                // 更新 Twitter URL
+                const twitterUrl = document.querySelector('meta[name="twitter:url"]');
+                if (twitterUrl) {
+                    twitterUrl.setAttribute('content', currentUrl);
+                }
+
+                // 更新结构化数据
+                updateStructuredData(sceneName, sceneDescription, currentUrl);
+            } catch (error) {
+                console.error('Failed to update metadata:', error);
+            }
+        };
+
+        // 更新结构化数据
+        const updateStructuredData = (sceneName, sceneDescription, url) => {
+            try {
+                const scriptTag = document.querySelector('script[type="application/ld+json"]');
+                if (scriptTag) {
+                    const structuredData = JSON.parse(scriptTag.textContent);
+                    structuredData.name = `${sceneName} - 3D场景查看器`;
+                    structuredData.description = sceneDescription;
+                    structuredData.url = url;
+                    scriptTag.textContent = JSON.stringify(structuredData);
+                }
+            } catch (error) {
+                console.error('Failed to update structured data:', error);
+            }
+        };
+
         const start = () => {
             app = new Shadow.Player(document.querySelector('#container'), {
                 server: '.',
@@ -92,7 +228,10 @@
                     if (response.ok) {
                         response.json().then(json => {
                             if (json.Code === 200) {
-                                app.start(JSON.stringify(json.Data));
+                                const sceneData = json.Data;
+                                // 动态更新页面元数据
+                                updateMetadata(sceneData);
+                                app.start(JSON.stringify(sceneData));
                             }
                         });
                     }
@@ -101,6 +240,8 @@
                 fetch(`${app.options.server}/Scene/${sceneFile}.txt`).then(response => {
                     if (response.ok) {
                         response.json().then(json => {
+                            // 动态更新页面元数据
+                            updateMetadata(json);
                             app.start(JSON.stringify(json));
                         });
                     }
