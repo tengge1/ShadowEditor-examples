@@ -4,14 +4,88 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Shadow Editor</title>
-    <link rel="shortcut icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>Shadow Editor - 免费开源的基于Three.js的三维场景编辑器</title>
+    <meta name="description" content="ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器。支持桌面版和Web版，跨平台（Windows、Linux、Mac），提供所见即所得的3D场景搭建、模型导入、材质编辑、后期处理等功能，支持导出GLTF、OBJ、STL等多种格式，适用于Web 3D开发和虚拟现实应用。">
+    <meta name="keywords" content="3D编辑器,Three.js编辑器,三维场景编辑器,WebGL编辑器,3D场景搭建,3D可视化,3D模型编辑,3D场景制作,在线3D编辑器,免费3D编辑器,开源3D编辑器,3D Web编辑器,GLTF编辑器,OBJ编辑器,3D模型转换,3D材质编辑,3D动画编辑,VR编辑器,3D场景发布">
+    <meta name="author" content="超腾开源">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.hylab.cn/demo/shadoweditor/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hylab.cn/demo/shadoweditor/">
+    <meta property="og:title" content="Shadow Editor - 免费开源的基于Three.js的三维场景编辑器">
+    <meta property="og:description" content="ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器。支持桌面版和Web版，提供所见即所得的3D场景搭建、模型导入、材质编辑、后期处理等功能。">
+    <meta property="og:image" content="https://www.hylab.cn/img/shadow_editor.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.hylab.cn/demo/shadoweditor/">
+    <meta name="twitter:title" content="Shadow Editor - 免费开源的基于Three.js的三维场景编辑器">
+    <meta name="twitter:description" content="ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器。支持桌面版和Web版，提供所见即所得的3D场景搭建、模型导入、材质编辑、后期处理等功能。">
+    <meta name="twitter:image" content="https://www.hylab.cn/img/shadow_editor.jpg">
+
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="application-name" content="Shadow Editor">
+
+    <!-- Icons -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="favicon.ico">
+
+    <!-- Stylesheets -->
     <link href="build/ShadowEditor.css" rel="stylesheet" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Shadow Editor",
+        "description": "ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器。支持桌面版和Web版，提供所见即所得的3D场景搭建、模型导入、材质编辑、后期处理等功能。",
+        "url": "https://www.hylab.cn/demo/shadoweditor/",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Windows, Linux, macOS, Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "3D场景编辑",
+            "模型导入导出",
+            "材质编辑",
+            "后期处理",
+            "动画编辑",
+            "VR支持",
+            "多语言支持",
+            "版本控制",
+            "团队协作"
+        ],
+        "softwareVersion": "1.0",
+        "author": {
+            "@type": "Organization",
+            "name": "超腾开源"
+        }
+    }
+    </script>
 </head>
 
 <body>
-    <div id="container" tabindex="10"></div>
+    <noscript>
+        <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+            <h1>Shadow Editor 需要 JavaScript 才能运行</h1>
+            <p>请在浏览器设置中启用 JavaScript 以使用 Shadow Editor 3D 场景编辑器。</p>
+            <p>Shadow Editor is a free and open-source 3D scene editor based on Three.js.</p>
+        </div>
+    </noscript>
+
+    <main role="main">
+        <div id="container" tabindex="10" aria-label="Shadow Editor 3D场景编辑器主界面" title="Shadow Editor - 3D场景编辑器"></div>
+    </main>
 
     <!-- three.js -->
     <script src="assets/js/three.js"></script>
