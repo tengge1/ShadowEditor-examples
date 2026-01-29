@@ -39,6 +39,9 @@
     <!-- Stylesheets -->
     <link href="build/ShadowEditor.css" rel="stylesheet" />
 
+    <!-- 百度统计 -->
+    <script src="https://hm.baidu.com/hm.js?80d3fa897e5b8f98eb056797fd68df46" async="" defer=""></script>
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -130,6 +133,99 @@
 
     <!-- Shadow Editor -->
     <script src="build/ShadowEditor.js"></script>
+
+    <!-- HyLab Analytics - 网站访问统计插件 -->
+    <script>
+        (function() {
+            // 配置参数
+            var CONFIG = {
+                apiEndpoint: '/api/website/analytics/collect',
+                storageKey: 'hylab_visitor_id',
+                excludePaths: ['/api/', '/admin/', '/static/']
+            };
+
+            // 生成 UUID v4
+            function generateUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = (Math.random() * 16) | 0;
+                    var v = c === 'x' ? r : (r & 0x3) | 0x8;
+                    return v.toString(16);
+                });
+            }
+
+            // 获取或创建访客ID
+            function getVisitorId() {
+                var visitorId = localStorage.getItem(CONFIG.storageKey);
+                if (!visitorId) {
+                    visitorId = generateUUID();
+                    localStorage.setItem(CONFIG.storageKey, visitorId);
+                }
+                return visitorId;
+            }
+
+            // 检查是否应该跟踪当前页面
+            function shouldTrackPage(path) {
+                return !CONFIG.excludePaths.some(function(prefix) {
+                    return path.indexOf(prefix) === 0;
+                });
+            }
+
+            // 发送统计数据
+            function sendAnalytics(url) {
+                if (!shouldTrackPage(url)) {
+                    return;
+                }
+
+                var params = new URLSearchParams();
+                params.append('url', url);
+                params.append('visitor_id', getVisitorId());
+                
+                if (document.referrer) {
+                    params.append('referrer', document.referrer);
+                }
+
+                var endpoint = CONFIG.apiEndpoint + '?' + params.toString();
+
+                // 使用 Navigator.sendBeacon API (如果可用) 或 fetch
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(endpoint);
+                } else {
+                    fetch(endpoint, {
+                        method: 'POST',
+                        keepalive: true
+                    }).catch(function(err) {
+                        console.error('Analytics error:', err);
+                    });
+                }
+            }
+
+            // 初始页面加载时跟踪
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    sendAnalytics(window.location.pathname + window.location.search);
+                });
+            } else {
+                sendAnalytics(window.location.pathname + window.location.search);
+            }
+
+            // 监听页面卸载事件（用户离开页面时）
+            window.addEventListener('beforeunload', function() {
+                // 可以在这里添加额外的统计逻辑
+            });
+
+            // 监听 popstate 事件（浏览器前进/后退按钮）
+            window.addEventListener('popstate', function() {
+                sendAnalytics(window.location.pathname + window.location.search);
+            });
+
+            // 暴露到全局，以便在需要时手动触发统计
+            window.HyLabAnalytics = {
+                track: sendAnalytics,
+                getVisitorId: getVisitorId
+            };
+        })();
+    </script>
+
     <script>
         window.onload = function () {
             new Shadow.Application(document.getElementById('container'), {
