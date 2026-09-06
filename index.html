@@ -46,41 +46,105 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Shadow Editor",
-        "description": "ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器。支持桌面版和Web版，提供所见即所得的3D场景搭建、模型导入、材质编辑、后期处理等功能。",
-        "url": "https://www.hylab.cn/demo/shadoweditor/",
-        "applicationCategory": "DesignApplication",
-        "operatingSystem": "Windows, Linux, macOS, Web",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "featureList": [
-            "3D场景编辑",
-            "模型导入导出",
-            "材质编辑",
-            "后期处理",
-            "动画编辑",
-            "VR支持",
-            "多语言支持",
-            "版本控制",
-            "团队协作"
-        ],
-        "softwareVersion": "1.0",
-        "author": {
-            "@type": "Organization",
-            "name": "超腾开源"
-        }
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "https://www.hylab.cn/#website",
+                "url": "https://www.hylab.cn",
+                "name": "超腾开源",
+                "inLanguage": "zh-CN",
+                "publisher": {
+                    "@type": "Organization",
+                    "@id": "https://www.hylab.cn/#organization",
+                    "name": "超腾开源",
+                    "url": "https://www.hylab.cn"
+                }
+            },
+            {
+                "@type": "WebPage",
+                "@id": "https://www.hylab.cn/demo/shadoweditor/#webpage",
+                "url": "https://www.hylab.cn/demo/shadoweditor/",
+                "name": "Shadow Editor - 免费开源的基于Three.js的三维场景编辑器（在线演示）",
+                "description": "Shadow Editor 是免费开源的基于 Three.js 的三维场景编辑器。本页为在线演示，可直接在浏览器中体验 3D 场景搭建、模型导入、材质编辑、动画编辑与后期处理等功能。",
+                "inLanguage": "zh-CN",
+                "isPartOf": {
+                    "@id": "https://www.hylab.cn/#website"
+                },
+                "mainEntity": {
+                    "@id": "https://www.hylab.cn/demo/shadoweditor/#software"
+                },
+                "potentialAction": {
+                    "@type": "ViewAction",
+                    "name": "查看 Shadow Editor 在线演示",
+                    "target": "https://www.hylab.cn/demo/shadoweditor/"
+                }
+            },
+            {
+                "@type": "SoftwareApplication",
+                "@id": "https://www.hylab.cn/demo/shadoweditor/#software",
+                "name": "Shadow Editor",
+                "alternateName": "ShadowEditor",
+                "description": "ShadowEditor是一款免费开源的基于Three.js、Go语言和MongoDB的三维场景编辑器，支持桌面版与Web版。提供所见即所得的3D场景搭建、模型导入、材质编辑、动画编辑、后期处理等功能，可导出GLTF、OBJ、STL等多种格式，适用于Web 3D开发与虚拟现实应用。",
+                "url": "https://www.hylab.cn/demo/shadoweditor/",
+                "applicationCategory": "DesignApplication",
+                "applicationSubCategory": "三维场景编辑器",
+                "operatingSystem": "Windows, Linux, macOS, Web",
+                "browserRequirements": "需要支持 WebGL 的现代浏览器",
+                "softwareVersion": "1.0",
+                "inLanguage": "zh-CN",
+                "isAccessibleForFree": true,
+                "offers": {
+                    "@type": "Offer",
+                    "name": "免费开源使用",
+                    "url": "https://www.hylab.cn/demo/shadoweditor/",
+                    "price": "0",
+                    "priceCurrency": "CNY",
+                    "availability": "https://schema.org/InStock"
+                },
+                "screenshot": "https://www.hylab.cn/img/shadow_editor.jpg",
+                "featureList": [
+                    "3D场景搭建与编辑",
+                    "模型导入导出（GLTF、OBJ、STL等）",
+                    "材质与贴图编辑",
+                    "动画编辑",
+                    "后期处理特效",
+                    "VR支持",
+                    "多语言支持",
+                    "版本控制",
+                    "团队协作"
+                ],
+                "author": {
+                    "@type": "Organization",
+                    "@id": "https://www.hylab.cn/#organization",
+                    "name": "超腾开源",
+                    "url": "https://www.hylab.cn"
+                },
+                "potentialAction": {
+                    "@type": "UseAction",
+                    "name": "立即在线体验 Shadow Editor",
+                    "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": "https://www.hylab.cn/demo/shadoweditor/",
+                        "actionPlatform": [
+                            "http://schema.org/DesktopWebPlatform",
+                            "http://schema.org/MobileWebPlatform"
+                        ]
+                    }
+                }
+            }
+        ]
     }
     </script>
 </head>
 
 <body>
+    <!-- SEO: 页面唯一 H1。编辑器界面占满全屏，故将 H1 做视觉隐藏处理，
+         保证静态正文中始终存在语义化 H1，便于搜索引擎识别页面主题（对正常访问与无障碍体验均无影响）。 -->
+    <h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0;">Shadow Editor - 免费开源的基于Three.js的三维场景编辑器</h1>
+
     <noscript>
         <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-            <h1>Shadow Editor 需要 JavaScript 才能运行</h1>
+            <h2>Shadow Editor 需要 JavaScript 才能运行</h2>
             <p>请在浏览器设置中启用 JavaScript 以使用 Shadow Editor 3D 场景编辑器。</p>
             <p>Shadow Editor is a free and open-source 3D scene editor based on Three.js.</p>
         </div>

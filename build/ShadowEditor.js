@@ -29284,8 +29284,20 @@
 	      onClick: this.handleScreenshot
 	    }, _t('Screenshot')), React.createElement(Button, {
 	      onClick: this.handleRecord
-	    }, isRecording ? _t('Stop') : _t('Record')));
-	  }
+	    }, isRecording ? _t('Stop') : _t('Record')), React.createElement("a", {
+	      className: "Label",
+	      href: "https://www.hylab.cn/",
+	      target: "_blank",
+	      rel: "noopener noreferrer",
+	      title: "超腾开源",
+	      style: {
+	        color: "#3399ff",
+	        textDecoration: "none",
+	        lineHeight: "20px",
+	        marginLeft: "auto"
+	      }
+	    }, "超腾开源"));
+	    }
 
 	  componentDidMount() {
 	    app.on('objectAdded.' + this.id, this.onUpdateInfo.bind(this));
