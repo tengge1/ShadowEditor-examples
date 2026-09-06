@@ -4,10 +4,9 @@
 
 ## Source
 
-* https://gitee.com/tengge1/ShadowEditor 
-* https://github.com/tengge1/ShadowEditor
+- https://gitee.com/tengge1/ShadowEditor
+- https://github.com/tengge1/ShadowEditor
 
 ## Demo
 
-* Gitee: http://tengge1.gitee.io/shadoweditor-examples/
-* GitHub: https://tengge1.github.io/ShadowEditor-examples/
+- 超腾开源: https://www.hylab.cn/demo/shadoweditor/
